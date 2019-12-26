@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package status;
+
+option go_package = "status";
+
+// protoc --go_out=../../src/errno *.proto
+// protoc --go_out=$GOPATH *.proto
+
+// cd /home/code/github/thci/common/proto
+// protoc --go_out=plugins=grpc:../src  status/status.proto
+
+message Status {
+    int32 code =1;
+    string  message  = 2;
+    string  messageCn  = 3;
+    repeated string stack = 4;
+    string  desc  = 5;
+    string  UUID  = 6;
+}

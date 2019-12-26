@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+import "status/status.proto";
+
+option go_package = "api/igm";
+
+package igm;
+
+service GM {
+    rpc GameCreate(GameCreateRequest)returns(GameCreateResponse){}
+    rpc GameDelete(GameDeleteRequest)returns(GMDefaultResponse){}
+    rpc GameList(GameListRequest)returns(GameListResponse){}
+    rpc GameStart(GameStartRequest)returns(GMDefaultResponse){}
+    rpc GameStop(GameStopRequest)returns(GMDefaultResponse){}
+}
+
+message GameCreateRequest {
+    int64 gameType = 1;
+    int64 port = 2;
+    string gid = 3;
+}
+
+message GameCreateResponse {
+    status.Status status = 1;
+    int64 gameType = 2;
+    string gid = 3;
+    int64 port = 4;
+}
+
+message GameDeleteRequest {
+    string gid = 1;
+}
+
+message GameListRequest {
+    string gid = 1;
+}
+
+message GameListResponse {
+    status.Status status = 1;
+    repeated GameInfo games = 2;
+}
+
+message GameInfo {
+    string gid = 1;
+    int64 state = 2;
+    int64 gameType = 3;
+    int64 port = 4;
+    int64 pid = 5;
+    map<string, string> players = 6;
+}
+
+message GameStartRequest {
+    string gid = 1;
+    string pid = 2;
+}
+
+message GameStopRequest {
+    string gid = 1;
+    string pid = 2;
+}
+
+message GMDefaultResponse {
+    status.Status status = 1;
+}
+
+service Game {
+    rpc PlayerConn(stream PlayerMessage)returns(stream GameMessage){}
+    rpc GameStart(GameStartRequest)returns(GMDefaultResponse){}
+    rpc GameStop(GameStopRequest)returns(GMDefaultResponse){}
+}
+
+message GameMessage {
+    int64 msgType = 1;
+    repeated int64 yourCards = 2;
+    repeated int64 lastCards = 3;
+    string lastId = 4;
+    bool roundOwner = 5;
+}
+
+message PlayerMessage {
+    int64 msgType = 1;
+    repeated int64 putCards = 2;
+}
