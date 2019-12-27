@@ -48,6 +48,7 @@ func buildPMCmd(parent *cobra.Command) {
 	buildPlayerCreateCmd(cmd)
 	buildPlayerDeleteCmd(cmd)
 	buildPlayerListCmd(cmd)
+	buildPlayerSignIn(cmd)
 
 	parent.AddCommand(cmd)
 }

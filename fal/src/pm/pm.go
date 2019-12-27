@@ -6,8 +6,14 @@ import (
 	"fmt"
 	"github.com/Sirupsen/logrus"
 	"github.com/google/uuid"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
 	"net"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"sync"
+	"time"
 )
 
 const (
@@ -22,7 +28,7 @@ const (
 
 var (
 	pm  *PlayerManager
-	log = logrus.WithFields(logrus.Fields{"pkg": "gm"})
+	log = logrus.WithFields(logrus.Fields{"pkg": "pm"})
 )
 
 type PlayerManager struct {
@@ -44,25 +50,6 @@ func NewPlayerManager() *PlayerManager {
 	return pm
 }
 
-func (m *PlayerManager) AddPlayer(user, pwd string) error {
-	pass, err := m.DB.Get(user, BucketPlayerList)
-	if err != nil || pass != pwd {
-		return fmt.Errorf("account or sercret error")
-	}
-	err = m.DB.CreateBucket(user)
-	if err != nil {
-		panic(err)
-	}
-	m.Lock()
-	defer m.Unlock()
-	_, exist := m.players[user]
-	if exist {
-		return fmt.Errorf("player already exist")
-	}
-	m.players[user] = &ipm.PlayerInfo{}
-	return nil
-}
-
 func (m *PlayerManager) CreatePlayer(req *ipm.PlayerCreateRequest) (*ipm.PlayerInfo, error) {
 	m.Lock()
 	defer m.Unlock()
@@ -79,10 +66,9 @@ func (m *PlayerManager) CreatePlayer(req *ipm.PlayerCreateRequest) (*ipm.PlayerI
 	id = PlayerPrefix + id
 
 	p := &ipm.PlayerInfo{
-		Pid:      id,
+		Id:       id,
 		Name:     req.Name,
 		Password: req.Password,
-		Port:     m.assignPort(req.Port),
 	}
 	kvs := make(map[string]string)
 	kvs[BucketKeyPid] = id
@@ -132,4 +118,66 @@ func (m *PlayerManager) GetAllPlayerInfo() map[string]*ipm.PlayerInfo {
 		players[k] = g
 	}
 	return players
+}
+
+func (m *PlayerManager) StartPlayer(req *ipm.PlayerSignInRequest) (*ipm.PlayerInfo, error) {
+	m.Lock()
+	defer m.Unlock()
+	p, exist := m.players[req.Pid]
+	if !exist {
+		log.Errorf("player %s is not create", req.Pid)
+		return p, fmt.Errorf("")
+	}
+	if p.Name != req.Name || p.Password != req.Password {
+		log.Errorf("player %s is name %s or password %s error", req.Pid, req.Name, req.Password)
+		return p, fmt.Errorf("")
+	}
+	p.Port = m.assignPort(p.Port)
+
+	args := []string{
+		filepath.Base(os.Args[0]),
+		"player",
+		"start",
+		"--name", p.Id,
+		"--addr", net.JoinHostPort("", fmt.Sprint(p.Port)),
+	}
+	var attr os.ProcAttr
+	attr.Files = []*os.File{os.Stdin, os.Stdout, os.Stderr}
+	attr.Env = os.Environ()
+	bin, _ := exec.LookPath(os.Args[0])
+	proc, err := os.StartProcess(bin, args, &attr)
+	if err != nil {
+		fmt.Println(err)
+		return p, err
+	}
+	p.Pid = int64(proc.Pid)
+	time.Sleep(time.Millisecond)
+	for i := 0; i < 10; i++ {
+		err = m.updatePlayerInfo(p)
+		if err == nil {
+			break
+		}
+		time.Sleep(500 * time.Millisecond)
+	}
+	if err != nil {
+		return p, err
+	}
+	return p, nil
+}
+
+func (m *PlayerManager) updatePlayerInfo(p *ipm.PlayerInfo) error {
+	addr := net.JoinHostPort("", fmt.Sprint(p.Port))
+	conn, err := grpc.Dial(addr, grpc.WithInsecure())
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	c := ipm.NewPlayerClient(conn)
+	resp, err := c.SyncInfo(context.Background(), p)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	p.Etag = resp.Etag
+	return nil
 }

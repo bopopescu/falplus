@@ -57,10 +57,7 @@ func (m *PMService) PlayerCreate(ctx context.Context, req *ipm.PlayerCreateReque
 		resp.Status = status.NewStatus(3000, err.Error())
 		return resp, nil
 	}
-	resp.Pid = p.Pid
-	resp.Port = p.Port
-	resp.Name = p.Name
-	resp.Password = p.Password
+	resp.Player = p
 	return resp, nil
 }
 
@@ -85,13 +82,20 @@ func (m *PMService) PlayerList(ctx context.Context, req *ipm.PlayerListRequest) 
 	return resp, nil
 }
 
-func (m *PMService) PlayerStart(ctx context.Context, req *ipm.PlayerStartRequest) (*ipm.PlayerStartResponse, error) {
-	resp := &ipm.PlayerStartResponse{}
+func (m *PMService) PlayerSignIn(ctx context.Context, req *ipm.PlayerSignInRequest) (*ipm.PlayerSignInResponse, error) {
+	resp := &ipm.PlayerSignInResponse{}
 	resp.Status = status.SuccessStatus
+	p, err := m.pm.StartPlayer(req)
+	if err != nil {
+		resp.Status = status.NewStatus(3000, err.Error())
+		return resp, nil
+	}
+	resp.Port = p.Port
+	resp.Etag = p.Etag
 	return resp, nil
 }
 
-func (m *PMService) PlayerStop(ctx context.Context, req *ipm.PlayerStopRequest) (*ipm.PMDefaultResponse, error) {
+func (m *PMService) PlayerSignOut(ctx context.Context, req *ipm.PlayerSignOutRequest) (*ipm.PMDefaultResponse, error) {
 	resp := &ipm.PMDefaultResponse{}
 	resp.Status = status.SuccessStatus
 	return resp, nil

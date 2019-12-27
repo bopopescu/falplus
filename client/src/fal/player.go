@@ -14,7 +14,6 @@ var pmAddr = ":12588"
 func buildPlayerCreateCmd(parent *cobra.Command) {
 	var addr string
 	var pid string
-	var port int64
 	var name string
 	var pwd string
 	cmd := &cobra.Command{
@@ -34,7 +33,6 @@ func buildPlayerCreateCmd(parent *cobra.Command) {
 			req := &ipm.PlayerCreateRequest{
 				Name:     name,
 				Pid:      pid,
-				Port:     port,
 				Password: pwd,
 			}
 			resp, err := c.PlayerCreate(context.Background(), req)
@@ -47,9 +45,8 @@ func buildPlayerCreateCmd(parent *cobra.Command) {
 	}
 	flags := cmd.Flags()
 	flags.StringVarP(&addr, "addr", "", "", "")
-	flags.StringVarP(&pid, "pid", "", "", "")
+	flags.StringVarP(&pid, "id", "", "", "")
 	flags.StringVarP(&name, "name", "n", "", "")
-	flags.Int64VarP(&port, "port", "p", 0, "")
 	flags.StringVarP(&pwd, "password", "", "", "")
 	parent.AddCommand(cmd)
 }
@@ -119,5 +116,45 @@ func buildPlayerListCmd(parent *cobra.Command) {
 	flags := cmd.Flags()
 	flags.StringVarP(&addr, "addr", "", "", "")
 	flags.StringVarP(&pid, "pid", "", "", "")
+	parent.AddCommand(cmd)
+}
+
+func buildPlayerSignIn(parent *cobra.Command) {
+	var addr string
+	var pid string
+	var name string
+	var pwd string
+	cmd := &cobra.Command{
+		Use:   "signin",
+		Short: "sign in player",
+		Run: func(cmd *cobra.Command, args []string) {
+			if addr == "" {
+				addr = pmAddr
+			}
+			conn, err := grpc.Dial(addr, grpc.WithInsecure())
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			defer conn.Close()
+			c := ipm.NewPMClient(conn)
+			req := &ipm.PlayerSignInRequest{
+				Pid:      pid,
+				Name:     name,
+				Password: pwd,
+			}
+			resp, err := c.PlayerSignIn(context.Background(), req)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			util.PrintStructObject(resp)
+		},
+	}
+	flags := cmd.Flags()
+	flags.StringVarP(&addr, "addr", "", "", "")
+	flags.StringVarP(&pid, "pid", "", "", "")
+	flags.StringVarP(&name, "name", "n", "", "")
+	flags.StringVarP(&pwd, "password", "", "", "")
 	parent.AddCommand(cmd)
 }

@@ -31,7 +31,6 @@ type PlayerCreateRequest struct {
 	Pid                  string   `protobuf:"bytes,1,opt,name=pid,proto3" json:"pid"`
 	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name"`
 	Password             string   `protobuf:"bytes,3,opt,name=password,proto3" json:"password"`
-	Port                 int64    `protobuf:"varint,4,opt,name=port,proto3" json:"port"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -82,19 +81,9 @@ func (m *PlayerCreateRequest) GetPassword() string {
 	return ""
 }
 
-func (m *PlayerCreateRequest) GetPort() int64 {
-	if m != nil {
-		return m.Port
-	}
-	return 0
-}
-
 type PlayerCreateResponse struct {
 	Status               *status.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status"`
-	Pid                  string         `protobuf:"bytes,2,opt,name=pid,proto3" json:"pid"`
-	Name                 string         `protobuf:"bytes,3,opt,name=name,proto3" json:"name"`
-	Password             string         `protobuf:"bytes,4,opt,name=password,proto3" json:"password"`
-	Port                 int64          `protobuf:"varint,5,opt,name=port,proto3" json:"port"`
+	Player               *PlayerInfo    `protobuf:"bytes,2,opt,name=player,proto3" json:"player"`
 	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
 	XXX_unrecognized     []byte         `json:"-"`
 	XXX_sizecache        int32          `json:"-"`
@@ -131,32 +120,11 @@ func (m *PlayerCreateResponse) GetStatus() *status.Status {
 	return nil
 }
 
-func (m *PlayerCreateResponse) GetPid() string {
+func (m *PlayerCreateResponse) GetPlayer() *PlayerInfo {
 	if m != nil {
-		return m.Pid
+		return m.Player
 	}
-	return ""
-}
-
-func (m *PlayerCreateResponse) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *PlayerCreateResponse) GetPassword() string {
-	if m != nil {
-		return m.Password
-	}
-	return ""
-}
-
-func (m *PlayerCreateResponse) GetPort() int64 {
-	if m != nil {
-		return m.Port
-	}
-	return 0
+	return nil
 }
 
 type PlayerDeleteRequest struct {
@@ -282,10 +250,12 @@ func (m *PlayerListResponse) GetPlayers() []*PlayerInfo {
 }
 
 type PlayerInfo struct {
-	Pid                  string   `protobuf:"bytes,1,opt,name=pid,proto3" json:"pid"`
+	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id"`
 	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name"`
 	Password             string   `protobuf:"bytes,3,opt,name=password,proto3" json:"password"`
-	Port                 int64    `protobuf:"varint,4,opt,name=port,proto3" json:"port"`
+	Etag                 string   `protobuf:"bytes,4,opt,name=etag,proto3" json:"etag"`
+	Port                 int64    `protobuf:"varint,5,opt,name=port,proto3" json:"port"`
+	Pid                  int64    `protobuf:"varint,6,opt,name=pid,proto3" json:"pid"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -315,9 +285,9 @@ func (m *PlayerInfo) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_PlayerInfo proto.InternalMessageInfo
 
-func (m *PlayerInfo) GetPid() string {
+func (m *PlayerInfo) GetId() string {
 	if m != nil {
-		return m.Pid
+		return m.Id
 	}
 	return ""
 }
@@ -336,6 +306,13 @@ func (m *PlayerInfo) GetPassword() string {
 	return ""
 }
 
+func (m *PlayerInfo) GetEtag() string {
+	if m != nil {
+		return m.Etag
+	}
+	return ""
+}
+
 func (m *PlayerInfo) GetPort() int64 {
 	if m != nil {
 		return m.Port
@@ -343,244 +320,253 @@ func (m *PlayerInfo) GetPort() int64 {
 	return 0
 }
 
-type PlayerStartRequest struct {
+func (m *PlayerInfo) GetPid() int64 {
+	if m != nil {
+		return m.Pid
+	}
+	return 0
+}
+
+type PlayerSignInRequest struct {
 	Pid                  string   `protobuf:"bytes,1,opt,name=pid,proto3" json:"pid"`
+	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name"`
+	Password             string   `protobuf:"bytes,3,opt,name=password,proto3" json:"password"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *PlayerStartRequest) Reset()         { *m = PlayerStartRequest{} }
-func (m *PlayerStartRequest) String() string { return proto.CompactTextString(m) }
-func (*PlayerStartRequest) ProtoMessage()    {}
-func (*PlayerStartRequest) Descriptor() ([]byte, []int) {
+func (m *PlayerSignInRequest) Reset()         { *m = PlayerSignInRequest{} }
+func (m *PlayerSignInRequest) String() string { return proto.CompactTextString(m) }
+func (*PlayerSignInRequest) ProtoMessage()    {}
+func (*PlayerSignInRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_8af9a1f56cafcd39, []int{6}
 }
-func (m *PlayerStartRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PlayerStartRequest.Unmarshal(m, b)
+func (m *PlayerSignInRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PlayerSignInRequest.Unmarshal(m, b)
 }
-func (m *PlayerStartRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PlayerStartRequest.Marshal(b, m, deterministic)
+func (m *PlayerSignInRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PlayerSignInRequest.Marshal(b, m, deterministic)
 }
-func (m *PlayerStartRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PlayerStartRequest.Merge(m, src)
+func (m *PlayerSignInRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PlayerSignInRequest.Merge(m, src)
 }
-func (m *PlayerStartRequest) XXX_Size() int {
-	return xxx_messageInfo_PlayerStartRequest.Size(m)
+func (m *PlayerSignInRequest) XXX_Size() int {
+	return xxx_messageInfo_PlayerSignInRequest.Size(m)
 }
-func (m *PlayerStartRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_PlayerStartRequest.DiscardUnknown(m)
+func (m *PlayerSignInRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_PlayerSignInRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_PlayerStartRequest proto.InternalMessageInfo
+var xxx_messageInfo_PlayerSignInRequest proto.InternalMessageInfo
 
-func (m *PlayerStartRequest) GetPid() string {
+func (m *PlayerSignInRequest) GetPid() string {
 	if m != nil {
 		return m.Pid
 	}
 	return ""
 }
 
-type PlayerStartResponse struct {
-	Status               *status.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status"`
-	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
-	XXX_unrecognized     []byte         `json:"-"`
-	XXX_sizecache        int32          `json:"-"`
-}
-
-func (m *PlayerStartResponse) Reset()         { *m = PlayerStartResponse{} }
-func (m *PlayerStartResponse) String() string { return proto.CompactTextString(m) }
-func (*PlayerStartResponse) ProtoMessage()    {}
-func (*PlayerStartResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_8af9a1f56cafcd39, []int{7}
-}
-func (m *PlayerStartResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PlayerStartResponse.Unmarshal(m, b)
-}
-func (m *PlayerStartResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PlayerStartResponse.Marshal(b, m, deterministic)
-}
-func (m *PlayerStartResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PlayerStartResponse.Merge(m, src)
-}
-func (m *PlayerStartResponse) XXX_Size() int {
-	return xxx_messageInfo_PlayerStartResponse.Size(m)
-}
-func (m *PlayerStartResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_PlayerStartResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PlayerStartResponse proto.InternalMessageInfo
-
-func (m *PlayerStartResponse) GetStatus() *status.Status {
-	if m != nil {
-		return m.Status
-	}
-	return nil
-}
-
-type PlayerStopRequest struct {
-	Pid                  string   `protobuf:"bytes,1,opt,name=pid,proto3" json:"pid"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *PlayerStopRequest) Reset()         { *m = PlayerStopRequest{} }
-func (m *PlayerStopRequest) String() string { return proto.CompactTextString(m) }
-func (*PlayerStopRequest) ProtoMessage()    {}
-func (*PlayerStopRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_8af9a1f56cafcd39, []int{8}
-}
-func (m *PlayerStopRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PlayerStopRequest.Unmarshal(m, b)
-}
-func (m *PlayerStopRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PlayerStopRequest.Marshal(b, m, deterministic)
-}
-func (m *PlayerStopRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PlayerStopRequest.Merge(m, src)
-}
-func (m *PlayerStopRequest) XXX_Size() int {
-	return xxx_messageInfo_PlayerStopRequest.Size(m)
-}
-func (m *PlayerStopRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_PlayerStopRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PlayerStopRequest proto.InternalMessageInfo
-
-func (m *PlayerStopRequest) GetPid() string {
-	if m != nil {
-		return m.Pid
-	}
-	return ""
-}
-
-type SignInRequest struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name"`
-	Password             string   `protobuf:"bytes,2,opt,name=password,proto3" json:"password"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *SignInRequest) Reset()         { *m = SignInRequest{} }
-func (m *SignInRequest) String() string { return proto.CompactTextString(m) }
-func (*SignInRequest) ProtoMessage()    {}
-func (*SignInRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_8af9a1f56cafcd39, []int{9}
-}
-func (m *SignInRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_SignInRequest.Unmarshal(m, b)
-}
-func (m *SignInRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_SignInRequest.Marshal(b, m, deterministic)
-}
-func (m *SignInRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SignInRequest.Merge(m, src)
-}
-func (m *SignInRequest) XXX_Size() int {
-	return xxx_messageInfo_SignInRequest.Size(m)
-}
-func (m *SignInRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_SignInRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_SignInRequest proto.InternalMessageInfo
-
-func (m *SignInRequest) GetName() string {
+func (m *PlayerSignInRequest) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
 }
 
-func (m *SignInRequest) GetPassword() string {
+func (m *PlayerSignInRequest) GetPassword() string {
 	if m != nil {
 		return m.Password
 	}
 	return ""
 }
 
-type SignInResponse struct {
+type PlayerSignInResponse struct {
 	Status               *status.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status"`
-	Etag                 string         `protobuf:"bytes,2,opt,name=etag,proto3" json:"etag"`
+	Port                 int64          `protobuf:"varint,2,opt,name=port,proto3" json:"port"`
+	Etag                 string         `protobuf:"bytes,3,opt,name=etag,proto3" json:"etag"`
 	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
 	XXX_unrecognized     []byte         `json:"-"`
 	XXX_sizecache        int32          `json:"-"`
 }
 
-func (m *SignInResponse) Reset()         { *m = SignInResponse{} }
-func (m *SignInResponse) String() string { return proto.CompactTextString(m) }
-func (*SignInResponse) ProtoMessage()    {}
-func (*SignInResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_8af9a1f56cafcd39, []int{10}
+func (m *PlayerSignInResponse) Reset()         { *m = PlayerSignInResponse{} }
+func (m *PlayerSignInResponse) String() string { return proto.CompactTextString(m) }
+func (*PlayerSignInResponse) ProtoMessage()    {}
+func (*PlayerSignInResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_8af9a1f56cafcd39, []int{7}
 }
-func (m *SignInResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_SignInResponse.Unmarshal(m, b)
+func (m *PlayerSignInResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PlayerSignInResponse.Unmarshal(m, b)
 }
-func (m *SignInResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_SignInResponse.Marshal(b, m, deterministic)
+func (m *PlayerSignInResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PlayerSignInResponse.Marshal(b, m, deterministic)
 }
-func (m *SignInResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SignInResponse.Merge(m, src)
+func (m *PlayerSignInResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PlayerSignInResponse.Merge(m, src)
 }
-func (m *SignInResponse) XXX_Size() int {
-	return xxx_messageInfo_SignInResponse.Size(m)
+func (m *PlayerSignInResponse) XXX_Size() int {
+	return xxx_messageInfo_PlayerSignInResponse.Size(m)
 }
-func (m *SignInResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_SignInResponse.DiscardUnknown(m)
+func (m *PlayerSignInResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_PlayerSignInResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_SignInResponse proto.InternalMessageInfo
+var xxx_messageInfo_PlayerSignInResponse proto.InternalMessageInfo
 
-func (m *SignInResponse) GetStatus() *status.Status {
+func (m *PlayerSignInResponse) GetStatus() *status.Status {
 	if m != nil {
 		return m.Status
 	}
 	return nil
 }
 
-func (m *SignInResponse) GetEtag() string {
+func (m *PlayerSignInResponse) GetPort() int64 {
+	if m != nil {
+		return m.Port
+	}
+	return 0
+}
+
+func (m *PlayerSignInResponse) GetEtag() string {
 	if m != nil {
 		return m.Etag
 	}
 	return ""
 }
 
-type SignOutRequest struct {
+type PlayerSignOutRequest struct {
+	Pid                  string   `protobuf:"bytes,1,opt,name=pid,proto3" json:"pid"`
+	Etag                 string   `protobuf:"bytes,2,opt,name=etag,proto3" json:"etag"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *PlayerSignOutRequest) Reset()         { *m = PlayerSignOutRequest{} }
+func (m *PlayerSignOutRequest) String() string { return proto.CompactTextString(m) }
+func (*PlayerSignOutRequest) ProtoMessage()    {}
+func (*PlayerSignOutRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_8af9a1f56cafcd39, []int{8}
+}
+func (m *PlayerSignOutRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PlayerSignOutRequest.Unmarshal(m, b)
+}
+func (m *PlayerSignOutRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PlayerSignOutRequest.Marshal(b, m, deterministic)
+}
+func (m *PlayerSignOutRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PlayerSignOutRequest.Merge(m, src)
+}
+func (m *PlayerSignOutRequest) XXX_Size() int {
+	return xxx_messageInfo_PlayerSignOutRequest.Size(m)
+}
+func (m *PlayerSignOutRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_PlayerSignOutRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PlayerSignOutRequest proto.InternalMessageInfo
+
+func (m *PlayerSignOutRequest) GetPid() string {
+	if m != nil {
+		return m.Pid
+	}
+	return ""
+}
+
+func (m *PlayerSignOutRequest) GetEtag() string {
+	if m != nil {
+		return m.Etag
+	}
+	return ""
+}
+
+type AttachRequest struct {
+	Etag                 string   `protobuf:"bytes,1,opt,name=etag,proto3" json:"etag"`
+	Pid                  string   `protobuf:"bytes,2,opt,name=pid,proto3" json:"pid"`
+	GamePort             string   `protobuf:"bytes,3,opt,name=gamePort,proto3" json:"gamePort"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AttachRequest) Reset()         { *m = AttachRequest{} }
+func (m *AttachRequest) String() string { return proto.CompactTextString(m) }
+func (*AttachRequest) ProtoMessage()    {}
+func (*AttachRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_8af9a1f56cafcd39, []int{9}
+}
+func (m *AttachRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AttachRequest.Unmarshal(m, b)
+}
+func (m *AttachRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AttachRequest.Marshal(b, m, deterministic)
+}
+func (m *AttachRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AttachRequest.Merge(m, src)
+}
+func (m *AttachRequest) XXX_Size() int {
+	return xxx_messageInfo_AttachRequest.Size(m)
+}
+func (m *AttachRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AttachRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AttachRequest proto.InternalMessageInfo
+
+func (m *AttachRequest) GetEtag() string {
+	if m != nil {
+		return m.Etag
+	}
+	return ""
+}
+
+func (m *AttachRequest) GetPid() string {
+	if m != nil {
+		return m.Pid
+	}
+	return ""
+}
+
+func (m *AttachRequest) GetGamePort() string {
+	if m != nil {
+		return m.GamePort
+	}
+	return ""
+}
+
+type DetachRequest struct {
 	Etag                 string   `protobuf:"bytes,1,opt,name=etag,proto3" json:"etag"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *SignOutRequest) Reset()         { *m = SignOutRequest{} }
-func (m *SignOutRequest) String() string { return proto.CompactTextString(m) }
-func (*SignOutRequest) ProtoMessage()    {}
-func (*SignOutRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_8af9a1f56cafcd39, []int{11}
+func (m *DetachRequest) Reset()         { *m = DetachRequest{} }
+func (m *DetachRequest) String() string { return proto.CompactTextString(m) }
+func (*DetachRequest) ProtoMessage()    {}
+func (*DetachRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_8af9a1f56cafcd39, []int{10}
 }
-func (m *SignOutRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_SignOutRequest.Unmarshal(m, b)
+func (m *DetachRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DetachRequest.Unmarshal(m, b)
 }
-func (m *SignOutRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_SignOutRequest.Marshal(b, m, deterministic)
+func (m *DetachRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DetachRequest.Marshal(b, m, deterministic)
 }
-func (m *SignOutRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SignOutRequest.Merge(m, src)
+func (m *DetachRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DetachRequest.Merge(m, src)
 }
-func (m *SignOutRequest) XXX_Size() int {
-	return xxx_messageInfo_SignOutRequest.Size(m)
+func (m *DetachRequest) XXX_Size() int {
+	return xxx_messageInfo_DetachRequest.Size(m)
 }
-func (m *SignOutRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_SignOutRequest.DiscardUnknown(m)
+func (m *DetachRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DetachRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_SignOutRequest proto.InternalMessageInfo
+var xxx_messageInfo_DetachRequest proto.InternalMessageInfo
 
-func (m *SignOutRequest) GetEtag() string {
+func (m *DetachRequest) GetEtag() string {
 	if m != nil {
 		return m.Etag
 	}
@@ -598,7 +584,7 @@ func (m *GetMessageRequest) Reset()         { *m = GetMessageRequest{} }
 func (m *GetMessageRequest) String() string { return proto.CompactTextString(m) }
 func (*GetMessageRequest) ProtoMessage()    {}
 func (*GetMessageRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_8af9a1f56cafcd39, []int{12}
+	return fileDescriptor_8af9a1f56cafcd39, []int{11}
 }
 func (m *GetMessageRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetMessageRequest.Unmarshal(m, b)
@@ -637,7 +623,7 @@ func (m *GetMessageResponse) Reset()         { *m = GetMessageResponse{} }
 func (m *GetMessageResponse) String() string { return proto.CompactTextString(m) }
 func (*GetMessageResponse) ProtoMessage()    {}
 func (*GetMessageResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_8af9a1f56cafcd39, []int{13}
+	return fileDescriptor_8af9a1f56cafcd39, []int{12}
 }
 func (m *GetMessageResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetMessageResponse.Unmarshal(m, b)
@@ -683,7 +669,7 @@ func (m *PutMessageRequest) Reset()         { *m = PutMessageRequest{} }
 func (m *PutMessageRequest) String() string { return proto.CompactTextString(m) }
 func (*PutMessageRequest) ProtoMessage()    {}
 func (*PutMessageRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_8af9a1f56cafcd39, []int{14}
+	return fileDescriptor_8af9a1f56cafcd39, []int{13}
 }
 func (m *PutMessageRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutMessageRequest.Unmarshal(m, b)
@@ -728,7 +714,7 @@ func (m *PMDefaultResponse) Reset()         { *m = PMDefaultResponse{} }
 func (m *PMDefaultResponse) String() string { return proto.CompactTextString(m) }
 func (*PMDefaultResponse) ProtoMessage()    {}
 func (*PMDefaultResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_8af9a1f56cafcd39, []int{15}
+	return fileDescriptor_8af9a1f56cafcd39, []int{14}
 }
 func (m *PMDefaultResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PMDefaultResponse.Unmarshal(m, b)
@@ -762,12 +748,11 @@ func init() {
 	proto.RegisterType((*PlayerListRequest)(nil), "ipm.PlayerListRequest")
 	proto.RegisterType((*PlayerListResponse)(nil), "ipm.PlayerListResponse")
 	proto.RegisterType((*PlayerInfo)(nil), "ipm.PlayerInfo")
-	proto.RegisterType((*PlayerStartRequest)(nil), "ipm.PlayerStartRequest")
-	proto.RegisterType((*PlayerStartResponse)(nil), "ipm.PlayerStartResponse")
-	proto.RegisterType((*PlayerStopRequest)(nil), "ipm.PlayerStopRequest")
-	proto.RegisterType((*SignInRequest)(nil), "ipm.SignInRequest")
-	proto.RegisterType((*SignInResponse)(nil), "ipm.SignInResponse")
-	proto.RegisterType((*SignOutRequest)(nil), "ipm.SignOutRequest")
+	proto.RegisterType((*PlayerSignInRequest)(nil), "ipm.PlayerSignInRequest")
+	proto.RegisterType((*PlayerSignInResponse)(nil), "ipm.PlayerSignInResponse")
+	proto.RegisterType((*PlayerSignOutRequest)(nil), "ipm.PlayerSignOutRequest")
+	proto.RegisterType((*AttachRequest)(nil), "ipm.AttachRequest")
+	proto.RegisterType((*DetachRequest)(nil), "ipm.DetachRequest")
 	proto.RegisterType((*GetMessageRequest)(nil), "ipm.GetMessageRequest")
 	proto.RegisterType((*GetMessageResponse)(nil), "ipm.GetMessageResponse")
 	proto.RegisterType((*PutMessageRequest)(nil), "ipm.PutMessageRequest")
@@ -789,8 +774,8 @@ type PMClient interface {
 	PlayerCreate(ctx context.Context, in *PlayerCreateRequest, opts ...grpc.CallOption) (*PlayerCreateResponse, error)
 	PlayerDelete(ctx context.Context, in *PlayerDeleteRequest, opts ...grpc.CallOption) (*PMDefaultResponse, error)
 	PlayerList(ctx context.Context, in *PlayerListRequest, opts ...grpc.CallOption) (*PlayerListResponse, error)
-	PlayerStart(ctx context.Context, in *PlayerStartRequest, opts ...grpc.CallOption) (*PlayerStartResponse, error)
-	PlayerStop(ctx context.Context, in *PlayerStopRequest, opts ...grpc.CallOption) (*PMDefaultResponse, error)
+	PlayerSignIn(ctx context.Context, in *PlayerSignInRequest, opts ...grpc.CallOption) (*PlayerSignInResponse, error)
+	PlayerSignOut(ctx context.Context, in *PlayerSignOutRequest, opts ...grpc.CallOption) (*PMDefaultResponse, error)
 }
 
 type pMClient struct {
@@ -803,7 +788,7 @@ func NewPMClient(cc *grpc.ClientConn) PMClient {
 
 func (c *pMClient) PlayerCreate(ctx context.Context, in *PlayerCreateRequest, opts ...grpc.CallOption) (*PlayerCreateResponse, error) {
 	out := new(PlayerCreateResponse)
-	err := c.cc.Invoke(ctx, "/ipm.PM/CreatePlayer", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ipm.PM/PlayerCreate", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -828,18 +813,18 @@ func (c *pMClient) PlayerList(ctx context.Context, in *PlayerListRequest, opts .
 	return out, nil
 }
 
-func (c *pMClient) PlayerStart(ctx context.Context, in *PlayerStartRequest, opts ...grpc.CallOption) (*PlayerStartResponse, error) {
-	out := new(PlayerStartResponse)
-	err := c.cc.Invoke(ctx, "/ipm.PM/PlayerStart", in, out, opts...)
+func (c *pMClient) PlayerSignIn(ctx context.Context, in *PlayerSignInRequest, opts ...grpc.CallOption) (*PlayerSignInResponse, error) {
+	out := new(PlayerSignInResponse)
+	err := c.cc.Invoke(ctx, "/ipm.PM/PlayerSignIn", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *pMClient) PlayerStop(ctx context.Context, in *PlayerStopRequest, opts ...grpc.CallOption) (*PMDefaultResponse, error) {
+func (c *pMClient) PlayerSignOut(ctx context.Context, in *PlayerSignOutRequest, opts ...grpc.CallOption) (*PMDefaultResponse, error) {
 	out := new(PMDefaultResponse)
-	err := c.cc.Invoke(ctx, "/ipm.PM/PlayerStop", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ipm.PM/PlayerSignOut", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -851,8 +836,8 @@ type PMServer interface {
 	PlayerCreate(context.Context, *PlayerCreateRequest) (*PlayerCreateResponse, error)
 	PlayerDelete(context.Context, *PlayerDeleteRequest) (*PMDefaultResponse, error)
 	PlayerList(context.Context, *PlayerListRequest) (*PlayerListResponse, error)
-	PlayerStart(context.Context, *PlayerStartRequest) (*PlayerStartResponse, error)
-	PlayerStop(context.Context, *PlayerStopRequest) (*PMDefaultResponse, error)
+	PlayerSignIn(context.Context, *PlayerSignInRequest) (*PlayerSignInResponse, error)
+	PlayerSignOut(context.Context, *PlayerSignOutRequest) (*PMDefaultResponse, error)
 }
 
 func RegisterPMServer(s *grpc.Server, srv PMServer) {
@@ -869,7 +854,7 @@ func _PM_PlayerCreate_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ipm.PM/CreatePlayer",
+		FullMethod: "/ipm.PM/PlayerCreate",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PMServer).PlayerCreate(ctx, req.(*PlayerCreateRequest))
@@ -913,38 +898,38 @@ func _PM_PlayerList_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PM_PlayerStart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PlayerStartRequest)
+func _PM_PlayerSignIn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PlayerSignInRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PMServer).PlayerStart(ctx, in)
+		return srv.(PMServer).PlayerSignIn(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ipm.PM/PlayerStart",
+		FullMethod: "/ipm.PM/PlayerSignIn",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PMServer).PlayerStart(ctx, req.(*PlayerStartRequest))
+		return srv.(PMServer).PlayerSignIn(ctx, req.(*PlayerSignInRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PM_PlayerStop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PlayerStopRequest)
+func _PM_PlayerSignOut_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PlayerSignOutRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PMServer).PlayerStop(ctx, in)
+		return srv.(PMServer).PlayerSignOut(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ipm.PM/PlayerStop",
+		FullMethod: "/ipm.PM/PlayerSignOut",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PMServer).PlayerStop(ctx, req.(*PlayerStopRequest))
+		return srv.(PMServer).PlayerSignOut(ctx, req.(*PlayerSignOutRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -954,7 +939,7 @@ var _PM_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*PMServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreatePlayer",
+			MethodName: "PlayerCreate",
 			Handler:    _PM_PlayerCreate_Handler,
 		},
 		{
@@ -966,12 +951,12 @@ var _PM_serviceDesc = grpc.ServiceDesc{
 			Handler:    _PM_PlayerList_Handler,
 		},
 		{
-			MethodName: "PlayerStart",
-			Handler:    _PM_PlayerStart_Handler,
+			MethodName: "PlayerSignIn",
+			Handler:    _PM_PlayerSignIn_Handler,
 		},
 		{
-			MethodName: "PlayerStop",
-			Handler:    _PM_PlayerStop_Handler,
+			MethodName: "PlayerSignOut",
+			Handler:    _PM_PlayerSignOut_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -982,8 +967,9 @@ var _PM_serviceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type PlayerClient interface {
-	SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*SignInResponse, error)
-	SignOut(ctx context.Context, in *SignOutRequest, opts ...grpc.CallOption) (*PMDefaultResponse, error)
+	SyncInfo(ctx context.Context, in *PlayerInfo, opts ...grpc.CallOption) (*PlayerInfo, error)
+	Attach(ctx context.Context, in *AttachRequest, opts ...grpc.CallOption) (*PMDefaultResponse, error)
+	Detach(ctx context.Context, in *DetachRequest, opts ...grpc.CallOption) (*PMDefaultResponse, error)
 	GetMessage(ctx context.Context, in *GetMessageRequest, opts ...grpc.CallOption) (*GetMessageResponse, error)
 	PutMessage(ctx context.Context, in *PutMessageRequest, opts ...grpc.CallOption) (*PMDefaultResponse, error)
 }
@@ -996,18 +982,27 @@ func NewPlayerClient(cc *grpc.ClientConn) PlayerClient {
 	return &playerClient{cc}
 }
 
-func (c *playerClient) SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*SignInResponse, error) {
-	out := new(SignInResponse)
-	err := c.cc.Invoke(ctx, "/ipm.Player/SignIn", in, out, opts...)
+func (c *playerClient) SyncInfo(ctx context.Context, in *PlayerInfo, opts ...grpc.CallOption) (*PlayerInfo, error) {
+	out := new(PlayerInfo)
+	err := c.cc.Invoke(ctx, "/ipm.Player/SyncInfo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *playerClient) SignOut(ctx context.Context, in *SignOutRequest, opts ...grpc.CallOption) (*PMDefaultResponse, error) {
+func (c *playerClient) Attach(ctx context.Context, in *AttachRequest, opts ...grpc.CallOption) (*PMDefaultResponse, error) {
 	out := new(PMDefaultResponse)
-	err := c.cc.Invoke(ctx, "/ipm.Player/SignOut", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ipm.Player/Attach", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *playerClient) Detach(ctx context.Context, in *DetachRequest, opts ...grpc.CallOption) (*PMDefaultResponse, error) {
+	out := new(PMDefaultResponse)
+	err := c.cc.Invoke(ctx, "/ipm.Player/Detach", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1034,8 +1029,9 @@ func (c *playerClient) PutMessage(ctx context.Context, in *PutMessageRequest, op
 
 // PlayerServer is the server API for Player service.
 type PlayerServer interface {
-	SignIn(context.Context, *SignInRequest) (*SignInResponse, error)
-	SignOut(context.Context, *SignOutRequest) (*PMDefaultResponse, error)
+	SyncInfo(context.Context, *PlayerInfo) (*PlayerInfo, error)
+	Attach(context.Context, *AttachRequest) (*PMDefaultResponse, error)
+	Detach(context.Context, *DetachRequest) (*PMDefaultResponse, error)
 	GetMessage(context.Context, *GetMessageRequest) (*GetMessageResponse, error)
 	PutMessage(context.Context, *PutMessageRequest) (*PMDefaultResponse, error)
 }
@@ -1044,38 +1040,56 @@ func RegisterPlayerServer(s *grpc.Server, srv PlayerServer) {
 	s.RegisterService(&_Player_serviceDesc, srv)
 }
 
-func _Player_SignIn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SignInRequest)
+func _Player_SyncInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PlayerInfo)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PlayerServer).SignIn(ctx, in)
+		return srv.(PlayerServer).SyncInfo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ipm.Player/SignIn",
+		FullMethod: "/ipm.Player/SyncInfo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PlayerServer).SignIn(ctx, req.(*SignInRequest))
+		return srv.(PlayerServer).SyncInfo(ctx, req.(*PlayerInfo))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Player_SignOut_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SignOutRequest)
+func _Player_Attach_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AttachRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PlayerServer).SignOut(ctx, in)
+		return srv.(PlayerServer).Attach(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ipm.Player/SignOut",
+		FullMethod: "/ipm.Player/Attach",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PlayerServer).SignOut(ctx, req.(*SignOutRequest))
+		return srv.(PlayerServer).Attach(ctx, req.(*AttachRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Player_Detach_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DetachRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlayerServer).Detach(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ipm.Player/Detach",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlayerServer).Detach(ctx, req.(*DetachRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1121,12 +1135,16 @@ var _Player_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*PlayerServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "SignIn",
-			Handler:    _Player_SignIn_Handler,
+			MethodName: "SyncInfo",
+			Handler:    _Player_SyncInfo_Handler,
 		},
 		{
-			MethodName: "SignOut",
-			Handler:    _Player_SignOut_Handler,
+			MethodName: "Attach",
+			Handler:    _Player_Attach_Handler,
+		},
+		{
+			MethodName: "Detach",
+			Handler:    _Player_Detach_Handler,
 		},
 		{
 			MethodName: "GetMessage",
@@ -1144,41 +1162,44 @@ var _Player_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("pm/pm.proto", fileDescriptor_8af9a1f56cafcd39) }
 
 var fileDescriptor_8af9a1f56cafcd39 = []byte{
-	// 568 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x55, 0x4d, 0x6f, 0xd3, 0x40,
-	0x10, 0xad, 0x3f, 0x48, 0xe9, 0x18, 0x4a, 0x33, 0x45, 0xc5, 0xf8, 0x14, 0x59, 0x25, 0x0d, 0x17,
-	0x47, 0x4a, 0x2f, 0x48, 0x08, 0x2a, 0x95, 0xa2, 0xaa, 0x52, 0xa3, 0x46, 0xc9, 0x8d, 0xdb, 0x46,
-	0xdd, 0x5a, 0x16, 0x71, 0xbc, 0x78, 0xd7, 0x42, 0xfc, 0x0f, 0x7e, 0x1a, 0x3f, 0x86, 0x23, 0xf2,
-	0xae, 0x37, 0x5e, 0xd7, 0x38, 0x22, 0x07, 0x4e, 0xde, 0xcc, 0xbc, 0xbc, 0x79, 0x33, 0x3b, 0xcf,
-	0x06, 0x8f, 0xa5, 0x63, 0x96, 0x46, 0x2c, 0xcf, 0x44, 0x86, 0x4e, 0xc2, 0xd2, 0xe0, 0x98, 0x0b,
-	0x22, 0x0a, 0x3e, 0x56, 0x0f, 0x95, 0x09, 0xbc, 0x38, 0x1d, 0xc7, 0x15, 0x2c, 0xfc, 0x0a, 0xc7,
-	0xb3, 0x15, 0xf9, 0x41, 0xf3, 0x4f, 0x39, 0x25, 0x82, 0xce, 0xe9, 0xb7, 0x82, 0x72, 0x81, 0x47,
-	0xe0, 0xb0, 0xe4, 0xde, 0xb7, 0x06, 0xd6, 0xe8, 0x60, 0x5e, 0x1e, 0x11, 0xc1, 0x5d, 0x93, 0x94,
-	0xfa, 0xb6, 0x0c, 0xc9, 0x33, 0x06, 0xf0, 0x94, 0x11, 0xce, 0xbf, 0x67, 0xf9, 0xbd, 0xef, 0xc8,
-	0xf8, 0xe6, 0x77, 0x89, 0x67, 0x59, 0x2e, 0x7c, 0x77, 0x60, 0x8d, 0x9c, 0xb9, 0x3c, 0x87, 0x3f,
-	0x2d, 0x78, 0xd9, 0xac, 0xc6, 0x59, 0xb6, 0xe6, 0x14, 0x87, 0xd0, 0x53, 0x12, 0x65, 0x45, 0x6f,
-	0x72, 0x18, 0x55, 0x8a, 0x17, 0xf2, 0x31, 0xaf, 0xb2, 0x5a, 0x96, 0xdd, 0x96, 0xe5, 0x74, 0xc8,
-	0x72, 0x3b, 0x64, 0x3d, 0x31, 0x64, 0x9d, 0xe9, 0x19, 0x5c, 0xd1, 0x15, 0xdd, 0x32, 0x83, 0xf0,
-	0x0d, 0xf4, 0x15, 0xf0, 0x36, 0xe1, 0xa2, 0x1b, 0x16, 0x03, 0x9a, 0xb0, 0x1d, 0x7b, 0x7c, 0x0b,
-	0xfb, 0x4c, 0xfe, 0x9b, 0xfb, 0xf6, 0xc0, 0x19, 0x79, 0x93, 0x17, 0x51, 0xc2, 0xd2, 0x48, 0x31,
-	0xde, 0xac, 0x1f, 0xb2, 0xb9, 0xce, 0x87, 0x4b, 0x80, 0x3a, 0xfc, 0x9f, 0xee, 0x6c, 0xa8, 0x9b,
-	0x59, 0x08, 0x92, 0x6f, 0x69, 0xfa, 0x83, 0x1e, 0x62, 0x85, 0xdb, 0xad, 0xeb, 0x7a, 0xb4, 0x0b,
-	0x91, 0xb1, 0xee, 0x2a, 0x17, 0xf0, 0x7c, 0x91, 0xc4, 0xeb, 0x9b, 0xb5, 0x86, 0xe8, 0x16, 0xad,
-	0x8e, 0x16, 0xed, 0x66, 0x8b, 0xe1, 0x2d, 0x1c, 0x6a, 0x82, 0x1d, 0xef, 0x05, 0xc1, 0xa5, 0x82,
-	0xc4, 0x7a, 0x98, 0xe5, 0x39, 0x3c, 0x55, 0x6c, 0x77, 0x85, 0x30, 0xf4, 0x48, 0x94, 0x65, 0xa0,
-	0xce, 0xa0, 0x7f, 0x4d, 0xc5, 0x94, 0x72, 0x4e, 0x62, 0xba, 0x0d, 0xb8, 0x04, 0x34, 0x81, 0x3b,
-	0x0a, 0x3c, 0x05, 0x37, 0x4e, 0xb9, 0x12, 0xe8, 0x4d, 0x8e, 0xa2, 0x24, 0x4e, 0xa3, 0x6b, 0x92,
-	0x52, 0xcd, 0x27, 0xb3, 0xe1, 0x1d, 0xf4, 0x67, 0xc5, 0x3f, 0x88, 0xc1, 0x21, 0xb8, 0xac, 0xa6,
-	0x43, 0x49, 0xa7, 0xae, 0x68, 0x43, 0x58, 0xe6, 0xc3, 0xf7, 0xd0, 0x9f, 0x4d, 0xaf, 0xe8, 0x03,
-	0x29, 0x56, 0x3b, 0x5f, 0xfb, 0xe4, 0x97, 0x0d, 0xf6, 0x6c, 0x8a, 0x9f, 0xe1, 0x99, 0xf9, 0x5e,
-	0x40, 0xdf, 0x58, 0xf9, 0xc6, 0x8b, 0x29, 0x78, 0xfd, 0x97, 0x8c, 0xaa, 0x19, 0xee, 0xe1, 0xa5,
-	0xa6, 0x51, 0x46, 0x6e, 0xd0, 0x34, 0xbc, 0x1d, 0x9c, 0xa8, 0xcc, 0x63, 0xdd, 0xe1, 0x1e, 0x5e,
-	0x68, 0x4f, 0x95, 0xe6, 0xc5, 0x13, 0x83, 0xc1, 0x30, 0x7d, 0xf0, 0xaa, 0x15, 0x37, 0x44, 0x78,
-	0x86, 0x11, 0xd0, 0x44, 0x9a, 0x16, 0x0a, 0xfc, 0x76, 0x62, 0xc3, 0xf1, 0x51, 0x8b, 0x28, 0xdd,
-	0xd0, 0x10, 0x61, 0xd8, 0xa3, 0xbb, 0x89, 0xc9, 0x6f, 0x0b, 0x7a, 0x0a, 0x8f, 0xe7, 0xd0, 0x53,
-	0x0b, 0x8f, 0x28, 0xe1, 0x0d, 0xfb, 0x04, 0xc7, 0x8d, 0xd8, 0xa6, 0xfe, 0x3b, 0xd8, 0xaf, 0xf6,
-	0x1a, 0x6b, 0x44, 0xbd, 0xe5, 0xdb, 0xc7, 0x57, 0xaf, 0x70, 0xa5, 0xbc, 0xb5, 0xfc, 0xd5, 0xf8,
-	0xda, 0xbb, 0x5e, 0xb5, 0x5e, 0x3c, 0x22, 0x68, 0x2d, 0x6c, 0xb7, 0x80, 0xcb, 0x83, 0x2f, 0xfb,
-	0x84, 0x25, 0xe3, 0x84, 0xa5, 0xcb, 0x9e, 0xfc, 0xc4, 0x9d, 0xff, 0x09, 0x00, 0x00, 0xff, 0xff,
-	0x21, 0xff, 0xa7, 0x94, 0x18, 0x07, 0x00, 0x00,
+	// 616 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x55, 0xcd, 0x6e, 0xd3, 0x40,
+	0x10, 0x4e, 0xec, 0xe0, 0xa6, 0x13, 0x52, 0x9a, 0x29, 0x2a, 0xc6, 0xa7, 0x68, 0x81, 0xa6, 0x5c,
+	0x1c, 0x29, 0x48, 0xbd, 0x80, 0x40, 0x94, 0xa0, 0xaa, 0x12, 0x51, 0x43, 0x72, 0x40, 0xe2, 0xb6,
+	0x6d, 0x37, 0xc6, 0x52, 0x6c, 0x2f, 0xd9, 0x8d, 0x50, 0x5f, 0x80, 0x77, 0xe1, 0xa1, 0x78, 0x17,
+	0xe4, 0x5d, 0xaf, 0x7f, 0x92, 0x26, 0x10, 0x89, 0x93, 0xd7, 0x33, 0xb3, 0x9f, 0xbf, 0x6f, 0x32,
+	0xdf, 0x04, 0x5a, 0x3c, 0xea, 0xf3, 0xc8, 0xe7, 0x8b, 0x44, 0x26, 0x68, 0x87, 0x3c, 0xf2, 0x8e,
+	0x84, 0xa4, 0x72, 0x29, 0xfa, 0xfa, 0xa1, 0x33, 0x5e, 0x2b, 0x88, 0xfa, 0x41, 0x56, 0x46, 0xbe,
+	0xc0, 0xd1, 0x78, 0x4e, 0xef, 0xd8, 0xe2, 0xc3, 0x82, 0x51, 0xc9, 0x26, 0xec, 0xfb, 0x92, 0x09,
+	0x89, 0x87, 0x60, 0xf3, 0xf0, 0xd6, 0xad, 0x77, 0xeb, 0xa7, 0xfb, 0x93, 0xf4, 0x88, 0x08, 0x8d,
+	0x98, 0x46, 0xcc, 0xb5, 0x54, 0x48, 0x9d, 0xd1, 0x83, 0x26, 0xa7, 0x42, 0xfc, 0x48, 0x16, 0xb7,
+	0xae, 0xad, 0xe2, 0xf9, 0x3b, 0x09, 0xe0, 0x71, 0x15, 0x58, 0xf0, 0x24, 0x16, 0x0c, 0x4f, 0xc0,
+	0xd1, 0x6c, 0x14, 0x78, 0x6b, 0x70, 0xe0, 0x67, 0xe4, 0xa6, 0xea, 0x31, 0xc9, 0xb2, 0xd8, 0x03,
+	0x87, 0xab, 0xfb, 0xea, 0x8b, 0xad, 0xc1, 0x23, 0x3f, 0xe4, 0x91, 0xaf, 0x21, 0x2f, 0xe3, 0x59,
+	0x32, 0xc9, 0xd2, 0xa4, 0x67, 0x14, 0x0c, 0xd9, 0x9c, 0x6d, 0x51, 0x40, 0x5e, 0x40, 0x47, 0x17,
+	0x7e, 0x0a, 0x85, 0xdc, 0x5c, 0x16, 0x00, 0x96, 0xcb, 0x76, 0xa4, 0xfd, 0x12, 0xf6, 0x34, 0x2f,
+	0xe1, 0x5a, 0x5d, 0xfb, 0x3e, 0xde, 0x26, 0x4f, 0x7e, 0xd6, 0x01, 0x8a, 0x38, 0x1e, 0x80, 0x95,
+	0x13, 0xb1, 0x76, 0x6f, 0x78, 0x5a, 0xcf, 0x24, 0x0d, 0xdc, 0x86, 0xae, 0x4f, 0xcf, 0x69, 0x8c,
+	0x27, 0x0b, 0xe9, 0x3e, 0xe8, 0xd6, 0x4f, 0xed, 0x89, 0x3a, 0x1b, 0xc5, 0x8e, 0x0a, 0x29, 0xc5,
+	0xf9, 0x0c, 0x4c, 0xc3, 0x20, 0xbe, 0x8c, 0xff, 0xdf, 0x0c, 0xcc, 0xcc, 0x0c, 0x18, 0xe0, 0x1d,
+	0x9b, 0x69, 0xe8, 0x5b, 0x25, 0xfa, 0x46, 0xa6, 0x5d, 0xc8, 0x24, 0x6f, 0xca, 0xdf, 0xb9, 0x5a,
+	0xca, 0xad, 0x0a, 0xd4, 0x6d, 0xab, 0x74, 0xfb, 0x33, 0xb4, 0xdf, 0x4b, 0x49, 0x6f, 0xbe, 0x99,
+	0x6b, 0xa6, 0xa8, 0x5e, 0xea, 0x64, 0x06, 0x65, 0x15, 0x50, 0x1e, 0x34, 0x03, 0x1a, 0xb1, 0x71,
+	0x4a, 0x30, 0x13, 0x6e, 0xde, 0xc9, 0x33, 0x68, 0x0f, 0xd9, 0x5f, 0x20, 0x49, 0x0f, 0x3a, 0x17,
+	0x4c, 0x8e, 0x98, 0x10, 0x34, 0x60, 0xdb, 0x0a, 0xaf, 0x01, 0xcb, 0x85, 0x3b, 0x36, 0xf1, 0x39,
+	0x34, 0x82, 0x48, 0x04, 0x99, 0x8d, 0x0e, 0xfd, 0x30, 0x88, 0xfc, 0x0b, 0x1a, 0x31, 0x83, 0xa7,
+	0xb2, 0xe4, 0x0a, 0x3a, 0xe3, 0xe5, 0x3f, 0x90, 0xc1, 0x13, 0x68, 0xf0, 0x02, 0x0e, 0x15, 0x9c,
+	0x6e, 0x7e, 0x0e, 0x98, 0xe6, 0xc9, 0x6b, 0xe8, 0x8c, 0x47, 0x43, 0x36, 0xa3, 0xcb, 0xf9, 0xce,
+	0x2e, 0x1a, 0xfc, 0xb6, 0xc0, 0x1a, 0x8f, 0xf0, 0x23, 0x3c, 0x2c, 0xef, 0x10, 0x74, 0x4b, 0x5e,
+	0xaa, 0xec, 0x2b, 0xef, 0xe9, 0x3d, 0x19, 0xfd, 0x4d, 0x52, 0xc3, 0x73, 0x03, 0xa3, 0x37, 0x44,
+	0x05, 0xa6, 0xb2, 0x34, 0xbc, 0x63, 0x9d, 0x59, 0xe5, 0x4d, 0x6a, 0xf8, 0xce, 0x78, 0x35, 0xdd,
+	0x0a, 0x78, 0x5c, 0x42, 0x28, 0x6d, 0x13, 0xef, 0xc9, 0x5a, 0x3c, 0x07, 0xc8, 0xb5, 0x68, 0x2f,
+	0x54, 0x48, 0x54, 0x7c, 0x57, 0xd1, 0x52, 0x35, 0x0e, 0xa9, 0xe1, 0x10, 0xda, 0x95, 0x51, 0xc7,
+	0xd5, 0xea, 0x62, 0xfc, 0x37, 0xab, 0x19, 0xfc, 0xb2, 0xc0, 0xd1, 0x57, 0xd0, 0x87, 0xe6, 0xf4,
+	0x2e, 0xbe, 0x51, 0x2b, 0x68, 0x75, 0x57, 0x79, 0xab, 0x01, 0x52, 0xc3, 0x33, 0x70, 0xb4, 0x5b,
+	0x10, 0x55, 0xb2, 0x62, 0x9d, 0x2d, 0x0d, 0x3c, 0x03, 0x47, 0x5b, 0x22, 0xbb, 0x57, 0xf1, 0xc7,
+	0xf6, 0xc6, 0x17, 0xc3, 0x9f, 0x35, 0x7e, 0xcd, 0x36, 0x59, 0xe3, 0xd7, 0x5d, 0x42, 0x6a, 0xf8,
+	0x16, 0xa0, 0x98, 0x6c, 0xf3, 0xcb, 0xad, 0x8e, 0xfa, 0x66, 0x02, 0xe7, 0xfb, 0x5f, 0xf7, 0x28,
+	0x0f, 0xfb, 0x21, 0x8f, 0xae, 0x1d, 0xf5, 0x9f, 0xf9, 0xea, 0x4f, 0x00, 0x00, 0x00, 0xff, 0xff,
+	0x9a, 0x8f, 0x9b, 0xf5, 0x69, 0x07, 0x00, 0x00,
 }

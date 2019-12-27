@@ -11,23 +11,19 @@ service PM {
     rpc PlayerCreate(PlayerCreateRequest)returns(PlayerCreateResponse){}
     rpc PlayerDelete(PlayerDeleteRequest)returns(PMDefaultResponse){}
     rpc PlayerList(PlayerListRequest)returns(PlayerListResponse){}
-    rpc PlayerStart(PlayerStartRequest)returns(PlayerStartResponse){}
-    rpc PlayerStop(PlayerStopRequest)returns(PMDefaultResponse){}
+    rpc PlayerSignIn(PlayerSignInRequest)returns(PlayerSignInResponse){}
+    rpc PlayerSignOut(PlayerSignOutRequest)returns(PMDefaultResponse){}
 }
 
 message PlayerCreateRequest {
     string pid = 1;
     string name = 2;
     string password = 3;
-    int64 port = 4;
 }
 
 message PlayerCreateResponse {
     status.Status status = 1;
-    string pid = 2;
-    string name = 3;
-    string password = 4;
-    int64 port = 5;
+    PlayerInfo player = 2;
 }
 
 message PlayerDeleteRequest {
@@ -44,42 +40,46 @@ message PlayerListResponse {
 }
 
 message PlayerInfo {
+    string id = 1;
+    string name = 2;
+    string password = 3;
+    string etag = 4;
+    int64 port = 5;
+    int64 pid = 6;
+}
+
+message PlayerSignInRequest {
     string pid = 1;
     string name = 2;
     string password = 3;
-    int64 port = 4;
 }
 
-message PlayerStartRequest {
-    string pid = 1;
-}
-
-message PlayerStartResponse{
+message PlayerSignInResponse{
     status.Status status = 1;
+    int64 port = 2;
+    string etag = 3;
 }
 
-message PlayerStopRequest {
+message PlayerSignOutRequest {
     string pid = 1;
+    string etag = 2;
 }
 
 service Player {
-    rpc SignIn(SignInRequest)returns(SignInResponse){}
-    rpc SignOut(SignOutRequest)returns(PMDefaultResponse){}
+    rpc SyncInfo(PlayerInfo)returns(PlayerInfo){}
+    rpc Attach(AttachRequest)returns(PMDefaultResponse){}
+    rpc Detach(DetachRequest)returns(PMDefaultResponse){}
     rpc GetMessage(GetMessageRequest)returns(GetMessageResponse){}
     rpc PutMessage(PutMessageRequest)returns(PMDefaultResponse){}
 }
 
-message SignInRequest {
-    string name = 1;
-    string password = 2;
+message AttachRequest {
+    string etag = 1;
+    string pid = 2;
+    string gamePort = 3;
 }
 
-message SignInResponse {
-    status.Status status = 1;
-    string etag = 2;
-}
-
-message SignOutRequest {
+message DetachRequest {
     string etag = 1;
 }
 

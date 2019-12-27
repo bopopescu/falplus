@@ -48,26 +48,49 @@ func (p *Player_Service) Start() {
 	p.service.Start()
 }
 
-func (p *Player_Service) SignIn(ctx context.Context, req *ipm.SignInRequest) (*ipm.SignInResponse, error) {
-	resp := &ipm.SignInResponse{}
+func (p *Player_Service) SyncInfo(ctx context.Context, req *ipm.PlayerInfo) (*ipm.PlayerInfo, error) {
+	p.player.UpdateInfo(req)
+	return req, nil
+}
+
+func (p *Player_Service) Attach(ctx context.Context, req *ipm.AttachRequest) (*ipm.PMDefaultResponse, error) {
+	resp := &ipm.PMDefaultResponse{}
 	resp.Status = status.SuccessStatus
+	err := p.player.ConnGame(req.Etag, req.GamePort)
+	if err != nil {
+		resp.Status = status.NewStatus(3001, err.Error())
+	}
 	return resp, nil
 }
 
-func (p *Player_Service) SignOut(ctx context.Context, req *ipm.SignOutRequest) (*ipm.PMDefaultResponse, error) {
+func (p *Player_Service) Detach(ctx context.Context, req *ipm.DetachRequest) (*ipm.PMDefaultResponse, error) {
 	resp := &ipm.PMDefaultResponse{}
 	resp.Status = status.SuccessStatus
+	err := p.player.CloseConnGame(req.Etag)
+	if err != nil {
+		resp.Status = status.NewStatus(3001, err.Error())
+	}
 	return resp, nil
 }
 
 func (p *Player_Service) GetMessage(ctx context.Context, req *ipm.GetMessageRequest) (*ipm.GetMessageResponse, error) {
 	resp := &ipm.GetMessageResponse{}
 	resp.Status = status.SuccessStatus
+	msg, err := p.player.ShowGameMsg(req.Etag)
+	if err != nil {
+		resp.Status = status.NewStatus(3001, err.Error())
+		return resp, nil
+	}
+	resp.Gmsg = msg
 	return resp, nil
 }
 
 func (p *Player_Service) PutMessage(ctx context.Context, req *ipm.PutMessageRequest) (*ipm.PMDefaultResponse, error) {
 	resp := &ipm.PMDefaultResponse{}
 	resp.Status = status.SuccessStatus
+	err := p.player.PutCards(req)
+	if err != nil {
+		resp.Status = status.NewStatus(3001, err.Error())
+	}
 	return resp, nil
 }
