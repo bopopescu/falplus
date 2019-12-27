@@ -17,13 +17,13 @@ var (
 )
 
 type Player_Service struct {
-	player *player.Player
+	player  *player.Player
 	service *server.Service
 }
 
 func NewPlayerServer(conf, name, proto, addr string) *Player_Service {
 	srv := &Player_Service{
-		player:player.NewPlayer(),
+		player: player.NewPlayer(),
 	}
 	service := server.NewService(conf, "player", name, proto, addr, srv)
 	srv.service = service

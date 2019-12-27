@@ -11,24 +11,24 @@ import (
 )
 
 const (
-	PMDB = "/var/lib/fal/pm.db"
+	PMDB             = "/var/lib/fal/pm.db"
 	BucketPlayerList = "players"
-	PlayerPrefix = "player-"
-	BucketKeyPid = "pid"
-	BucketKeyName = "name"
-	BucketKeyPwd = "password"
-	BucketKeyPort = "port"
+	PlayerPrefix     = "player-"
+	BucketKeyPid     = "pid"
+	BucketKeyName    = "name"
+	BucketKeyPwd     = "password"
+	BucketKeyPort    = "port"
 )
 
 var (
-	pm *PlayerManager
+	pm  *PlayerManager
 	log = logrus.WithFields(logrus.Fields{"pkg": "gm"})
 )
 
 type PlayerManager struct {
 	sync.RWMutex
 	players map[string]*ipm.PlayerInfo
-	DB *fdb.FalDB
+	DB      *fdb.FalDB
 }
 
 func NewPlayerManager() *PlayerManager {
@@ -38,8 +38,8 @@ func NewPlayerManager() *PlayerManager {
 		panic(err)
 	}
 	pm = &PlayerManager{
-		players:make(map[string]*ipm.PlayerInfo),
-		DB:db,
+		players: make(map[string]*ipm.PlayerInfo),
+		DB:      db,
 	}
 	return pm
 }
@@ -79,17 +79,17 @@ func (m *PlayerManager) CreatePlayer(req *ipm.PlayerCreateRequest) (*ipm.PlayerI
 	id = PlayerPrefix + id
 
 	p := &ipm.PlayerInfo{
-		Pid:id,
-		Name:req.Name,
-		Password:req.Password,
-		Port:m.assignPort(req.Port),
+		Pid:      id,
+		Name:     req.Name,
+		Password: req.Password,
+		Port:     m.assignPort(req.Port),
 	}
 	kvs := make(map[string]string)
 	kvs[BucketKeyPid] = id
 	kvs[BucketKeyPort] = fmt.Sprint(p.Port)
 	kvs[BucketKeyName] = p.Name
 	kvs[BucketKeyPwd] = p.Password
-	data := map[string]map[string]string{id:kvs}
+	data := map[string]map[string]string{id: kvs}
 	m.players[id] = p
 
 	if err := m.DB.Put(id, fmt.Sprint(req.Name), BucketPlayerList); err != nil {

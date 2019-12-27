@@ -9,16 +9,16 @@ import (
 )
 
 type Player struct {
-	User string
-	Pwd string
-	Score int
-	Cards []int
-	conn *grpc.ClientConn
-	stream igm.Game_PlayerConnClient
-	close chan struct{}
+	User    string
+	Pwd     string
+	Score   int
+	Cards   []int
+	conn    *grpc.ClientConn
+	stream  igm.Game_PlayerConnClient
+	close   chan struct{}
 	msgChan chan *message
-	resp chan *igm.PlayerMessage
-	req *igm.GameMessage
+	resp    chan *igm.PlayerMessage
+	req     *igm.GameMessage
 }
 
 var player *Player
@@ -26,9 +26,9 @@ var player *Player
 func NewPlayer() *Player {
 	if player == nil {
 		player = &Player{
-			close:make(chan struct{}),
-			msgChan:make(chan *message, 1),
-			resp:make(chan *igm.PlayerMessage),
+			close:   make(chan struct{}),
+			msgChan: make(chan *message, 1),
+			resp:    make(chan *igm.PlayerMessage),
 		}
 	}
 	return player
@@ -46,7 +46,7 @@ func (p *Player) ShowCards() (*igm.GameMessage, error) {
 	}
 	msg := <-p.msgChan
 	go func() {
-		msg.pMsg = <- p.resp
+		msg.pMsg = <-p.resp
 		msg.Done()
 	}()
 	p.req = msg.gMsg

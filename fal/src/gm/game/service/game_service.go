@@ -16,13 +16,13 @@ import (
 var log = logrus.WithFields(logrus.Fields{"pkg": "gm/game/service"})
 
 type GameService struct {
-	game *game.Game
-	service *server.Service
+	game     *game.Game
+	service  *server.Service
 	gameOver chan struct{}
 }
 
 func NewGameServer(configFilePath, name, proto, addr string) *GameService {
-	srv := &GameService{gameOver:make(chan struct{})}
+	srv := &GameService{gameOver: make(chan struct{})}
 	service := server.NewService(configFilePath, "game", name, proto, addr, srv)
 	srv.service = service
 	return srv
@@ -58,13 +58,13 @@ func (m *GameService) PlayerConn(stream igm.Game_PlayerConnServer) error {
 	}
 }
 
-func (m *GameService) GameStart (ctx context.Context, req *igm.GameStartRequest) (*igm.GMDefaultResponse, error) {
+func (m *GameService) GameStart(ctx context.Context, req *igm.GameStartRequest) (*igm.GMDefaultResponse, error) {
 	resp := &igm.GMDefaultResponse{}
 	resp.Status = status.SuccessStatus
 	return resp, nil
 }
 
-func (m *GameService) GameStop (ctx context.Context, req *igm.GameStopRequest) (*igm.GMDefaultResponse, error) {
+func (m *GameService) GameStop(ctx context.Context, req *igm.GameStopRequest) (*igm.GMDefaultResponse, error) {
 	resp := &igm.GMDefaultResponse{}
 	resp.Status = status.SuccessStatus
 	return resp, nil

@@ -14,11 +14,11 @@ import (
 
 var (
 	pmServer *PMService
-	log = logrus.WithFields(logrus.Fields{"pkg": "pm/service"})
+	log      = logrus.WithFields(logrus.Fields{"pkg": "pm/service"})
 )
 
 type PMService struct {
-	pm *pm.PlayerManager
+	pm      *pm.PlayerManager
 	service *server.Service
 }
 
@@ -49,7 +49,7 @@ func (m *PMService) Start() {
 	m.service.Start()
 }
 
-func (m *PMService)PlayerCreate(ctx context.Context, req *ipm.PlayerCreateRequest) (*ipm.PlayerCreateResponse, error) {
+func (m *PMService) PlayerCreate(ctx context.Context, req *ipm.PlayerCreateRequest) (*ipm.PlayerCreateResponse, error) {
 	resp := &ipm.PlayerCreateResponse{}
 	resp.Status = status.SuccessStatus
 	p, err := m.pm.CreatePlayer(req)
@@ -64,7 +64,7 @@ func (m *PMService)PlayerCreate(ctx context.Context, req *ipm.PlayerCreateReques
 	return resp, nil
 }
 
-func (m *PMService)PlayerDelete(ctx context.Context, req *ipm.PlayerDeleteRequest) (*ipm.PMDefaultResponse, error) {
+func (m *PMService) PlayerDelete(ctx context.Context, req *ipm.PlayerDeleteRequest) (*ipm.PMDefaultResponse, error) {
 	resp := &ipm.PMDefaultResponse{}
 	resp.Status = status.SuccessStatus
 	err := m.pm.DeletePlayer(req.Pid)
@@ -74,7 +74,7 @@ func (m *PMService)PlayerDelete(ctx context.Context, req *ipm.PlayerDeleteReques
 	return resp, nil
 }
 
-func (m *PMService)PlayerList(ctx context.Context, req *ipm.PlayerListRequest) (*ipm.PlayerListResponse, error) {
+func (m *PMService) PlayerList(ctx context.Context, req *ipm.PlayerListRequest) (*ipm.PlayerListResponse, error) {
 	resp := &ipm.PlayerListResponse{}
 	resp.Status = status.SuccessStatus
 	for pid, info := range m.pm.GetAllPlayerInfo() {
@@ -85,13 +85,13 @@ func (m *PMService)PlayerList(ctx context.Context, req *ipm.PlayerListRequest) (
 	return resp, nil
 }
 
-func (m *PMService)PlayerStart(ctx context.Context, req *ipm.PlayerStartRequest) (*ipm.PlayerStartResponse, error) {
+func (m *PMService) PlayerStart(ctx context.Context, req *ipm.PlayerStartRequest) (*ipm.PlayerStartResponse, error) {
 	resp := &ipm.PlayerStartResponse{}
 	resp.Status = status.SuccessStatus
 	return resp, nil
 }
 
-func (m *PMService)PlayerStop(ctx context.Context, req *ipm.PlayerStopRequest) (*ipm.PMDefaultResponse, error) {
+func (m *PMService) PlayerStop(ctx context.Context, req *ipm.PlayerStopRequest) (*ipm.PMDefaultResponse, error) {
 	resp := &ipm.PMDefaultResponse{}
 	resp.Status = status.SuccessStatus
 	return resp, nil

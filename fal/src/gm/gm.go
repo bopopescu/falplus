@@ -21,23 +21,23 @@ var (
 )
 
 const (
-	GMDB            = "/var/lib/fal/gm.db"
-	BucketGameList = "games"
-	GamePrefix = "game-"
-	BucketKeyPid = "pid"
-	BucketKeyType = "type"
-	BucketKeyGid = "gid"
-	BucketKeyState = "state"
+	GMDB             = "/var/lib/fal/gm.db"
+	BucketGameList   = "games"
+	GamePrefix       = "game-"
+	BucketKeyPid     = "pid"
+	BucketKeyType    = "type"
+	BucketKeyGid     = "gid"
+	BucketKeyState   = "state"
 	BucketKeyPlayers = "players"
-	BucketKeyPort = "port"
+	BucketKeyPort    = "port"
 )
 
 var gm *GameManager
 
 type GameManager struct {
 	sync.RWMutex
-	games map[string]*igm.GameInfo
-	DB *fdb.FalDB
+	games  map[string]*igm.GameInfo
+	DB     *fdb.FalDB
 	isInit bool
 }
 
@@ -48,8 +48,8 @@ func NewGameManager() *GameManager {
 		panic(err)
 	}
 	gm = &GameManager{
-		games:make(map[string]*igm.GameInfo),
-		DB:db,
+		games: make(map[string]*igm.GameInfo),
+		DB:    db,
 	}
 	return gm
 }
@@ -91,12 +91,12 @@ func (m *GameManager) gameInit() error {
 			players := make(map[string]string)
 			json.Unmarshal([]byte(kvs[BucketKeyPlayers]), &players)
 			info := &igm.GameInfo{
-				Gid:kvs[BucketKeyGid],
-				Port:port,
-				State:state,
-				Pid:pid,
-				GameType:gType,
-				Players:players,
+				Gid:      kvs[BucketKeyGid],
+				Port:     port,
+				State:    state,
+				Pid:      pid,
+				GameType: gType,
+				Players:  players,
 			}
 			m.games[info.Gid] = info
 		}
@@ -120,9 +120,9 @@ func (m *GameManager) CreateGame(req *igm.GameCreateRequest) (*igm.GameInfo, err
 	id = GamePrefix + id
 
 	g := &igm.GameInfo{
-		Gid:id,
-		GameType:req.GameType,
-		Port:m.assignPort(req.Port),
+		Gid:      id,
+		GameType: req.GameType,
+		Port:     m.assignPort(req.Port),
 	}
 
 	err := m.startGame(g)
@@ -137,7 +137,7 @@ func (m *GameManager) CreateGame(req *igm.GameCreateRequest) (*igm.GameInfo, err
 	kvs[BucketKeyState] = fmt.Sprint(g.State)
 	kvs[BucketKeyPort] = fmt.Sprint(g.Port)
 	kvs[BucketKeyPid] = fmt.Sprint(g.Pid)
-	data := map[string]map[string]string{id:kvs}
+	data := map[string]map[string]string{id: kvs}
 	m.games[id] = g
 	err = m.DB.Put(id, fmt.Sprint(req.GameType), BucketGameList)
 	if err != nil {

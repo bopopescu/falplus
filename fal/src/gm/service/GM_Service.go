@@ -15,11 +15,11 @@ import (
 
 var (
 	gmServer *GMService
-	log = logrus.WithFields(logrus.Fields{"pkg": "gm/service"})
+	log      = logrus.WithFields(logrus.Fields{"pkg": "gm/service"})
 )
 
 type GMService struct {
-	gm *gm.GameManager
+	gm      *gm.GameManager
 	service *server.Service
 }
 
@@ -56,7 +56,7 @@ func (m *GMService) Start() {
 	m.service.Start()
 }
 
-func (m *GMService)GameCreate(ctx context.Context, req *igm.GameCreateRequest) (*igm.GameCreateResponse, error) {
+func (m *GMService) GameCreate(ctx context.Context, req *igm.GameCreateRequest) (*igm.GameCreateResponse, error) {
 	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &igm.GameCreateResponse{}
 	resp.Status = status.SuccessStatus
@@ -71,7 +71,7 @@ func (m *GMService)GameCreate(ctx context.Context, req *igm.GameCreateRequest) (
 	return resp, nil
 }
 
-func (m *GMService)GameDelete(ctx context.Context, req *igm.GameDeleteRequest) (*igm.GMDefaultResponse, error) {
+func (m *GMService) GameDelete(ctx context.Context, req *igm.GameDeleteRequest) (*igm.GMDefaultResponse, error) {
 	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &igm.GMDefaultResponse{}
 	resp.Status = status.SuccessStatus
@@ -82,7 +82,7 @@ func (m *GMService)GameDelete(ctx context.Context, req *igm.GameDeleteRequest) (
 	return resp, nil
 }
 
-func (m *GMService)GameList(ctx context.Context, req *igm.GameListRequest) (*igm.GameListResponse, error) {
+func (m *GMService) GameList(ctx context.Context, req *igm.GameListRequest) (*igm.GameListResponse, error) {
 	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &igm.GameListResponse{}
 	resp.Status = status.SuccessStatus
@@ -94,14 +94,14 @@ func (m *GMService)GameList(ctx context.Context, req *igm.GameListRequest) (*igm
 	return resp, nil
 }
 
-func (m *GMService)GameStart(ctx context.Context, req *igm.GameStartRequest) (*igm.GMDefaultResponse, error) {
+func (m *GMService) GameStart(ctx context.Context, req *igm.GameStartRequest) (*igm.GMDefaultResponse, error) {
 	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &igm.GMDefaultResponse{}
 	resp.Status = status.SuccessStatus
 	return resp, nil
 }
 
-func (m *GMService)GameStop(ctx context.Context, req *igm.GameStopRequest) (*igm.GMDefaultResponse, error) {
+func (m *GMService) GameStop(ctx context.Context, req *igm.GameStopRequest) (*igm.GMDefaultResponse, error) {
 	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &igm.GMDefaultResponse{}
 	resp.Status = status.SuccessStatus

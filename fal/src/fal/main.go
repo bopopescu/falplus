@@ -10,8 +10,8 @@ import (
 
 func main() {
 	rootCmd := &cobra.Command{
-		Use:"fal",
-		Short:"fight against landlord",
+		Use:   "fal",
+		Short: "fight against landlord",
 	}
 	buildGMCmd(rootCmd)
 	buildPMCmd(rootCmd)
@@ -22,21 +22,21 @@ func main() {
 
 func buildGMCmd(parent *cobra.Command) {
 	cmd := &cobra.Command{
-		Use:"gm",
-		Short:"gm command",
+		Use:   "gm",
+		Short: "gm command",
 	}
 	buildGMStartCmd(cmd)
 	parent.AddCommand(cmd)
 }
 
-func buildGMStartCmd(parent *cobra.Command){
+func buildGMStartCmd(parent *cobra.Command) {
 	var addr string
 	var proto string
 	var name string
 	var conf string
 	cmd := &cobra.Command{
-		Use:"start",
-		Short:"start gm daemon",
+		Use:   "start",
+		Short: "start gm daemon",
 		Run: func(cmd *cobra.Command, args []string) {
 			gmServer := gm_service.NewGMServer(conf, name, proto, addr)
 			gmServer.Start()
@@ -50,23 +50,23 @@ func buildGMStartCmd(parent *cobra.Command){
 	parent.AddCommand(cmd)
 }
 
-func buildGameCmd(parent *cobra.Command){
+func buildGameCmd(parent *cobra.Command) {
 	cmd := &cobra.Command{
-		Use:"game",
-		Short:"game command",
+		Use:   "game",
+		Short: "game command",
 	}
 	buildGameStartCmd(cmd)
 	parent.AddCommand(cmd)
 }
 
-func buildGameStartCmd(parent *cobra.Command){
+func buildGameStartCmd(parent *cobra.Command) {
 	var addr string
 	var proto string
 	var name string
 	var conf string
 	cmd := &cobra.Command{
-		Use:"start",
-		Short:"start game daemon",
+		Use:   "start",
+		Short: "start game daemon",
 		Run: func(cmd *cobra.Command, args []string) {
 			gameServer := game_service.NewGameServer(conf, name, proto, addr)
 			gameServer.Start()
@@ -80,23 +80,23 @@ func buildGameStartCmd(parent *cobra.Command){
 	parent.AddCommand(cmd)
 }
 
-func buildPMCmd(parent *cobra.Command){
+func buildPMCmd(parent *cobra.Command) {
 	cmd := &cobra.Command{
-		Use:"pm",
-		Short:"pm command",
+		Use:   "pm",
+		Short: "pm command",
 	}
 	buildPMStartCmd(cmd)
 	parent.AddCommand(cmd)
 }
 
-func buildPMStartCmd(parent *cobra.Command){
+func buildPMStartCmd(parent *cobra.Command) {
 	var addr string
 	var proto string
 	var name string
 	var conf string
 	cmd := &cobra.Command{
-		Use:"start",
-		Short:"start pm daemon",
+		Use:   "start",
+		Short: "start pm daemon",
 		Run: func(cmd *cobra.Command, args []string) {
 			pmServer := pm_service.NewPMServer(conf, name, proto, addr)
 			pmServer.Start()
@@ -110,23 +110,23 @@ func buildPMStartCmd(parent *cobra.Command){
 	parent.AddCommand(cmd)
 }
 
-func buildPlayerCmd(parent *cobra.Command){
+func buildPlayerCmd(parent *cobra.Command) {
 	cmd := &cobra.Command{
-		Use:"player",
-		Short:"player command",
+		Use:   "player",
+		Short: "player command",
 	}
 	buildPlayerStartCmd(cmd)
 	parent.AddCommand(cmd)
 }
 
-func buildPlayerStartCmd(parent *cobra.Command){
+func buildPlayerStartCmd(parent *cobra.Command) {
 	var addr string
 	var proto string
 	var name string
 	var conf string
 	cmd := &cobra.Command{
-		Use:"start",
-		Short:"start player daemon",
+		Use:   "start",
+		Short: "start player daemon",
 		Run: func(cmd *cobra.Command, args []string) {
 			playerServer := player_service.NewPlayerServer(conf, name, proto, addr)
 			playerServer.Start()
