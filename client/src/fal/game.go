@@ -11,14 +11,14 @@ import (
 
 var gmAddr = ":12587"
 
-func buildGameCreateCmd(parent *cobra.Command){
+func buildGameCreateCmd(parent *cobra.Command) {
 	var addr string
 	var gtype int64
 	var gid string
 	var port int64
 	cmd := &cobra.Command{
-		Use:"create",
-		Short:"create a game",
+		Use:   "create",
+		Short: "create a game",
 		Run: func(cmd *cobra.Command, args []string) {
 			if addr == "" {
 				addr = gmAddr
@@ -31,9 +31,9 @@ func buildGameCreateCmd(parent *cobra.Command){
 			defer conn.Close()
 			c := igm.NewGMClient(conn)
 			req := &igm.GameCreateRequest{
-				GameType:gtype,
-				Gid:gid,
-				Port:port,
+				GameType: gtype,
+				Gid:      gid,
+				Port:     port,
 			}
 			resp, err := c.GameCreate(context.Background(), req)
 			if err != nil {
@@ -51,12 +51,12 @@ func buildGameCreateCmd(parent *cobra.Command){
 	parent.AddCommand(cmd)
 }
 
-func buildGameDeleteCmd(parent *cobra.Command){
+func buildGameDeleteCmd(parent *cobra.Command) {
 	var addr string
 	var gid string
 	cmd := &cobra.Command{
-		Use:"delete",
-		Short:"delete a game",
+		Use:   "delete",
+		Short: "delete a game",
 		Run: func(cmd *cobra.Command, args []string) {
 			if addr == "" {
 				addr = gmAddr
@@ -69,7 +69,7 @@ func buildGameDeleteCmd(parent *cobra.Command){
 			defer conn.Close()
 			c := igm.NewGMClient(conn)
 			req := &igm.GameDeleteRequest{
-				Gid:gid,
+				Gid: gid,
 			}
 			resp, err := c.GameDelete(context.Background(), req)
 			if err != nil {
@@ -85,12 +85,12 @@ func buildGameDeleteCmd(parent *cobra.Command){
 	parent.AddCommand(cmd)
 }
 
-func buildGameListCmd(parent *cobra.Command){
+func buildGameListCmd(parent *cobra.Command) {
 	var addr string
 	var gid string
 	cmd := &cobra.Command{
-		Use:"list",
-		Short:"list game",
+		Use:   "list",
+		Short: "list game",
 		Run: func(cmd *cobra.Command, args []string) {
 			if addr == "" {
 				addr = gmAddr
@@ -103,7 +103,7 @@ func buildGameListCmd(parent *cobra.Command){
 			defer conn.Close()
 			c := igm.NewGMClient(conn)
 			req := &igm.GameListRequest{
-				Gid:gid,
+				Gid: gid,
 			}
 			resp, err := c.GameList(context.Background(), req)
 			if err != nil {
@@ -118,4 +118,3 @@ func buildGameListCmd(parent *cobra.Command){
 	flags.StringVarP(&gid, "gid", "", "", "")
 	parent.AddCommand(cmd)
 }
-

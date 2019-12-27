@@ -34,7 +34,7 @@ func buildDebugStartCmd(parentCmd *cobra.Command, addr string) {
 	var ProfCmd = &cobra.Command{
 		Use:   "start",
 		Short: "start prof service",
-		Example:"use Example:\n" +
+		Example: "use Example:\n" +
 			"go tool pprof http://localhost:10000/debug/pprof/profile\n" +
 			"go tool pprof http://localhost:10000/debug/pprof/heap\n" +
 			"go tool pprof http://localhost:10000/debug/pprof/goroutine",
@@ -47,7 +47,7 @@ func buildDebugStartCmd(parentCmd *cobra.Command, addr string) {
 			defer conn.Close()
 
 			c := idebug.NewDebugClient(conn)
-			resp, err := c.StartPprof(context.Background(), &idebug.StartPprofRequest{Addr:address})
+			resp, err := c.StartPprof(context.Background(), &idebug.StartPprofRequest{Addr: address})
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -96,7 +96,7 @@ func buildDebugProfCmd(parentCmd *cobra.Command, addr string) {
 
 	var ProfCmd = &cobra.Command{
 		Use:   "prof",
-		Short: "prof command " ,
+		Short: "prof command ",
 		Long: `	exampel :
         access storage debug prof --path=/root/default.prof
         go tool pprof -top /usr/local/bin/storage  /root/default.prof
@@ -106,7 +106,7 @@ func buildDebugProfCmd(parentCmd *cobra.Command, addr string) {
 		`,
 		Run: func(cmd *cobra.Command, args []string) {
 			opts := []grpc.DialOption{grpc.WithInsecure()}
-			conn, err := grpc.Dial(address,opts...)
+			conn, err := grpc.Dial(address, opts...)
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -168,7 +168,7 @@ func buildDebugGetLogLevelCmd(parentCmd *cobra.Command, addr string) {
 		Short: "get log level",
 		Run: func(cmd *cobra.Command, args []string) {
 			opts := []grpc.DialOption{grpc.WithInsecure()}
-			conn, err := grpc.Dial(address,opts...)
+			conn, err := grpc.Dial(address, opts...)
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -199,7 +199,7 @@ func buildDebugSetLogLevelCmd(parentCmd *cobra.Command, addr string) {
 		Short: "set log level",
 		Run: func(cmd *cobra.Command, args []string) {
 			opts := []grpc.DialOption{grpc.WithInsecure()}
-			conn, err := grpc.Dial(address,opts...)
+			conn, err := grpc.Dial(address, opts...)
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -230,7 +230,7 @@ func buildStatsStackCmd(parentCmd *cobra.Command, addr string) {
 		Short: "stack controller stack",
 		Run: func(cmd *cobra.Command, args []string) {
 			opts := []grpc.DialOption{grpc.WithInsecure()}
-			conn, err := grpc.Dial(address,opts...)
+			conn, err := grpc.Dial(address, opts...)
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -238,7 +238,7 @@ func buildStatsStackCmd(parentCmd *cobra.Command, addr string) {
 			defer conn.Close()
 
 			c := idebug.NewDebugClient(conn)
-			resp, err := c.Stats(context.Background(), &idebug.StatsRequest{Name: "stack"},grpc.MaxCallRecvMsgSize(1024*1024*1024))
+			resp, err := c.Stats(context.Background(), &idebug.StatsRequest{Name: "stack"}, grpc.MaxCallRecvMsgSize(1024*1024*1024))
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -260,7 +260,7 @@ func buildStatsMemstatsCmd(parentCmd *cobra.Command, addr string) {
 		Short: "memstats controller stack",
 		Run: func(cmd *cobra.Command, args []string) {
 			opts := []grpc.DialOption{grpc.WithInsecure()}
-			conn, err := grpc.Dial(address,opts...)
+			conn, err := grpc.Dial(address, opts...)
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -268,7 +268,7 @@ func buildStatsMemstatsCmd(parentCmd *cobra.Command, addr string) {
 			defer conn.Close()
 
 			c := idebug.NewDebugClient(conn)
-			resp, err := c.Stats(context.Background(), &idebug.StatsRequest{Name: "memstats"},grpc.MaxCallRecvMsgSize(1024*1024*1024))
+			resp, err := c.Stats(context.Background(), &idebug.StatsRequest{Name: "memstats"}, grpc.MaxCallRecvMsgSize(1024*1024*1024))
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -290,7 +290,7 @@ func buildStatsRoutineCmd(parentCmd *cobra.Command, addr string) {
 		Short: "routine controller stack",
 		Run: func(cmd *cobra.Command, args []string) {
 			opts := []grpc.DialOption{grpc.WithInsecure()}
-			conn, err := grpc.Dial(address,opts...)
+			conn, err := grpc.Dial(address, opts...)
 			if err != nil {
 				fmt.Println(err)
 				return

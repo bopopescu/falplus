@@ -19,18 +19,18 @@ func BuildFALCmd(parent *cobra.Command) {
 
 func buildDBCmd(parent *cobra.Command) {
 	cmd := &cobra.Command{
-		Use:"db",
-		Short:"manage db",
+		Use:   "db",
+		Short: "manage db",
 	}
 	buildBucketCmd(cmd)
 	buildKeyCmd(cmd)
 	parent.AddCommand(cmd)
 }
 
-func buildGMCmd(parent *cobra.Command){
+func buildGMCmd(parent *cobra.Command) {
 	cmd := &cobra.Command{
-		Use:"game",
-		Short:"manage game",
+		Use:   "game",
+		Short: "manage game",
 	}
 	buildGameCreateCmd(cmd)
 	buildGameDeleteCmd(cmd)
@@ -39,10 +39,10 @@ func buildGMCmd(parent *cobra.Command){
 	parent.AddCommand(cmd)
 }
 
-func buildPMCmd(parent *cobra.Command){
+func buildPMCmd(parent *cobra.Command) {
 	cmd := &cobra.Command{
-		Use:"player",
-		Short:"manage player",
+		Use:   "player",
+		Short: "manage player",
 	}
 
 	buildPlayerCreateCmd(cmd)

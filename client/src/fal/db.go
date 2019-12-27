@@ -8,8 +8,8 @@ import (
 
 func buildBucketCmd(parent *cobra.Command) {
 	cmd := &cobra.Command{
-		Use:"bucket",
-		Short:"bucket operate",
+		Use:   "bucket",
+		Short: "bucket operate",
 	}
 	buildBucketListCmd(cmd)
 	parent.AddCommand(cmd)
@@ -18,8 +18,8 @@ func buildBucketCmd(parent *cobra.Command) {
 func buildBucketListCmd(parent *cobra.Command) {
 	var file string
 	cmd := &cobra.Command{
-		Use:"list",
-		Short:"list buckets",
+		Use:   "list",
+		Short: "list buckets",
 		Run: func(cmd *cobra.Command, args []string) {
 			db := fdb.NewDB(file)
 			buckets, err := db.GetAllBucket()
@@ -37,8 +37,8 @@ func buildBucketListCmd(parent *cobra.Command) {
 
 func buildKeyCmd(parent *cobra.Command) {
 	cmd := &cobra.Command{
-		Use:"key",
-		Short:"key operate",
+		Use:   "key",
+		Short: "key operate",
 	}
 	buildKVList(cmd)
 	parent.AddCommand(cmd)
@@ -48,8 +48,8 @@ func buildKVList(parent *cobra.Command) {
 	var file string
 	var bucket string
 	cmd := &cobra.Command{
-		Use:"list",
-		Short:"list kv",
+		Use:   "list",
+		Short: "list kv",
 		Run: func(cmd *cobra.Command, args []string) {
 			db := fdb.NewDB(file)
 			buckets, err := db.GetAllKV(bucket)

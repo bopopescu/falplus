@@ -11,15 +11,15 @@ import (
 
 var pmAddr = ":12588"
 
-func buildPlayerCreateCmd(parent *cobra.Command){
+func buildPlayerCreateCmd(parent *cobra.Command) {
 	var addr string
 	var pid string
 	var port int64
 	var name string
 	var pwd string
 	cmd := &cobra.Command{
-		Use:"create",
-		Short:"create a player",
+		Use:   "create",
+		Short: "create a player",
 		Run: func(cmd *cobra.Command, args []string) {
 			if addr == "" {
 				addr = pmAddr
@@ -32,7 +32,7 @@ func buildPlayerCreateCmd(parent *cobra.Command){
 			defer conn.Close()
 			c := ipm.NewPMClient(conn)
 			req := &ipm.PlayerCreateRequest{
-				Name:	  name,
+				Name:     name,
 				Pid:      pid,
 				Port:     port,
 				Password: pwd,
@@ -54,12 +54,12 @@ func buildPlayerCreateCmd(parent *cobra.Command){
 	parent.AddCommand(cmd)
 }
 
-func buildPlayerDeleteCmd(parent *cobra.Command){
+func buildPlayerDeleteCmd(parent *cobra.Command) {
 	var addr string
 	var pid string
 	cmd := &cobra.Command{
-		Use:"delete",
-		Short:"delete a game",
+		Use:   "delete",
+		Short: "delete a game",
 		Run: func(cmd *cobra.Command, args []string) {
 			if addr == "" {
 				addr = pmAddr
@@ -72,7 +72,7 @@ func buildPlayerDeleteCmd(parent *cobra.Command){
 			defer conn.Close()
 			c := ipm.NewPMClient(conn)
 			req := &ipm.PlayerDeleteRequest{
-				Pid:pid,
+				Pid: pid,
 			}
 			resp, err := c.PlayerDelete(context.Background(), req)
 			if err != nil {
@@ -88,12 +88,12 @@ func buildPlayerDeleteCmd(parent *cobra.Command){
 	parent.AddCommand(cmd)
 }
 
-func buildPlayerListCmd(parent *cobra.Command){
+func buildPlayerListCmd(parent *cobra.Command) {
 	var addr string
 	var pid string
 	cmd := &cobra.Command{
-		Use:"list",
-		Short:"list game",
+		Use:   "list",
+		Short: "list game",
 		Run: func(cmd *cobra.Command, args []string) {
 			if addr == "" {
 				addr = pmAddr
@@ -106,7 +106,7 @@ func buildPlayerListCmd(parent *cobra.Command){
 			defer conn.Close()
 			c := ipm.NewPMClient(conn)
 			req := &ipm.PlayerListRequest{
-				Pid:      pid,
+				Pid: pid,
 			}
 			resp, err := c.PlayerList(context.Background(), req)
 			if err != nil {
