@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/Sirupsen/logrus"
 	"github.com/google/uuid"
+	"iclient"
 	"net"
 	"os"
 	"os/exec"
@@ -14,6 +15,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"util"
 )
 
 var (
@@ -116,7 +118,6 @@ func (m *GameManager) CreateGame(req *igm.GameCreateRequest) (*igm.GameInfo, err
 	} else {
 		id = uuid.New().String()
 	}
-
 	id = GamePrefix + id
 
 	g := &igm.GameInfo{
@@ -178,11 +179,20 @@ func (m *GameManager) DeleteGame(id string) error {
 }
 
 func (m *GameManager) GetAllGameInfo() map[string]*igm.GameInfo {
+	m.RLock()
+	defer m.RUnlock()
 	games := make(map[string]*igm.GameInfo)
 	for k, g := range m.games {
 		games[k] = g
 	}
 	return games
+}
+
+func (m *GameManager) GetGameInfo(gid string) *igm.GameInfo {
+	m.RLock()
+	defer m.RUnlock()
+	g, _ := m.games[gid]
+	return g
 }
 
 func (m *GameManager) startGame(g *igm.GameInfo) error {
@@ -206,6 +216,28 @@ func (m *GameManager) startGame(g *igm.GameInfo) error {
 	return nil
 }
 
-func (m *GameManager) stopGame(id string) error {
+func (m *GameManager) DefaultGameResponse(gid string, f func(c *iclient.GameClient) (*igm.GMDefaultResponse, error)) error {
+	m.RLock()
+	defer m.RUnlock()
+	g, exist := m.games[gid]
+	if !exist {
+		return fmt.Errorf("game %s is not exist", gid)
+	}
+	addr := net.JoinHostPort(util.GetIPv4Addr(), fmt.Sprint(g.Port))
+	c, err := iclient.NewGameClient(addr)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	defer c.Close()
+	resp, err := f(c)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	if resp.Status.Code != 0 {
+		log.Error(resp.Status)
+		return resp.Status
+	}
 	return nil
 }

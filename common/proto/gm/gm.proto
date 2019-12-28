@@ -12,6 +12,8 @@ service GM {
     rpc GameList(GameListRequest)returns(GameListResponse){}
     rpc GameStart(GameStartRequest)returns(GMDefaultResponse){}
     rpc GameStop(GameStopRequest)returns(GMDefaultResponse){}
+    rpc GameAddPlayer(AddPlayerRequest)returns(AddPlayerResponse){}
+    rpc GameExit(GameExitRequest)returns(GMDefaultResponse){}
 }
 
 message GameCreateRequest {
@@ -64,9 +66,27 @@ message GMDefaultResponse {
 }
 
 service Game {
+    rpc AddPlayer(AddPlayerRequest)returns(GMDefaultResponse){}
     rpc PlayerConn(stream PlayerMessage)returns(stream GameMessage){}
-    rpc GameStart(GameStartRequest)returns(GMDefaultResponse){}
-    rpc GameStop(GameStopRequest)returns(GMDefaultResponse){}
+    rpc Start(GameStartRequest)returns(GMDefaultResponse){}
+    rpc Stop(GameStopRequest)returns(GMDefaultResponse){}
+    rpc Exit(GameExitRequest)returns(GMDefaultResponse){}
+}
+
+message GameExitRequest{
+    string gid = 1;
+    string playerId = 2;
+}
+
+message AddPlayerRequest{
+    string gid = 1;
+    string playerId = 2;
+    string playerAddr = 3;
+}
+
+message AddPlayerResponse{
+    status.Status status = 1;
+    string gameAddr = 2;
 }
 
 message GameMessage {
@@ -74,10 +94,11 @@ message GameMessage {
     repeated int64 yourCards = 2;
     repeated int64 lastCards = 3;
     string lastId = 4;
-    bool roundOwner = 5;
+    string roundOwner = 5;
 }
 
 message PlayerMessage {
     int64 msgType = 1;
     repeated int64 putCards = 2;
+    string playerId = 3;
 }

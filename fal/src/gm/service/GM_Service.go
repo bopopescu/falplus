@@ -2,11 +2,14 @@ package service
 
 import (
 	"api/igm"
+	"fmt"
 	"github.com/Sirupsen/logrus"
 	"github.com/Unknwon/goconfig"
 	"gm"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/reflection"
+	"iclient"
+	"net"
 	"os"
 	"server"
 	"status"
@@ -63,6 +66,7 @@ func (m *GMService) GameCreate(ctx context.Context, req *igm.GameCreateRequest) 
 	g, err := m.gm.CreateGame(req)
 	if err != nil {
 		resp.Status = status.NewStatus(2000, err.Error())
+		log.Error(err)
 		return resp, nil
 	}
 	resp.Gid = g.Gid
@@ -75,9 +79,13 @@ func (m *GMService) GameDelete(ctx context.Context, req *igm.GameDeleteRequest) 
 	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &igm.GMDefaultResponse{}
 	resp.Status = status.SuccessStatus
+	m.gm.DefaultGameResponse(req.Gid, func(c *iclient.GameClient) (*igm.GMDefaultResponse, error) {
+		return c.Exit(ctx, &igm.GameExitRequest{})
+	})
 	err := m.gm.DeleteGame(req.Gid)
 	if err != nil {
 		resp.Status = status.NewStatus(2001, err.Error())
+		log.Error(err)
 	}
 	return resp, nil
 }
@@ -94,10 +102,35 @@ func (m *GMService) GameList(ctx context.Context, req *igm.GameListRequest) (*ig
 	return resp, nil
 }
 
+func (m *GMService) GameAddPlayer(ctx context.Context, req *igm.AddPlayerRequest) (*igm.AddPlayerResponse, error) {
+	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
+	resp := &igm.AddPlayerResponse{}
+	resp.Status = status.SuccessStatus
+	req.PlayerAddr = util.GetIPAddrFromCtx(ctx)
+	err := m.gm.DefaultGameResponse(req.Gid, func(c *iclient.GameClient) (*igm.GMDefaultResponse, error) {
+		return c.AddPlayer(ctx, req)
+	})
+	if err != nil {
+		resp.Status = status.NewStatus(2001, err.Error())
+		log.Error(err)
+		return resp, nil
+	}
+	port := m.gm.GetGameInfo(req.Gid).Port
+	resp.GameAddr = net.JoinHostPort(util.GetIPv4Addr(), fmt.Sprint(port))
+	return resp, nil
+}
+
 func (m *GMService) GameStart(ctx context.Context, req *igm.GameStartRequest) (*igm.GMDefaultResponse, error) {
 	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &igm.GMDefaultResponse{}
 	resp.Status = status.SuccessStatus
+	err := m.gm.DefaultGameResponse(req.Gid, func(c *iclient.GameClient) (*igm.GMDefaultResponse, error) {
+		return c.Start(ctx, req)
+	})
+	if err != nil {
+		resp.Status = status.NewStatus(2001, err.Error())
+		log.Error(err)
+	}
 	return resp, nil
 }
 
@@ -105,5 +138,26 @@ func (m *GMService) GameStop(ctx context.Context, req *igm.GameStopRequest) (*ig
 	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &igm.GMDefaultResponse{}
 	resp.Status = status.SuccessStatus
+	err := m.gm.DefaultGameResponse(req.Gid, func(c *iclient.GameClient) (*igm.GMDefaultResponse, error) {
+		return c.Stop(ctx, req)
+	})
+	if err != nil {
+		resp.Status = status.NewStatus(2001, err.Error())
+		log.Error(err)
+	}
+	return resp, nil
+}
+
+func (m *GMService) GameExit(ctx context.Context, req *igm.GameExitRequest) (*igm.GMDefaultResponse, error) {
+	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
+	resp := &igm.GMDefaultResponse{}
+	resp.Status = status.SuccessStatus
+	err := m.gm.DefaultGameResponse(req.Gid, func(c *iclient.GameClient) (*igm.GMDefaultResponse, error) {
+		return c.Exit(ctx, req)
+	})
+	if err != nil {
+		resp.Status = status.NewStatus(2001, err.Error())
+		log.Error(err)
+	}
 	return resp, nil
 }

@@ -70,3 +70,17 @@ func GetIPAddrFromCtx(ctx context.Context) string {
 	}
 	return ""
 }
+
+func GetIPv4Addr() string {
+	addrs, err := net.InterfaceAddrs()
+	if err == nil {
+		for _, address := range addrs {
+			if ipnet, ok := address.(*net.IPNet); ok {
+				if p4 := ipnet.IP.To4(); len(p4) == net.IPv4len {
+					return ipnet.IP.String()
+				}
+			}
+		}
+	}
+	return ""
+}

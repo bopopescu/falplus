@@ -67,6 +67,7 @@ message PlayerSignOutRequest {
 
 service Player {
     rpc SyncInfo(PlayerInfo)returns(PlayerInfo){}
+    rpc Stop(PlayerInfo)returns(PMDefaultResponse){}
     rpc Attach(AttachRequest)returns(PMDefaultResponse){}
     rpc Detach(DetachRequest)returns(PMDefaultResponse){}
     rpc GetMessage(GetMessageRequest)returns(GetMessageResponse){}

@@ -69,7 +69,7 @@ func buildGameStartCmd(parent *cobra.Command) {
 		Short: "start game daemon",
 		Run: func(cmd *cobra.Command, args []string) {
 			gameServer := game_service.NewGameServer(conf, name, proto, addr)
-			gameServer.Start()
+			gameServer.Run()
 		},
 	}
 	flags := cmd.Flags()

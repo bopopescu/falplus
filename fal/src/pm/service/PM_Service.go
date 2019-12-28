@@ -10,6 +10,7 @@ import (
 	"pm"
 	"server"
 	"status"
+	"util"
 )
 
 var (
@@ -50,11 +51,13 @@ func (m *PMService) Start() {
 }
 
 func (m *PMService) PlayerCreate(ctx context.Context, req *ipm.PlayerCreateRequest) (*ipm.PlayerCreateResponse, error) {
+	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &ipm.PlayerCreateResponse{}
 	resp.Status = status.SuccessStatus
 	p, err := m.pm.CreatePlayer(req)
 	if err != nil {
 		resp.Status = status.NewStatus(3000, err.Error())
+		log.Error(err)
 		return resp, nil
 	}
 	resp.Player = p
@@ -62,16 +65,19 @@ func (m *PMService) PlayerCreate(ctx context.Context, req *ipm.PlayerCreateReque
 }
 
 func (m *PMService) PlayerDelete(ctx context.Context, req *ipm.PlayerDeleteRequest) (*ipm.PMDefaultResponse, error) {
+	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &ipm.PMDefaultResponse{}
 	resp.Status = status.SuccessStatus
 	err := m.pm.DeletePlayer(req.Pid)
 	if err != nil {
 		resp.Status = status.NewStatus(3001, err.Error())
+		log.Error(err)
 	}
 	return resp, nil
 }
 
 func (m *PMService) PlayerList(ctx context.Context, req *ipm.PlayerListRequest) (*ipm.PlayerListResponse, error) {
+	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &ipm.PlayerListResponse{}
 	resp.Status = status.SuccessStatus
 	for pid, info := range m.pm.GetAllPlayerInfo() {
@@ -83,11 +89,13 @@ func (m *PMService) PlayerList(ctx context.Context, req *ipm.PlayerListRequest) 
 }
 
 func (m *PMService) PlayerSignIn(ctx context.Context, req *ipm.PlayerSignInRequest) (*ipm.PlayerSignInResponse, error) {
+	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &ipm.PlayerSignInResponse{}
 	resp.Status = status.SuccessStatus
 	p, err := m.pm.StartPlayer(req)
 	if err != nil {
 		resp.Status = status.NewStatus(3000, err.Error())
+		log.Error(err)
 		return resp, nil
 	}
 	resp.Port = p.Port
@@ -96,7 +104,13 @@ func (m *PMService) PlayerSignIn(ctx context.Context, req *ipm.PlayerSignInReque
 }
 
 func (m *PMService) PlayerSignOut(ctx context.Context, req *ipm.PlayerSignOutRequest) (*ipm.PMDefaultResponse, error) {
+	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &ipm.PMDefaultResponse{}
 	resp.Status = status.SuccessStatus
+	err := m.pm.SignOutPlayer(req)
+	if err != nil {
+		resp.Status = status.NewStatus(3000, err.Error())
+		log.Error(err)
+	}
 	return resp, nil
 }

@@ -7,13 +7,14 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/google/uuid"
 	"golang.org/x/net/context"
-	"google.golang.org/grpc"
+	"iclient"
 	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"sync"
 	"time"
+	"util"
 )
 
 const (
@@ -23,7 +24,6 @@ const (
 	BucketKeyPid     = "pid"
 	BucketKeyName    = "name"
 	BucketKeyPwd     = "password"
-	BucketKeyPort    = "port"
 )
 
 var (
@@ -72,7 +72,6 @@ func (m *PlayerManager) CreatePlayer(req *ipm.PlayerCreateRequest) (*ipm.PlayerI
 	}
 	kvs := make(map[string]string)
 	kvs[BucketKeyPid] = id
-	kvs[BucketKeyPort] = fmt.Sprint(p.Port)
 	kvs[BucketKeyName] = p.Name
 	kvs[BucketKeyPwd] = p.Password
 	data := map[string]map[string]string{id: kvs}
@@ -166,18 +165,45 @@ func (m *PlayerManager) StartPlayer(req *ipm.PlayerSignInRequest) (*ipm.PlayerIn
 }
 
 func (m *PlayerManager) updatePlayerInfo(p *ipm.PlayerInfo) error {
-	addr := net.JoinHostPort("", fmt.Sprint(p.Port))
-	conn, err := grpc.Dial(addr, grpc.WithInsecure())
+	addr := net.JoinHostPort(util.GetIPv4Addr(), fmt.Sprint(p.Port))
+	c, err := iclient.NewPlayerClient(addr)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
-	c := ipm.NewPlayerClient(conn)
+	defer c.Close()
 	resp, err := c.SyncInfo(context.Background(), p)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
 	p.Etag = resp.Etag
+	return nil
+}
+
+func (m *PlayerManager) SignOutPlayer(req *ipm.PlayerSignOutRequest) error {
+	p, exist := m.players[req.Pid]
+	if !exist {
+		return fmt.Errorf("pid %s is not exist", req.Pid)
+	}
+	if p.Etag != req.Etag {
+		return fmt.Errorf("etag %s is wrong", req.Pid)
+	}
+	addr := net.JoinHostPort(util.GetIPv4Addr(), fmt.Sprint(p.Port))
+	c, err := iclient.NewPlayerClient(addr)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	defer c.Close()
+	resp, err := c.Stop(context.Background(), p)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	if resp.Status.Code != 0 {
+		log.Error(resp.Status)
+		return resp.Status
+	}
 	return nil
 }

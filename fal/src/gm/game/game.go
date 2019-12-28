@@ -13,10 +13,18 @@ type Game struct {
 	Id      string
 	Port    int64
 	Pid     int
-	Players []igm.Game_PlayerConnServer
+	Players []*PInfo
 	Cards   [][]int64
 	LastId  string
+	LastWin int
 	msgChan chan *message
+	Stop    chan struct{}
+}
+
+type PInfo struct {
+	Stream igm.Game_PlayerConnServer
+	Id     string
+	Addr   string
 }
 
 type message struct {
@@ -37,6 +45,7 @@ const (
 func NewGame() *Game {
 	game = &Game{
 		msgChan: make(chan *message),
+		Stop:    make(chan struct{}),
 	}
 	return game
 }
@@ -49,6 +58,8 @@ func (g *Game) Start() {
 	g.Unlock()
 	for {
 		select {
+		case <-g.Stop:
+			return
 		case msg := <-g.msgChan:
 			g.sendMessage(msg)
 			msg.Done()
@@ -58,19 +69,19 @@ func (g *Game) Start() {
 
 // 向所有玩家发送信息，获取牌权持有者的响应
 func (g *Game) sendMessage(msg *message) {
-	for index, stream := range g.Players {
+	for index, p := range g.Players {
 		msg.gMsg.LastCards = g.Cards[3]     // 场上牌
 		msg.gMsg.YourCards = g.Cards[index] // 玩家手里牌
 		msg.gMsg.LastId = g.LastId
 		if msg.owner == index {
-			msg.gMsg.RoundOwner = true // 牌权
+			msg.gMsg.RoundOwner = g.Players[index].Id // 牌权
 		}
-		err := stream.Send(msg.gMsg)
+		err := p.Stream.Send(msg.gMsg)
 		if err != nil {
 			msg.err = err
 			return
 		}
-		r, err := stream.Recv()
+		r, err := p.Stream.Recv()
 		if err != nil {
 			msg.err = err
 			return
@@ -82,13 +93,14 @@ func (g *Game) sendMessage(msg *message) {
 }
 
 // 争夺地主
-func (g *Game) qiangdizhu() (int, error) {
-	for index := 0; index < 3; index++ {
-		resp, err := g.round(igm.QiangDiZhu, index, nil, "")
+func (g *Game) fightForLandlord(cur int) (int, error) {
+	for i := cur; i < cur+3; i++ {
+		index := i % 3
+		resp, err := g.round(igm.Get, index)
 		if err != nil {
 			return 0, err
 		}
-		if resp.MsgType == igm.QiangDiZhu {
+		if resp.MsgType == igm.Get {
 			g.Cards[index] = append(g.Cards[index], g.Cards[3]...)
 			g.Cards[3] = g.Cards[3][:0]
 			return index, nil
@@ -97,14 +109,10 @@ func (g *Game) qiangdizhu() (int, error) {
 	return 0, fmt.Errorf("nobody get landlord")
 }
 
-// 回合指定回合类型，牌权，当前场上牌，场上牌所有者
-func (g *Game) round(rtype int64, owner int, pcard []int64, powner string) (*igm.PlayerMessage, error) {
+// 回合指定回合类型，牌权
+func (g *Game) round(rtype int64, owner int) (*igm.PlayerMessage, error) {
 	msg := &message{}
-	gMsg := &igm.GameMessage{
-		MsgType:   rtype,
-		LastId:    powner,
-		LastCards: pcard,
-	}
+	gMsg := &igm.GameMessage{MsgType: rtype}
 	msg.gMsg = gMsg
 	msg.owner = owner
 	msg.Add(1)
@@ -114,28 +122,29 @@ func (g *Game) round(rtype int64, owner int, pcard []int64, powner string) (*igm
 }
 
 // 指定牌权，当前回合类型，场上牌，场上牌所属。
-func (g *Game) gameLogical() {
-	lIndex, err := g.qiangdizhu()
+func (g *Game) GameLogical() {
+	lIndex, err := g.fightForLandlord(g.LastWin)
 	if err != nil {
 		panic(err)
 	}
-	msg := &message{owner: lIndex}
-	gMsg := &igm.GameMessage{MsgType: igm.ChuPai}
-	msg.gMsg = gMsg
 	for {
-		msg.Add(1)
-		g.msgChan <- msg
-		msg.Wait()
-		if msg.err != nil {
+		cur := lIndex
+		resp, err := g.round(igm.Put, cur)
+		if err != nil {
 			panic(err)
 		}
-		resp := msg.pMsg
+		lIndex++
+		lIndex %= 3
 		if resp.MsgType == igm.Pass {
 			continue
 		}
+		g.Cards[3] = resp.PutCards
+		g.LastId = g.Players[cur].Id
 		// 更新并判断
-		if g.updateCards(msg.owner, resp.PutCards) {
-
+		if g.updateCards(cur, resp.PutCards) {
+			g.LastWin = cur
+			close(g.Stop)
+			return
 		}
 	}
 }

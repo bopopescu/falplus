@@ -472,12 +472,158 @@ func (m *GMDefaultResponse) GetStatus() *status.Status {
 	return nil
 }
 
+type GameExitRequest struct {
+	Gid                  string   `protobuf:"bytes,1,opt,name=gid,proto3" json:"gid"`
+	PlayerId             string   `protobuf:"bytes,2,opt,name=playerId,proto3" json:"playerId"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GameExitRequest) Reset()         { *m = GameExitRequest{} }
+func (m *GameExitRequest) String() string { return proto.CompactTextString(m) }
+func (*GameExitRequest) ProtoMessage()    {}
+func (*GameExitRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_910b291f729993e2, []int{9}
+}
+func (m *GameExitRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GameExitRequest.Unmarshal(m, b)
+}
+func (m *GameExitRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GameExitRequest.Marshal(b, m, deterministic)
+}
+func (m *GameExitRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GameExitRequest.Merge(m, src)
+}
+func (m *GameExitRequest) XXX_Size() int {
+	return xxx_messageInfo_GameExitRequest.Size(m)
+}
+func (m *GameExitRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GameExitRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GameExitRequest proto.InternalMessageInfo
+
+func (m *GameExitRequest) GetGid() string {
+	if m != nil {
+		return m.Gid
+	}
+	return ""
+}
+
+func (m *GameExitRequest) GetPlayerId() string {
+	if m != nil {
+		return m.PlayerId
+	}
+	return ""
+}
+
+type AddPlayerRequest struct {
+	Gid                  string   `protobuf:"bytes,1,opt,name=gid,proto3" json:"gid"`
+	PlayerId             string   `protobuf:"bytes,2,opt,name=playerId,proto3" json:"playerId"`
+	PlayerAddr           string   `protobuf:"bytes,3,opt,name=playerAddr,proto3" json:"playerAddr"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AddPlayerRequest) Reset()         { *m = AddPlayerRequest{} }
+func (m *AddPlayerRequest) String() string { return proto.CompactTextString(m) }
+func (*AddPlayerRequest) ProtoMessage()    {}
+func (*AddPlayerRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_910b291f729993e2, []int{10}
+}
+func (m *AddPlayerRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AddPlayerRequest.Unmarshal(m, b)
+}
+func (m *AddPlayerRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AddPlayerRequest.Marshal(b, m, deterministic)
+}
+func (m *AddPlayerRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddPlayerRequest.Merge(m, src)
+}
+func (m *AddPlayerRequest) XXX_Size() int {
+	return xxx_messageInfo_AddPlayerRequest.Size(m)
+}
+func (m *AddPlayerRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AddPlayerRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AddPlayerRequest proto.InternalMessageInfo
+
+func (m *AddPlayerRequest) GetGid() string {
+	if m != nil {
+		return m.Gid
+	}
+	return ""
+}
+
+func (m *AddPlayerRequest) GetPlayerId() string {
+	if m != nil {
+		return m.PlayerId
+	}
+	return ""
+}
+
+func (m *AddPlayerRequest) GetPlayerAddr() string {
+	if m != nil {
+		return m.PlayerAddr
+	}
+	return ""
+}
+
+type AddPlayerResponse struct {
+	Status               *status.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status"`
+	GameAddr             string         `protobuf:"bytes,2,opt,name=gameAddr,proto3" json:"gameAddr"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
+}
+
+func (m *AddPlayerResponse) Reset()         { *m = AddPlayerResponse{} }
+func (m *AddPlayerResponse) String() string { return proto.CompactTextString(m) }
+func (*AddPlayerResponse) ProtoMessage()    {}
+func (*AddPlayerResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_910b291f729993e2, []int{11}
+}
+func (m *AddPlayerResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AddPlayerResponse.Unmarshal(m, b)
+}
+func (m *AddPlayerResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AddPlayerResponse.Marshal(b, m, deterministic)
+}
+func (m *AddPlayerResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddPlayerResponse.Merge(m, src)
+}
+func (m *AddPlayerResponse) XXX_Size() int {
+	return xxx_messageInfo_AddPlayerResponse.Size(m)
+}
+func (m *AddPlayerResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_AddPlayerResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AddPlayerResponse proto.InternalMessageInfo
+
+func (m *AddPlayerResponse) GetStatus() *status.Status {
+	if m != nil {
+		return m.Status
+	}
+	return nil
+}
+
+func (m *AddPlayerResponse) GetGameAddr() string {
+	if m != nil {
+		return m.GameAddr
+	}
+	return ""
+}
+
 type GameMessage struct {
 	MsgType              int64    `protobuf:"varint,1,opt,name=msgType,proto3" json:"msgType"`
 	YourCards            []int64  `protobuf:"varint,2,rep,packed,name=yourCards,proto3" json:"yourCards"`
 	LastCards            []int64  `protobuf:"varint,3,rep,packed,name=lastCards,proto3" json:"lastCards"`
 	LastId               string   `protobuf:"bytes,4,opt,name=lastId,proto3" json:"lastId"`
-	RoundOwner           bool     `protobuf:"varint,5,opt,name=roundOwner,proto3" json:"roundOwner"`
+	RoundOwner           string   `protobuf:"bytes,5,opt,name=roundOwner,proto3" json:"roundOwner"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -487,7 +633,7 @@ func (m *GameMessage) Reset()         { *m = GameMessage{} }
 func (m *GameMessage) String() string { return proto.CompactTextString(m) }
 func (*GameMessage) ProtoMessage()    {}
 func (*GameMessage) Descriptor() ([]byte, []int) {
-	return fileDescriptor_910b291f729993e2, []int{9}
+	return fileDescriptor_910b291f729993e2, []int{12}
 }
 func (m *GameMessage) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GameMessage.Unmarshal(m, b)
@@ -535,16 +681,17 @@ func (m *GameMessage) GetLastId() string {
 	return ""
 }
 
-func (m *GameMessage) GetRoundOwner() bool {
+func (m *GameMessage) GetRoundOwner() string {
 	if m != nil {
 		return m.RoundOwner
 	}
-	return false
+	return ""
 }
 
 type PlayerMessage struct {
 	MsgType              int64    `protobuf:"varint,1,opt,name=msgType,proto3" json:"msgType"`
 	PutCards             []int64  `protobuf:"varint,2,rep,packed,name=putCards,proto3" json:"putCards"`
+	PlayerId             string   `protobuf:"bytes,3,opt,name=playerId,proto3" json:"playerId"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -554,7 +701,7 @@ func (m *PlayerMessage) Reset()         { *m = PlayerMessage{} }
 func (m *PlayerMessage) String() string { return proto.CompactTextString(m) }
 func (*PlayerMessage) ProtoMessage()    {}
 func (*PlayerMessage) Descriptor() ([]byte, []int) {
-	return fileDescriptor_910b291f729993e2, []int{10}
+	return fileDescriptor_910b291f729993e2, []int{13}
 }
 func (m *PlayerMessage) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlayerMessage.Unmarshal(m, b)
@@ -588,6 +735,13 @@ func (m *PlayerMessage) GetPutCards() []int64 {
 	return nil
 }
 
+func (m *PlayerMessage) GetPlayerId() string {
+	if m != nil {
+		return m.PlayerId
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*GameCreateRequest)(nil), "igm.GameCreateRequest")
 	proto.RegisterType((*GameCreateResponse)(nil), "igm.GameCreateResponse")
@@ -599,6 +753,9 @@ func init() {
 	proto.RegisterType((*GameStartRequest)(nil), "igm.GameStartRequest")
 	proto.RegisterType((*GameStopRequest)(nil), "igm.GameStopRequest")
 	proto.RegisterType((*GMDefaultResponse)(nil), "igm.GMDefaultResponse")
+	proto.RegisterType((*GameExitRequest)(nil), "igm.GameExitRequest")
+	proto.RegisterType((*AddPlayerRequest)(nil), "igm.AddPlayerRequest")
+	proto.RegisterType((*AddPlayerResponse)(nil), "igm.AddPlayerResponse")
 	proto.RegisterType((*GameMessage)(nil), "igm.GameMessage")
 	proto.RegisterType((*PlayerMessage)(nil), "igm.PlayerMessage")
 }
@@ -620,6 +777,8 @@ type GMClient interface {
 	GameList(ctx context.Context, in *GameListRequest, opts ...grpc.CallOption) (*GameListResponse, error)
 	GameStart(ctx context.Context, in *GameStartRequest, opts ...grpc.CallOption) (*GMDefaultResponse, error)
 	GameStop(ctx context.Context, in *GameStopRequest, opts ...grpc.CallOption) (*GMDefaultResponse, error)
+	GameAddPlayer(ctx context.Context, in *AddPlayerRequest, opts ...grpc.CallOption) (*AddPlayerResponse, error)
+	GameExit(ctx context.Context, in *GameExitRequest, opts ...grpc.CallOption) (*GMDefaultResponse, error)
 }
 
 type gMClient struct {
@@ -675,6 +834,24 @@ func (c *gMClient) GameStop(ctx context.Context, in *GameStopRequest, opts ...gr
 	return out, nil
 }
 
+func (c *gMClient) GameAddPlayer(ctx context.Context, in *AddPlayerRequest, opts ...grpc.CallOption) (*AddPlayerResponse, error) {
+	out := new(AddPlayerResponse)
+	err := c.cc.Invoke(ctx, "/igm.GM/GameAddPlayer", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gMClient) GameExit(ctx context.Context, in *GameExitRequest, opts ...grpc.CallOption) (*GMDefaultResponse, error) {
+	out := new(GMDefaultResponse)
+	err := c.cc.Invoke(ctx, "/igm.GM/GameExit", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GMServer is the server API for GM service.
 type GMServer interface {
 	GameCreate(context.Context, *GameCreateRequest) (*GameCreateResponse, error)
@@ -682,6 +859,8 @@ type GMServer interface {
 	GameList(context.Context, *GameListRequest) (*GameListResponse, error)
 	GameStart(context.Context, *GameStartRequest) (*GMDefaultResponse, error)
 	GameStop(context.Context, *GameStopRequest) (*GMDefaultResponse, error)
+	GameAddPlayer(context.Context, *AddPlayerRequest) (*AddPlayerResponse, error)
+	GameExit(context.Context, *GameExitRequest) (*GMDefaultResponse, error)
 }
 
 func RegisterGMServer(s *grpc.Server, srv GMServer) {
@@ -778,6 +957,42 @@ func _GM_GameStop_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GM_GameAddPlayer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddPlayerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GMServer).GameAddPlayer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/igm.GM/GameAddPlayer",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GMServer).GameAddPlayer(ctx, req.(*AddPlayerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GM_GameExit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GameExitRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GMServer).GameExit(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/igm.GM/GameExit",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GMServer).GameExit(ctx, req.(*GameExitRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _GM_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "igm.GM",
 	HandlerType: (*GMServer)(nil),
@@ -802,6 +1017,14 @@ var _GM_serviceDesc = grpc.ServiceDesc{
 			MethodName: "GameStop",
 			Handler:    _GM_GameStop_Handler,
 		},
+		{
+			MethodName: "GameAddPlayer",
+			Handler:    _GM_GameAddPlayer_Handler,
+		},
+		{
+			MethodName: "GameExit",
+			Handler:    _GM_GameExit_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "gm/gm.proto",
@@ -811,9 +1034,11 @@ var _GM_serviceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type GameClient interface {
+	AddPlayer(ctx context.Context, in *AddPlayerRequest, opts ...grpc.CallOption) (*GMDefaultResponse, error)
 	PlayerConn(ctx context.Context, opts ...grpc.CallOption) (Game_PlayerConnClient, error)
-	GameStart(ctx context.Context, in *GameStartRequest, opts ...grpc.CallOption) (*GMDefaultResponse, error)
-	GameStop(ctx context.Context, in *GameStopRequest, opts ...grpc.CallOption) (*GMDefaultResponse, error)
+	Start(ctx context.Context, in *GameStartRequest, opts ...grpc.CallOption) (*GMDefaultResponse, error)
+	Stop(ctx context.Context, in *GameStopRequest, opts ...grpc.CallOption) (*GMDefaultResponse, error)
+	Exit(ctx context.Context, in *GameExitRequest, opts ...grpc.CallOption) (*GMDefaultResponse, error)
 }
 
 type gameClient struct {
@@ -822,6 +1047,15 @@ type gameClient struct {
 
 func NewGameClient(cc *grpc.ClientConn) GameClient {
 	return &gameClient{cc}
+}
+
+func (c *gameClient) AddPlayer(ctx context.Context, in *AddPlayerRequest, opts ...grpc.CallOption) (*GMDefaultResponse, error) {
+	out := new(GMDefaultResponse)
+	err := c.cc.Invoke(ctx, "/igm.Game/AddPlayer", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *gameClient) PlayerConn(ctx context.Context, opts ...grpc.CallOption) (Game_PlayerConnClient, error) {
@@ -855,18 +1089,27 @@ func (x *gamePlayerConnClient) Recv() (*GameMessage, error) {
 	return m, nil
 }
 
-func (c *gameClient) GameStart(ctx context.Context, in *GameStartRequest, opts ...grpc.CallOption) (*GMDefaultResponse, error) {
+func (c *gameClient) Start(ctx context.Context, in *GameStartRequest, opts ...grpc.CallOption) (*GMDefaultResponse, error) {
 	out := new(GMDefaultResponse)
-	err := c.cc.Invoke(ctx, "/igm.Game/GameStart", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/igm.Game/Start", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *gameClient) GameStop(ctx context.Context, in *GameStopRequest, opts ...grpc.CallOption) (*GMDefaultResponse, error) {
+func (c *gameClient) Stop(ctx context.Context, in *GameStopRequest, opts ...grpc.CallOption) (*GMDefaultResponse, error) {
 	out := new(GMDefaultResponse)
-	err := c.cc.Invoke(ctx, "/igm.Game/GameStop", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/igm.Game/Stop", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameClient) Exit(ctx context.Context, in *GameExitRequest, opts ...grpc.CallOption) (*GMDefaultResponse, error) {
+	out := new(GMDefaultResponse)
+	err := c.cc.Invoke(ctx, "/igm.Game/Exit", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -875,13 +1118,33 @@ func (c *gameClient) GameStop(ctx context.Context, in *GameStopRequest, opts ...
 
 // GameServer is the server API for Game service.
 type GameServer interface {
+	AddPlayer(context.Context, *AddPlayerRequest) (*GMDefaultResponse, error)
 	PlayerConn(Game_PlayerConnServer) error
-	GameStart(context.Context, *GameStartRequest) (*GMDefaultResponse, error)
-	GameStop(context.Context, *GameStopRequest) (*GMDefaultResponse, error)
+	Start(context.Context, *GameStartRequest) (*GMDefaultResponse, error)
+	Stop(context.Context, *GameStopRequest) (*GMDefaultResponse, error)
+	Exit(context.Context, *GameExitRequest) (*GMDefaultResponse, error)
 }
 
 func RegisterGameServer(s *grpc.Server, srv GameServer) {
 	s.RegisterService(&_Game_serviceDesc, srv)
+}
+
+func _Game_AddPlayer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddPlayerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).AddPlayer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/igm.Game/AddPlayer",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).AddPlayer(ctx, req.(*AddPlayerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Game_PlayerConn_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -910,38 +1173,56 @@ func (x *gamePlayerConnServer) Recv() (*PlayerMessage, error) {
 	return m, nil
 }
 
-func _Game_GameStart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Game_Start_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GameStartRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GameServer).GameStart(ctx, in)
+		return srv.(GameServer).Start(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/igm.Game/GameStart",
+		FullMethod: "/igm.Game/Start",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServer).GameStart(ctx, req.(*GameStartRequest))
+		return srv.(GameServer).Start(ctx, req.(*GameStartRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Game_GameStop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Game_Stop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GameStopRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GameServer).GameStop(ctx, in)
+		return srv.(GameServer).Stop(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/igm.Game/GameStop",
+		FullMethod: "/igm.Game/Stop",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServer).GameStop(ctx, req.(*GameStopRequest))
+		return srv.(GameServer).Stop(ctx, req.(*GameStopRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Game_Exit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GameExitRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).Exit(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/igm.Game/Exit",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).Exit(ctx, req.(*GameExitRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -951,12 +1232,20 @@ var _Game_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*GameServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GameStart",
-			Handler:    _Game_GameStart_Handler,
+			MethodName: "AddPlayer",
+			Handler:    _Game_AddPlayer_Handler,
 		},
 		{
-			MethodName: "GameStop",
-			Handler:    _Game_GameStop_Handler,
+			MethodName: "Start",
+			Handler:    _Game_Start_Handler,
+		},
+		{
+			MethodName: "Stop",
+			Handler:    _Game_Stop_Handler,
+		},
+		{
+			MethodName: "Exit",
+			Handler:    _Game_Exit_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
@@ -973,42 +1262,49 @@ var _Game_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("gm/gm.proto", fileDescriptor_910b291f729993e2) }
 
 var fileDescriptor_910b291f729993e2 = []byte{
-	// 590 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x55, 0x5b, 0x8b, 0xd3, 0x40,
-	0x14, 0x6e, 0x92, 0xde, 0x72, 0xea, 0x6a, 0x77, 0x5c, 0xd7, 0x10, 0x44, 0x4a, 0x16, 0xa5, 0x4f,
-	0xad, 0xd4, 0x0b, 0x6b, 0x15, 0x05, 0xbb, 0x4b, 0x59, 0xb0, 0x28, 0xa9, 0xbe, 0xf8, 0x22, 0x23,
-	0x9d, 0x0d, 0x61, 0x9b, 0x8b, 0x99, 0x89, 0x92, 0x17, 0xff, 0x88, 0xff, 0x64, 0x7f, 0x90, 0xbf,
-	0x43, 0x26, 0x27, 0xd7, 0x96, 0x2a, 0x7d, 0xda, 0xa7, 0xcc, 0xf9, 0xce, 0xed, 0x9b, 0xf9, 0xce,
-	0x69, 0xa1, 0xe7, 0x78, 0x63, 0xc7, 0x1b, 0x85, 0x51, 0x20, 0x02, 0xa2, 0xb9, 0x8e, 0x67, 0xde,
-	0xe5, 0x82, 0x8a, 0x98, 0x8f, 0xf1, 0x83, 0x1e, 0xeb, 0x33, 0x1c, 0xce, 0xa9, 0xc7, 0x66, 0x11,
-	0xa3, 0x82, 0xd9, 0xec, 0x7b, 0xcc, 0xb8, 0x20, 0x26, 0x74, 0x1d, 0xea, 0xb1, 0x4f, 0x49, 0xc8,
-	0x0c, 0x65, 0xa0, 0x0c, 0x35, 0xbb, 0xb0, 0x09, 0x81, 0x66, 0x18, 0x44, 0xc2, 0x50, 0x53, 0x3c,
-	0x3d, 0x93, 0x3e, 0x68, 0x8e, 0xbb, 0x32, 0xb4, 0x81, 0x32, 0xd4, 0x6d, 0x79, 0xb4, 0x7e, 0x01,
-	0xa9, 0x96, 0xe5, 0x61, 0xe0, 0x73, 0x46, 0x1e, 0x43, 0x1b, 0x9b, 0xa7, 0x55, 0x7b, 0x93, 0xdb,
-	0xa3, 0x8c, 0xcb, 0x32, 0xfd, 0xd8, 0x99, 0xb7, 0xd6, 0x5f, 0xdd, 0xe8, 0xbf, 0xd5, 0xab, 0x60,
-	0xd4, 0x2c, 0x19, 0x59, 0x8f, 0xf0, 0x5a, 0x67, 0x6c, 0xcd, 0xca, 0x6b, 0x65, 0xa9, 0x4a, 0x49,
-	0xf3, 0x04, 0xee, 0xc8, 0xb0, 0xf7, 0x2e, 0x17, 0xbb, 0x83, 0xbe, 0x42, 0xbf, 0x0c, 0xda, 0xf3,
-	0x26, 0x27, 0xd0, 0x92, 0xcc, 0xb9, 0xa1, 0x0e, 0xb4, 0x61, 0x6f, 0x72, 0x30, 0x72, 0x1d, 0x6f,
-	0x24, 0xab, 0x5d, 0xf8, 0x97, 0x81, 0x8d, 0x3e, 0xeb, 0x8f, 0x02, 0xdd, 0x1c, 0xdb, 0xee, 0x4f,
-	0x8e, 0xa0, 0x25, 0xab, 0xe5, 0x4f, 0x81, 0x46, 0xed, 0x8d, 0xb4, 0x1d, 0x1a, 0x35, 0xeb, 0x1a,
-	0x85, 0xee, 0xca, 0x68, 0xa5, 0x90, 0x3c, 0x92, 0x67, 0xd0, 0x09, 0xd7, 0x34, 0x61, 0x11, 0x37,
-	0xda, 0x29, 0x3b, 0xb3, 0xc6, 0x6e, 0xf4, 0x11, 0x9d, 0xe7, 0xbe, 0x88, 0x12, 0x3b, 0x0f, 0x35,
-	0xa7, 0x70, 0xab, 0xea, 0x90, 0x75, 0xaf, 0x58, 0x92, 0xf3, 0xbd, 0x62, 0x89, 0xe4, 0xfb, 0x83,
-	0xae, 0x63, 0xe4, 0xab, 0xdb, 0x68, 0x4c, 0xd5, 0x53, 0xc5, 0x7a, 0x81, 0x2f, 0xb9, 0x14, 0x34,
-	0xda, 0xfd, 0xde, 0x39, 0x53, 0xcc, 0x96, 0x47, 0xeb, 0x39, 0xca, 0xb4, 0x14, 0x41, 0xb8, 0x4f,
-	0xda, 0x2b, 0x38, 0x9c, 0x2f, 0xce, 0xd8, 0x25, 0x8d, 0xd7, 0x7b, 0x2b, 0x67, 0xfd, 0x56, 0xa0,
-	0x27, 0x9b, 0x2e, 0x18, 0xe7, 0xd4, 0x61, 0xc4, 0x80, 0x8e, 0xc7, 0x9d, 0xca, 0x4a, 0xe4, 0x26,
-	0x79, 0x00, 0x7a, 0x12, 0xc4, 0xd1, 0x8c, 0x46, 0x2b, 0xd4, 0x59, 0xb3, 0x4b, 0x40, 0x7a, 0xd7,
-	0x94, 0x0b, 0xf4, 0x6a, 0xe8, 0x2d, 0x00, 0x72, 0x0c, 0x6d, 0x69, 0x5c, 0xac, 0x52, 0xad, 0x74,
-	0x3b, 0xb3, 0xc8, 0x43, 0x80, 0x28, 0x88, 0xfd, 0xd5, 0x87, 0x9f, 0x3e, 0x8b, 0x52, 0xd1, 0xba,
-	0x76, 0x05, 0xb1, 0xce, 0xe1, 0x00, 0x55, 0xf8, 0x3f, 0x3d, 0x13, 0xba, 0x61, 0x2c, 0xaa, 0xec,
-	0x0a, 0x7b, 0x72, 0xad, 0x82, 0x3a, 0x5f, 0x90, 0xb7, 0x00, 0xe5, 0xb6, 0x92, 0xe3, 0x62, 0x0c,
-	0x6a, 0xbf, 0x0a, 0xe6, 0xfd, 0x2d, 0x1c, 0x9f, 0xd4, 0x6a, 0x90, 0x37, 0x58, 0x00, 0xd7, 0xad,
-	0x52, 0xa0, 0xb6, 0x7f, 0x66, 0x86, 0x6f, 0x4a, 0x62, 0x35, 0xc8, 0x4b, 0x5c, 0x00, 0xb9, 0x62,
-	0xe4, 0xa8, 0xc8, 0xae, 0xac, 0xa5, 0x79, 0x6f, 0x03, 0x2d, 0x52, 0x5f, 0x83, 0x5e, 0xcc, 0x14,
-	0x29, 0xa3, 0xaa, 0x33, 0xf6, 0x8f, 0xc6, 0x53, 0x6c, 0x2c, 0x27, 0xab, 0xd2, 0xb8, 0x32, 0x68,
-	0xbb, 0x73, 0x27, 0xd7, 0x0a, 0x34, 0x65, 0x34, 0x39, 0x05, 0x40, 0x31, 0x66, 0x81, 0xef, 0x13,
-	0x92, 0x26, 0xd4, 0xd4, 0x31, 0xfb, 0x45, 0xe9, 0x0c, 0xb1, 0x1a, 0x43, 0xe5, 0x89, 0x72, 0x73,
-	0xe4, 0xdf, 0xe9, 0x5f, 0x3a, 0x34, 0x74, 0xc7, 0xae, 0xe3, 0x7d, 0x6b, 0xa7, 0xff, 0x04, 0x4f,
-	0xff, 0x06, 0x00, 0x00, 0xff, 0xff, 0xc6, 0xb6, 0xc8, 0x2c, 0x32, 0x06, 0x00, 0x00,
+	// 699 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x56, 0xdb, 0x6e, 0xd3, 0x4c,
+	0x10, 0xae, 0xe3, 0x24, 0xad, 0x27, 0x7f, 0x7f, 0xd2, 0xa5, 0x14, 0xcb, 0x42, 0xa8, 0xda, 0x0a,
+	0x94, 0xab, 0x14, 0x05, 0xa8, 0x4a, 0x41, 0x94, 0xd2, 0x56, 0x51, 0x25, 0x2a, 0x90, 0x0b, 0x42,
+	0xe2, 0x06, 0x16, 0x79, 0x6b, 0x59, 0x8d, 0x0f, 0xd8, 0x6b, 0xc0, 0x37, 0xbc, 0x08, 0x2f, 0xc0,
+	0x23, 0xf0, 0x44, 0x3c, 0x07, 0x5a, 0x8f, 0x0f, 0xeb, 0x84, 0x14, 0x9a, 0x2b, 0xef, 0x1c, 0x76,
+	0xbe, 0x6f, 0x66, 0x67, 0x46, 0x86, 0x9e, 0xeb, 0x6f, 0xbb, 0xfe, 0x30, 0x8a, 0x43, 0x11, 0x12,
+	0xdd, 0x73, 0x7d, 0xeb, 0x7a, 0x22, 0x98, 0x48, 0x93, 0x6d, 0xfc, 0xa0, 0x85, 0xbe, 0x81, 0xb5,
+	0x31, 0xf3, 0xf9, 0x61, 0xcc, 0x99, 0xe0, 0x36, 0xff, 0x94, 0xf2, 0x44, 0x10, 0x0b, 0x56, 0x5c,
+	0xe6, 0xf3, 0xd7, 0x59, 0xc4, 0x4d, 0x6d, 0x53, 0x1b, 0xe8, 0x76, 0x25, 0x13, 0x02, 0xed, 0x28,
+	0x8c, 0x85, 0xd9, 0xca, 0xf5, 0xf9, 0x99, 0xf4, 0x41, 0x77, 0x3d, 0xc7, 0xd4, 0x37, 0xb5, 0x81,
+	0x61, 0xcb, 0x23, 0xfd, 0x06, 0x44, 0x0d, 0x9b, 0x44, 0x61, 0x90, 0x70, 0x72, 0x17, 0xba, 0x08,
+	0x9e, 0x47, 0xed, 0x8d, 0xfe, 0x1f, 0x16, 0x5c, 0xce, 0xf2, 0x8f, 0x5d, 0x58, 0x1b, 0xf8, 0xad,
+	0x29, 0xfc, 0x19, 0xac, 0x8a, 0x51, 0xbb, 0x66, 0x44, 0xef, 0x60, 0x5a, 0x47, 0x7c, 0xc2, 0xeb,
+	0xb4, 0x8a, 0xab, 0x5a, 0x4d, 0x73, 0x0b, 0xae, 0x49, 0xb7, 0x17, 0x5e, 0x22, 0xe6, 0x3b, 0xbd,
+	0x87, 0x7e, 0xed, 0x74, 0xc5, 0x4c, 0xb6, 0xa0, 0x23, 0x99, 0x27, 0x66, 0x6b, 0x53, 0x1f, 0xf4,
+	0x46, 0xab, 0x43, 0xcf, 0xf5, 0x87, 0x32, 0xda, 0x49, 0x70, 0x1e, 0xda, 0x68, 0xa3, 0xbf, 0x34,
+	0x58, 0x29, 0x75, 0xb3, 0xf8, 0x64, 0x1d, 0x3a, 0x32, 0x5a, 0x59, 0x0a, 0x14, 0x1a, 0x35, 0xd2,
+	0xe7, 0xbc, 0x51, 0xbb, 0xf9, 0x46, 0x91, 0xe7, 0x98, 0x9d, 0x5c, 0x25, 0x8f, 0xe4, 0x01, 0x2c,
+	0x47, 0x13, 0x96, 0xf1, 0x38, 0x31, 0xbb, 0x39, 0x3b, 0xab, 0xc1, 0x6e, 0xf8, 0x0a, 0x8d, 0xc7,
+	0x81, 0x88, 0x33, 0xbb, 0x74, 0xb5, 0xf6, 0xe0, 0x3f, 0xd5, 0x20, 0xe3, 0x5e, 0xf0, 0xac, 0xe4,
+	0x7b, 0xc1, 0x33, 0xc9, 0xf7, 0x33, 0x9b, 0xa4, 0xc8, 0xd7, 0xb0, 0x51, 0xd8, 0x6b, 0xed, 0x6a,
+	0x74, 0x07, 0x2b, 0x79, 0x26, 0x58, 0x3c, 0xbf, 0xde, 0x25, 0x53, 0xbc, 0x2d, 0x8f, 0xf4, 0x21,
+	0x3e, 0xd3, 0x99, 0x08, 0xa3, 0xab, 0x5c, 0x7b, 0x0c, 0x6b, 0xe3, 0xd3, 0x23, 0x7e, 0xce, 0xd2,
+	0xc9, 0x95, 0x5f, 0x8e, 0xee, 0x23, 0xe6, 0xf1, 0x57, 0xef, 0x12, 0xaa, 0x16, 0xac, 0x60, 0x5d,
+	0x4e, 0x4a, 0xe0, 0x4a, 0xa6, 0x1f, 0xa0, 0x7f, 0xe0, 0x38, 0x58, 0xab, 0x85, 0x22, 0x90, 0xdb,
+	0x00, 0x78, 0x3e, 0x70, 0x9c, 0xb8, 0xe8, 0x78, 0x45, 0x43, 0xdf, 0xc2, 0x9a, 0x82, 0xb0, 0xd8,
+	0x8c, 0xe5, 0xa1, 0x0b, 0xe0, 0x52, 0xa6, 0xdf, 0x35, 0xe8, 0xc9, 0xe4, 0x4f, 0x79, 0x92, 0x30,
+	0x97, 0x13, 0x13, 0x96, 0xfd, 0xc4, 0x55, 0xd6, 0x41, 0x29, 0x92, 0x5b, 0x60, 0x64, 0x61, 0x1a,
+	0x1f, 0xb2, 0xd8, 0xc1, 0x1e, 0xd7, 0xed, 0x5a, 0x21, 0xad, 0x13, 0x96, 0x08, 0xb4, 0xea, 0x68,
+	0xad, 0x14, 0x64, 0x03, 0xba, 0x52, 0x38, 0x71, 0xf2, 0x3e, 0x35, 0xec, 0x42, 0x92, 0x69, 0xc7,
+	0x61, 0x1a, 0x38, 0x2f, 0xbf, 0x04, 0x3c, 0xce, 0x1b, 0xd6, 0xb0, 0x15, 0x0d, 0x65, 0xb0, 0x8a,
+	0x39, 0xff, 0x9d, 0x9e, 0xac, 0x6e, 0x2a, 0x54, 0x76, 0x95, 0xdc, 0xa8, 0xbc, 0xde, 0xac, 0xfc,
+	0xe8, 0xa7, 0x0e, 0xad, 0xf1, 0x29, 0xd9, 0x07, 0xa8, 0xb7, 0x18, 0xd9, 0xa8, 0xc6, 0xa3, 0xb1,
+	0x2d, 0xad, 0x9b, 0x33, 0x7a, 0x7c, 0x0a, 0xba, 0x44, 0x9e, 0x62, 0x00, 0x5c, 0x43, 0x4a, 0x80,
+	0xc6, 0x5e, 0xb2, 0x0a, 0xfd, 0x74, 0xab, 0xd2, 0x25, 0xf2, 0x08, 0x17, 0x83, 0x5c, 0x3d, 0x64,
+	0xbd, 0xba, 0xad, 0xac, 0x2b, 0xeb, 0xc6, 0x94, 0xb6, 0xba, 0xfa, 0x04, 0x8c, 0x6a, 0xd6, 0x48,
+	0xed, 0xa5, 0xce, 0xde, 0x25, 0xc0, 0x7b, 0x08, 0x2c, 0x27, 0x4e, 0x01, 0x56, 0x06, 0xf0, 0x92,
+	0xbb, 0xcf, 0x60, 0x75, 0x8c, 0x9d, 0x84, 0xcf, 0x54, 0xa0, 0x4f, 0x0f, 0x43, 0x11, 0x61, 0xa6,
+	0x83, 0x6b, 0x74, 0x39, 0x7b, 0x0a, 0xba, 0x32, 0x8a, 0xf3, 0xd1, 0x47, 0x3f, 0x5a, 0xd0, 0x96,
+	0xde, 0xb2, 0x00, 0xff, 0x48, 0xe1, 0x4f, 0x49, 0xec, 0x02, 0xa0, 0xeb, 0x61, 0x18, 0x04, 0x84,
+	0xe4, 0x7e, 0x8d, 0xae, 0xb3, 0xfa, 0x15, 0xb1, 0x42, 0x43, 0x97, 0x06, 0xda, 0x3d, 0x8d, 0xec,
+	0x42, 0x67, 0xc1, 0xa2, 0xef, 0x40, 0x7b, 0xa1, 0x82, 0xef, 0x40, 0x7b, 0x91, 0x52, 0x3d, 0x37,
+	0xde, 0x2d, 0xb3, 0xc8, 0xdb, 0xf6, 0x5c, 0xff, 0x63, 0x37, 0xff, 0x1b, 0xb8, 0xff, 0x3b, 0x00,
+	0x00, 0xff, 0xff, 0x2b, 0xa5, 0x08, 0xd0, 0x36, 0x08, 0x00, 0x00,
 }

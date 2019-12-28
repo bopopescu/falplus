@@ -18,7 +18,19 @@ const(
 	CardTypeJoker = "joker"
 )
 
-var falType = map[int]int{
+const(
+	ValueTypeSingle = "single"
+	ValueTypeSequence = "sequence"
+	ValueTypeDouble = "double"
+	ValueTypePairs = "pairs"
+	ValueType3take1 = "3take1"
+	ValueType4take2 = "4take2"
+	ValueTypeBomb = "bomb"
+	ValueTypeThree = "three"
+	ValueTypeUnknown = "unknown"
+)
+
+var falType = map[int64]int64{
 	1:12, 2:13, 3:1,
 	4:2,  5:3,  6:4,
 	7:5,  8:6,  9:7,
@@ -28,12 +40,12 @@ var falType = map[int]int{
 
 type Card struct {
 	GameType   string
-	CardSeq    int
-	CardNumber int
+	CardSeq    int64
+	CardNumber int64
 	CardType   string
 }
 
-func (c Card) GetCardValue() int {
+func (c Card) GetCardValue() int64 {
 	switch c.GameType {
 	case GameTypeFAL:
 		return falType[c.CardNumber]
@@ -42,17 +54,17 @@ func (c Card) GetCardValue() int {
 	}
 }
 
-var Cards map[int]Card
+var Cards map[int64]Card
 
-func DistributeCards(num int) []int64 {
+func DistributeCards(num int64) []int64 {
 	rand.Seed(time.Now().UnixNano())
 	dis := make([]int64, num+1)
-	last := rand.Intn(num) + 1
-	dis[last] = int64(num)
+	last := rand.Int63n(num) + 1
+	dis[last] = num
 	for i:=num-1;i>0;i--{
-		index := rand.Intn(i) + 1
-		count := 0
-		for j:=1;j<num+1;j++{
+		index := rand.Int63n(i) + 1
+		count := int64(0)
+		for j:=int64(1);j<num+1;j++{
 			if dis[j] == 0 {
 				count++
 			}
@@ -68,9 +80,9 @@ func DistributeCards(num int) []int64 {
 
 func init() {
 	if Cards == nil {
-		Cards = make(map[int]Card, 54)
+		Cards = make(map[int64]Card, 54)
 	}
-	addCard := func(seq, value int, ctype string) {
+	addCard := func(seq, value int64, ctype string) {
 		card := Card{
 			GameType:   GameTypeFAL,
 			CardSeq:    seq,
@@ -80,8 +92,8 @@ func init() {
 		Cards[seq] = card
 	}
 	var ctype string
-	var value int
-	for i:=0;i<52;i++{
+	var value int64
+	for i:=int64(0);i<52;i++{
 		switch i/13 {
 		case 0:
 			ctype = CardTypeSpade
@@ -102,15 +114,19 @@ func init() {
 	addCard(53, 15, CardTypeJoker)
 }
 
-//获取重复数个数及其值
-func GetRepeatNumAndValue(nums []int) (int, int) {
-	max := 1
-	repeat := 1
+//获取重复数个数及其值和长度
+func GetRepeatNumAndValue(cards []int64) (int64, int64, int64) {
+	var nums []int64
+	for _, seq := range cards {
+		nums = append(nums, Cards[seq].GetCardValue())
+	}
+	max := int64(1)
+	repeat := int64(1)
 	value := nums[0]
 	if len(nums) == 1 {
-		return 1, nums[0]
+		return 1, nums[0], 1
 	} else if len(nums) == 2 && nums[0] == 14 && nums[1] == 15 || len(nums) == 2 && nums[1] == 14 && nums[0] == 15 {
-		return 4, nums[0]
+		return 4, nums[0], 4
 	}
 	for i := 1; i < len(nums); i++ {
 		if nums[i] == nums[i-1] {
@@ -124,62 +140,41 @@ func GetRepeatNumAndValue(nums []int) (int, int) {
 		}
 	}
 	fmt.Println("重复次数", max, "重复值", value)
-	return max, value
+	return max, value, int64(len(nums))
 }
 
 //获取出牌类型
-func GetCardsType(repeatnum int, nums []int) string {
+func GetCardsType(repeatnum int64, nums []int64) string {
 	if repeatnum == 1 {
 		if len(nums) == 1 {
-			str := "single"
-			return str
+			return ValueTypeSingle
 		} else if len(nums) >= 5 && IsSequence(nums) {
-			str := "sequence"
-			return str
-		} else {
-			str := "err"
-			return str
+			return ValueTypeSequence
 		}
 	} else if repeatnum == 2 {
 		if len(nums) == 2 {
-			str := "double"
-			return str
+			return ValueTypeDouble
 		} else if len(nums) >= 6 && len(nums)%2 == 0 && IsSequencePair(nums) {
-			str := "sequencepair"
-			return str
-		} else {
-			str := "err"
-			return str
+			return ValueTypePairs
 		}
 	} else if repeatnum == 3 {
 		if len(nums) == 3 {
-			str := "three"
-			return str
+			return ValueTypeThree
 		} else if len(nums) == 4 {
-			str := "threeandone"
-			return str
-		} else {
-			str := "err"
-			return str
+			return ValueType3take1
 		}
 	} else if repeatnum == 4 {
 		if len(nums) == 4 || len(nums) == 2 {
-			str := "bomb"
-			return str
+			return ValueTypeBomb
 		} else if len(nums) == 6 {
-			str := "fourandtwo"
-			return str
-		} else {
-			str := "err"
-			return str
+			return ValueType4take2
 		}
 	}
-	str := "err"
-	return str
+	return ValueTypeUnknown
 }
 
 //连牌
-func IsSequence(nums []int) bool {
+func IsSequence(nums []int64) bool {
 	for i := 1; i < len(nums); i++ {
 		if nums[i]-nums[i-1] != 1 {
 			return false
@@ -189,7 +184,7 @@ func IsSequence(nums []int) bool {
 }
 
 //连对
-func IsSequencePair(nums []int) bool {
+func IsSequencePair(nums []int64) bool {
 	for i := 2; i < len(nums); i++ {
 		if nums[i]-nums[i-2] != 1 {
 			return false
