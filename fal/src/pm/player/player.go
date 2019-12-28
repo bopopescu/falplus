@@ -91,22 +91,36 @@ func (p *Player) checkRespValid(resp *igm.PlayerMessage) bool {
 		// 争夺地主中只能选择抢或者过
 		// 出牌判断是否可出
 		switch p.req.MsgType {
+		case igm.Over:
+			return true
 		case igm.Get:
-			if resp.MsgType != igm.Get && resp.MsgType != igm.Pass {
+			resp.PutCards = nil
+			if resp.MsgType == igm.Pass {
+				return true
+			}
+			if resp.MsgType != igm.Get {
 				return false
 			}
-			resp.PutCards = nil
 		case igm.Put:
-			lastRepeated, lastValue, lastLength := card.GetRepeatNumAndValue(p.req.LastCards)
-			lastType := card.GetCardsType(lastRepeated, p.req.LastCards)
+			// 地主第一次不能不出牌,上次牌是自己的不能不出
+			if resp.MsgType == igm.Pass && (p.req.LastId != "" || p.req.LastId != p.Id) {
+				resp.PutCards = nil
+				return true
+			}
+			if resp.MsgType != igm.Put {
+				return false
+			}
 
 			repeated, value, length := card.GetRepeatNumAndValue(resp.PutCards)
 			curType := card.GetCardsType(repeated, resp.PutCards)
 
-			// 牌类型正确且上次牌无人要
-			if curType != card.ValueTypeUnknown && p.req.LastId == p.Id {
+			// 牌类型正确且上次牌无人要，或者地主首次出牌
+			if curType != card.ValueTypeUnknown && (p.req.LastId == p.Id || p.req.LastId == "") {
 				return true
 			}
+
+			lastRepeated, lastValue, lastLength := card.GetRepeatNumAndValue(p.req.LastCards)
+			lastType := card.GetCardsType(lastRepeated, p.req.LastCards)
 
 			// 牌类型未知 或者非炸弹的情况下类型不等 或者类型相等长度不等 或者类型相等值较小
 			if curType == card.ValueTypeUnknown ||
@@ -118,7 +132,7 @@ func (p *Player) checkRespValid(resp *igm.PlayerMessage) bool {
 		}
 	} else {
 		// 无牌权无需关心
-		resp.MsgType = igm.Msg
+		resp.MsgType = igm.Over
 		resp.PutCards = nil
 	}
 
@@ -140,7 +154,7 @@ func (p *Player) ConnGame(etag, addr string) error {
 		return err
 	}
 	pMsg := &igm.PlayerMessage{
-		MsgType:  igm.Msg,
+		MsgType:  igm.Over,
 		PlayerId: p.Id,
 	}
 	err = stream.Send(pMsg)

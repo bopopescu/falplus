@@ -4,8 +4,11 @@ import (
 	"api/igm"
 	"card"
 	"fmt"
+	"github.com/Sirupsen/logrus"
 	"sync"
 )
+
+var log = logrus.WithFields(logrus.Fields{"pkg": "gm/game"})
 
 type Game struct {
 	sync.RWMutex
@@ -14,7 +17,7 @@ type Game struct {
 	Port    int64
 	Pid     int
 	Players []*PInfo
-	Cards   [][]int64
+	Cards   []nums
 	LastId  string
 	LastWin int
 	msgChan chan *message
@@ -35,6 +38,8 @@ type message struct {
 	sync.WaitGroup
 }
 
+type nums []int64
+
 var game *Game
 
 const (
@@ -54,7 +59,14 @@ func (g *Game) Start() {
 	g.Lock()
 	g.Status = Start
 	cards := card.DistributeCards(54)
-	g.Cards = append(g.Cards, cards[:13], cards[13:26], cards[26:39], cards[52:])
+	// 此方法赋值会复用cards的内存，造成意想不到的bug
+	// g.Cards = append(g.Cards, cards[:17], cards[17:34], cards[34:51], cards[51:])
+	g.Cards = make([]nums, 3)
+	for index := range g.Cards {
+		g.Cards[index] = make([]int64, 17)
+		copy(g.Cards[index], cards[index*17:(index+1)*17])
+	}
+	g.Cards = append(g.Cards, cards[51:])
 	g.Unlock()
 	for {
 		select {
@@ -69,27 +81,34 @@ func (g *Game) Start() {
 
 // 向所有玩家发送信息，获取牌权持有者的响应
 func (g *Game) sendMessage(msg *message) {
+	wg := &sync.WaitGroup{}
 	for index, p := range g.Players {
-		msg.gMsg.LastCards = g.Cards[3]     // 场上牌
-		msg.gMsg.YourCards = g.Cards[index] // 玩家手里牌
-		msg.gMsg.LastId = g.LastId
-		if msg.owner == index {
-			msg.gMsg.RoundOwner = g.Players[index].Id // 牌权
-		}
-		err := p.Stream.Send(msg.gMsg)
-		if err != nil {
-			msg.err = err
-			return
-		}
-		r, err := p.Stream.Recv()
-		if err != nil {
-			msg.err = err
-			return
-		}
-		if msg.owner == index {
-			msg.pMsg = r
-		}
+		wg.Add(1)
+		go func(index int, p *PInfo) {
+			defer wg.Done()
+			gMsg := *msg.gMsg
+			gMsg.LastCards = g.Cards[3]     // 场上牌
+			gMsg.YourCards = g.Cards[index] // 玩家手里牌
+			gMsg.LastId = g.LastId
+			gMsg.RoundOwner = g.Players[msg.owner].Id // 牌权
+			err := p.Stream.Send(&gMsg)
+			if err != nil {
+				msg.err = err
+				log.Error(err)
+				return
+			}
+			r, err := p.Stream.Recv()
+			if err != nil {
+				msg.err = err
+				log.Error(err)
+				return
+			}
+			if msg.owner == index {
+				msg.pMsg = r
+			}
+		}(index, p)
 	}
+	wg.Wait()
 }
 
 // 争夺地主
@@ -131,7 +150,9 @@ func (g *Game) GameLogical() {
 		cur := lIndex
 		resp, err := g.round(igm.Put, cur)
 		if err != nil {
-			panic(err)
+			log.Error(err)
+			close(g.Stop)
+			return
 		}
 		lIndex++
 		lIndex %= 3
@@ -142,6 +163,7 @@ func (g *Game) GameLogical() {
 		g.LastId = g.Players[cur].Id
 		// 更新并判断
 		if g.updateCards(cur, resp.PutCards) {
+			g.round(igm.Over, cur)
 			g.LastWin = cur
 			close(g.Stop)
 			return

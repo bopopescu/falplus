@@ -21,6 +21,7 @@ var (
 type PlayerService struct {
 	player  *player.Player
 	service *server.Service
+	geted   bool
 }
 
 func NewPlayerServer(conf, name, proto, addr string) *PlayerService {
@@ -107,6 +108,7 @@ func (p *PlayerService) GetMessage(ctx context.Context, req *ipm.GetMessageReque
 		return resp, nil
 	}
 	resp.Gmsg = msg
+	p.geted = true
 	return resp, nil
 }
 
@@ -114,10 +116,16 @@ func (p *PlayerService) PutMessage(ctx context.Context, req *ipm.PutMessageReque
 	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &ipm.PMDefaultResponse{}
 	resp.Status = status.SuccessStatus
+	if !p.geted {
+		resp.Status = status.NewStatus(3001, "must get before put")
+		return resp, nil
+	}
 	err := p.player.PutCards(req)
 	if err != nil {
 		resp.Status = status.NewStatus(3001, err.Error())
 		log.Error(err)
+		return resp, nil
 	}
+	p.geted = false
 	return resp, nil
 }

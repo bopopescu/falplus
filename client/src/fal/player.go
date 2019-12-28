@@ -204,6 +204,11 @@ func buildPlayerGetMsg(parent *cobra.Command) {
 				fmt.Println(err)
 				return
 			}
+			if resp.Status.Code != 0 {
+				fmt.Println(resp.Status)
+				return
+			}
+
 			fmt.Printf("message type:%s\n", igm.MsgType[resp.Gmsg.MsgType])
 			var cards []card.Card
 			for _, req := range resp.Gmsg.YourCards {
@@ -214,7 +219,7 @@ func buildPlayerGetMsg(parent *cobra.Command) {
 			})
 			fmt.Println("your cards:")
 			for _, c := range cards {
-				fmt.Printf("%d-%s-%d\t", c.CardSeq, c.CardType, c.GetCardValue())
+				fmt.Printf("%d-%s-%d\t", c.CardSeq, c.CardType, c.CardNumber)
 			}
 			fmt.Println()
 
@@ -227,11 +232,11 @@ func buildPlayerGetMsg(parent *cobra.Command) {
 			})
 			fmt.Printf("Last round owner %s cards:\n", resp.Gmsg.LastId)
 			for _, c := range lastCards {
-				fmt.Printf("%d-%s-%d\t", c.CardSeq, c.CardType, c.GetCardValue())
+				fmt.Printf("%d-%s-%d\t", c.CardSeq, c.CardType, c.CardNumber)
 			}
 			fmt.Println()
 
-			fmt.Printf("player:%s is round owner", resp.Gmsg.RoundOwner)
+			fmt.Printf("player:%s is round owner\n", resp.Gmsg.RoundOwner)
 		},
 	}
 
@@ -253,14 +258,16 @@ func buildPlayerPutMsg(parent *cobra.Command) {
 			msg := &igm.PlayerMessage{
 				MsgType: msgtype,
 			}
-			cards := strings.Split(seqs, ",")
-			for _, c := range cards {
-				seq, err := strconv.ParseInt(c, 10, 64)
-				if err != nil {
-					fmt.Println(err)
-					return
+			if seqs != "" {
+				cards := strings.Split(seqs, ",")
+				for _, c := range cards {
+					seq, err := strconv.ParseInt(c, 10, 64)
+					if err != nil {
+						fmt.Println(err)
+						return
+					}
+					msg.PutCards = append(msg.PutCards, seq)
 				}
-				msg.PutCards = append(msg.PutCards, seq)
 			}
 			req := &ipm.PutMessageRequest{
 				Etag: etag,
@@ -275,6 +282,7 @@ func buildPlayerPutMsg(parent *cobra.Command) {
 	flags.StringVarP(&addr, "addr", "", "", "")
 	flags.StringVarP(&etag, "etag", "", "", "")
 	flags.StringVarP(&seqs, "seqs", "", "", "")
+	flags.Int64VarP(&msgtype, "type", "", 0, "0:msg 1:get 2:put 3:pass")
 
 	parent.AddCommand(cmd)
 }

@@ -37,12 +37,12 @@ func NewGMServer(conf, name, proto, addr string) *GMService {
 
 func (m *GMService) Init(c *goconfig.ConfigFile) {
 	m.gm = gm.NewGameManager()
-	go func() {
-		err := m.gm.InitUpdate()
-		if err != nil {
-			log.Error(status.UpdateStatus(err).Details())
-		}
-	}()
+	//go func() {
+	//	err := m.gm.InitUpdate()
+	//	if err != nil {
+	//		log.Error(status.UpdateStatus(err).Details())
+	//	}
+	//}()
 }
 
 func (m *GMService) Signal(sig os.Signal) bool {

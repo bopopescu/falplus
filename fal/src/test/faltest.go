@@ -23,18 +23,18 @@ func create() {
 	defer pmc.Close()
 
 	ctx := context.Background()
-	gameCreateReq := &igm.GameCreateRequest{GameType:1}
+	gameCreateReq := &igm.GameCreateRequest{GameType: 1}
 	gameCreateResp, err := gmc.GameCreate(ctx, gameCreateReq)
 	if err != nil || gameCreateResp.Status.Code != 0 {
 		panic("create game error")
 	}
 
-	playerCreateReq := &ipm.PlayerCreateRequest{Name:"zhang",Password:"123"}
+	playerCreateReq := &ipm.PlayerCreateRequest{Name: "zhang", Password: "123"}
 	playerCreateResp, err := pmc.PlayerCreate(ctx, playerCreateReq)
 	if err != nil || playerCreateResp.Status.Code != 0 {
 		panic("create player error")
 	}
-	playerSignInReq := &ipm.PlayerSignInRequest{Name:"zhang",Password:"123",Pid:playerCreateReq.Pid}
+	playerSignInReq := &ipm.PlayerSignInRequest{Name: "zhang", Password: "123", Pid: playerCreateResp.Player.Id}
 	playerSignInResp, err := pmc.PlayerSignIn(ctx, playerSignInReq)
 	if err != nil || playerSignInResp.Status.Code != 0 {
 		panic("sign in player error")
@@ -46,6 +46,7 @@ func create() {
 		panic("create player error")
 	}
 	playerSignInReq.Name = "jia"
+	playerSignInReq.Pid = playerCreateResp.Player.Id
 	playerSignInResp, err = pmc.PlayerSignIn(ctx, playerSignInReq)
 	if err != nil || playerSignInResp.Status.Code != 0 {
 		panic("sign in player error")
@@ -57,6 +58,7 @@ func create() {
 		panic("create player error")
 	}
 	playerSignInReq.Name = "hua"
+	playerSignInReq.Pid = playerCreateResp.Player.Id
 	playerSignInResp, err = pmc.PlayerSignIn(ctx, playerSignInReq)
 	if err != nil || playerSignInResp.Status.Code != 0 {
 		panic("sign in player error")
@@ -94,12 +96,12 @@ func conn() {
 			panic(err)
 		}
 
-		addResp, err := gmc.GameAddPlayer(ctx, &igm.AddPlayerRequest{Gid:gameList.Games[0].Gid,PlayerId:p.Id})
+		addResp, err := gmc.GameAddPlayer(ctx, &igm.AddPlayerRequest{Gid: gameList.Games[0].Gid, PlayerId: p.Id})
 		if err != nil || addResp.Status.Code != 0 {
 			panic("GameAddPlayer error")
 		}
 
-		attachResp, err := pc.Attach(ctx, &ipm.AttachRequest{Etag:p.Etag,Pid:p.Id,GamePort:addResp.GameAddr})
+		attachResp, err := pc.Attach(ctx, &ipm.AttachRequest{Etag: p.Etag, Pid: p.Id, GamePort: addResp.GameAddr})
 		if err != nil || attachResp.Status.Code != 0 {
 			panic("Attach error")
 		}
@@ -109,7 +111,7 @@ func conn() {
 
 }
 
-func main(){
+func main() {
 	create()
 	conn()
 }

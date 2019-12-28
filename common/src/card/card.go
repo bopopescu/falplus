@@ -116,6 +116,9 @@ func init() {
 
 //获取重复数个数及其值和长度
 func GetRepeatNumAndValue(cards []int64) (int64, int64, int64) {
+	if len(cards) == 0 {
+		return 0, 0, 0
+	}
 	var nums []int64
 	for _, seq := range cards {
 		nums = append(nums, Cards[seq].GetCardValue())
