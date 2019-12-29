@@ -2,12 +2,14 @@ package service
 
 import (
 	"api/ipm"
+	"fmt"
 	"github.com/Sirupsen/logrus"
 	"github.com/Unknwon/goconfig"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/reflection"
 	"os"
 	"pm/player"
+	"scode"
 	"server"
 	"status"
 	"time"
@@ -57,14 +59,14 @@ func (p *PlayerService) SyncInfo(ctx context.Context, req *ipm.PlayerInfo) (*ipm
 	return req, nil
 }
 
+// 退出进程
 func (p *PlayerService) Stop(ctx context.Context, req *ipm.PlayerInfo) (*ipm.PMDefaultResponse, error) {
-	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
+	log.Debugf("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &ipm.PMDefaultResponse{}
 	resp.Status = status.SuccessStatus
-	if req.Etag != p.player.Etag {
-		resp.Status = status.NewStatus(3001, "etag error")
-		log.Errorf("etag error")
-		return resp, nil
+	err := p.player.CloseConnGame(req.Etag)
+	if err != nil {
+		log.Error("CloseConnGame error:%s", err)
 	}
 	go func() {
 		time.Sleep(time.Second)
@@ -79,8 +81,9 @@ func (p *PlayerService) Attach(ctx context.Context, req *ipm.AttachRequest) (*ip
 	resp.Status = status.SuccessStatus
 	err := p.player.ConnGame(req.Etag, req.GamePort)
 	if err != nil {
-		resp.Status = status.NewStatus(3001, err.Error())
-		log.Error(err)
+		log.Errorf("ConnGame error:%s", err)
+		resp.Status = status.UpdateStatus(err)
+		return resp, nil
 	}
 	return resp, nil
 }
@@ -91,8 +94,9 @@ func (p *PlayerService) Detach(ctx context.Context, req *ipm.DetachRequest) (*ip
 	resp.Status = status.SuccessStatus
 	err := p.player.CloseConnGame(req.Etag)
 	if err != nil {
-		resp.Status = status.NewStatus(3001, err.Error())
-		log.Error(err)
+		log.Errorf("CloseConnGame error:%s", err)
+		resp.Status = status.UpdateStatus(err)
+		return resp, nil
 	}
 	return resp, nil
 }
@@ -103,8 +107,8 @@ func (p *PlayerService) GetMessage(ctx context.Context, req *ipm.GetMessageReque
 	resp.Status = status.SuccessStatus
 	msg, err := p.player.ShowGameMsg(req.Etag)
 	if err != nil {
-		resp.Status = status.NewStatus(3001, err.Error())
-		log.Error(err)
+		log.Errorf("ShowGameMsg error:%s", err)
+		resp.Status = status.UpdateStatus(err)
 		return resp, nil
 	}
 	resp.Gmsg = msg
@@ -117,13 +121,14 @@ func (p *PlayerService) PutMessage(ctx context.Context, req *ipm.PutMessageReque
 	resp := &ipm.PMDefaultResponse{}
 	resp.Status = status.SuccessStatus
 	if !p.geted {
-		resp.Status = status.NewStatus(3001, "must get before put")
+		desc := fmt.Sprintf("must get before put")
+		resp.Status = status.NewStatusDesc(scode.PutMessageBeforeGet, desc)
 		return resp, nil
 	}
 	err := p.player.PutCards(req)
 	if err != nil {
-		resp.Status = status.NewStatus(3001, err.Error())
-		log.Error(err)
+		log.Errorf("PutCards error:%s", err)
+		resp.Status = status.UpdateStatus(err)
 		return resp, nil
 	}
 	p.geted = false

@@ -13,6 +13,7 @@ service GM {
     rpc GameStart(GameStartRequest)returns(GMDefaultResponse){}
     rpc GameStop(GameStopRequest)returns(GMDefaultResponse){}
     rpc GameAddPlayer(AddPlayerRequest)returns(AddPlayerResponse){}
+    rpc GameDelPlayer(DelPlayerRequest)returns(GMDefaultResponse){}
     rpc GameExit(GameExitRequest)returns(GMDefaultResponse){}
 }
 
@@ -67,6 +68,7 @@ message GMDefaultResponse {
 
 service Game {
     rpc AddPlayer(AddPlayerRequest)returns(GMDefaultResponse){}
+    rpc DelPlayer(DelPlayerRequest)returns(GMDefaultResponse){}
     rpc PlayerConn(stream PlayerMessage)returns(stream GameMessage){}
     rpc Start(GameStartRequest)returns(GMDefaultResponse){}
     rpc Stop(GameStopRequest)returns(GMDefaultResponse){}
@@ -75,13 +77,17 @@ service Game {
 
 message GameExitRequest{
     string gid = 1;
-    string playerId = 2;
+    string pid = 2;
 }
 
 message AddPlayerRequest{
     string gid = 1;
-    string playerId = 2;
-    string playerAddr = 3;
+    string pid = 2;
+}
+
+message DelPlayerRequest{
+    string gid = 1;
+    string pid = 2;
 }
 
 message AddPlayerResponse{
@@ -100,5 +106,5 @@ message GameMessage {
 message PlayerMessage {
     int64 msgType = 1;
     repeated int64 putCards = 2;
-    string playerId = 3;
+    string pid = 3;
 }

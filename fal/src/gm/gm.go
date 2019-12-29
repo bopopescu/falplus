@@ -12,6 +12,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"scode"
+	"status"
 	"strconv"
 	"strings"
 	"sync"
@@ -75,15 +77,15 @@ func (m *GameManager) InitUpdate() error {
 func (m *GameManager) gameInit() error {
 	buckets, err := m.DB.GetAllBucket()
 	if err != nil {
-		log.Error(err)
-		return err
+		desc := fmt.Sprintf("GetAllBucket error:%s", err)
+		return status.NewStatusDesc(scode.GMDBOperateError, desc)
 	}
 	log.Info(buckets)
 	for _, b := range buckets {
 		kvs, err := m.DB.GetAllKV(b)
 		if err != nil {
-			log.Error(err)
-			return err
+			desc := fmt.Sprintf("GetAllKV error:%s", err)
+			return status.NewStatusDesc(scode.GMDBOperateError, desc)
 		}
 		if strings.HasPrefix(b, GamePrefix) {
 			port, _ := strconv.ParseInt(kvs[BucketKeyPort], 10, 64)
@@ -113,7 +115,8 @@ func (m *GameManager) CreateGame(req *igm.GameCreateRequest) (*igm.GameInfo, err
 	if req.Gid != "" {
 		_, exist := m.games[req.Gid]
 		if exist {
-			return nil, fmt.Errorf("game already exist")
+			desc := fmt.Sprintf("game %s already exist", req.Gid)
+			return nil, status.NewStatusDesc(scode.GameAlreadyExist, desc)
 		}
 	} else {
 		id = uuid.New().String()
@@ -128,8 +131,7 @@ func (m *GameManager) CreateGame(req *igm.GameCreateRequest) (*igm.GameInfo, err
 
 	err := m.startGame(g)
 	if err != nil {
-		log.Error(err)
-		return nil, err
+		return nil, status.UpdateStatus(err)
 	}
 
 	kvs := make(map[string]string)
@@ -140,21 +142,23 @@ func (m *GameManager) CreateGame(req *igm.GameCreateRequest) (*igm.GameInfo, err
 	kvs[BucketKeyPid] = fmt.Sprint(g.Pid)
 	data := map[string]map[string]string{id: kvs}
 	m.games[id] = g
-	err = m.DB.Put(id, fmt.Sprint(req.GameType), BucketGameList)
-	if err != nil {
-		log.Error(err)
-		return nil, err
+
+	if err = m.DB.Put(id, fmt.Sprint(req.GameType), BucketGameList); err != nil {
+		desc := fmt.Sprintf("put key:%s value:%s bucket:%s error:%s", id, fmt.Sprint(req.GameType), BucketGameList, err)
+		return nil, status.NewStatusDesc(scode.GMDBOperateError, desc)
 	}
-	return g, m.DB.PutBatch(data)
+	if err = m.DB.PutBatch(data); err != nil {
+		desc := fmt.Sprintf("PutBatch data:%v error:%s", data, err)
+		return nil, status.NewStatusDesc(scode.GMDBOperateError, desc)
+	}
+	return g, nil
 }
 
 func (m *GameManager) assignPort(port int64) int64 {
-	if port != 0 {
-		return port
-	}
-	lis, err := net.Listen("tcp", ":")
+	lis, err := net.Listen("tcp", net.JoinHostPort(util.GetIPv4Addr(), fmt.Sprint(port)))
 	if err != nil {
-
+		log.Error(err)
+		lis, _ = net.Listen("tcp", ":")
 	}
 	lis.Close()
 	return int64(lis.Addr().(*net.TCPAddr).Port)
@@ -162,12 +166,13 @@ func (m *GameManager) assignPort(port int64) int64 {
 
 func (m *GameManager) DeleteGame(id string) error {
 	m.Lock()
-	defer m.Unlock()
 	_, exist := m.games[id]
 	if !exist {
-		return fmt.Errorf("game not exist")
+		desc := fmt.Sprintf("game %s not exist", id)
+		return status.NewStatusDesc(scode.GameNotExist, desc)
 	}
 	delete(m.games, id)
+	m.Unlock()
 
 	if err := m.DB.Delete(id, BucketGameList); err != nil {
 		log.Error(err)
@@ -206,11 +211,15 @@ func (m *GameManager) startGame(g *igm.GameInfo) error {
 	var attr os.ProcAttr
 	attr.Files = []*os.File{os.Stdin, os.Stdout, os.Stderr}
 	attr.Env = os.Environ()
-	bin, _ := exec.LookPath(os.Args[0])
+	bin, err := exec.LookPath(os.Args[0])
+	if err != nil {
+		desc := fmt.Sprintf("exec.LookPath %s error:%s", os.Args[0], err)
+		return status.NewStatusDesc(scode.GMCallGoLibError, desc)
+	}
 	proc, err := os.StartProcess(bin, args, &attr)
 	if err != nil {
-		fmt.Println(err)
-		return err
+		desc := fmt.Sprintf("os.StartProcess %s %v %v error:%s", bin, args, attr)
+		return status.NewStatusDesc(scode.GMCallGoLibError, desc)
 	}
 	g.Pid = int64(proc.Pid)
 	return nil
@@ -218,26 +227,25 @@ func (m *GameManager) startGame(g *igm.GameInfo) error {
 
 func (m *GameManager) DefaultGameResponse(gid string, f func(c *iclient.GameClient) (*igm.GMDefaultResponse, error)) error {
 	m.RLock()
-	defer m.RUnlock()
 	g, exist := m.games[gid]
+	m.RUnlock()
 	if !exist {
-		return fmt.Errorf("game %s is not exist", gid)
+		desc := fmt.Sprintf("game %s not exist", gid)
+		return status.NewStatusDesc(scode.GameNotExist, desc)
 	}
 	addr := net.JoinHostPort(util.GetIPv4Addr(), fmt.Sprint(g.Port))
 	c, err := iclient.NewGameClient(addr)
 	if err != nil {
-		log.Error(err)
-		return err
+		return status.UpdateStatus(err)
 	}
 	defer c.Close()
 	resp, err := f(c)
 	if err != nil {
-		log.Error(err)
-		return err
+		desc := fmt.Sprintf("GRPC error:%s", err)
+		return status.NewStatusDesc(scode.GRPCError, desc)
 	}
 	if resp.Status.Code != 0 {
-		log.Error(resp.Status)
-		return resp.Status
+		return status.UpdateStatus(resp.Status)
 	}
 	return nil
 }

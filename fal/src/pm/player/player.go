@@ -9,7 +9,14 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/net/context"
 	"iclient"
+	"scode"
+	"status"
 	"sync"
+)
+
+var (
+	log    = logrus.WithFields(logrus.Fields{"pkg": "pm/player/service"})
+	player *Player
 )
 
 type Player struct {
@@ -26,12 +33,15 @@ type Player struct {
 	req     *igm.GameMessage
 	Etag    string
 	port    int64
+	connErr error
 }
 
-var (
-	log    = logrus.WithFields(logrus.Fields{"pkg": "pm/player/service"})
-	player *Player
-)
+type message struct {
+	gMsg *igm.GameMessage
+	pMsg *igm.PlayerMessage
+	err  error
+	sync.WaitGroup
+}
 
 func NewPlayer() *Player {
 	if player == nil {
@@ -47,9 +57,11 @@ func NewPlayer() *Player {
 func (p *Player) Close() {
 	if p.gClient != nil {
 		p.gClient.Close()
+		close(p.close)
 	}
 }
 
+// 同步信息到GM
 func (p *Player) UpdateInfo(info *ipm.PlayerInfo) {
 	info.Etag = uuid.New().String()
 	p.Etag = info.Etag
@@ -59,13 +71,26 @@ func (p *Player) UpdateInfo(info *ipm.PlayerInfo) {
 	p.Id = info.Id
 }
 
+// 获取game端推送的消息
 func (p *Player) ShowGameMsg(etag string) (*igm.GameMessage, error) {
+	// 收发信息出错
+	if p.connErr != nil {
+		return nil, status.UpdateStatus(p.connErr)
+	}
+
+	// 认证
 	if p.Etag != etag {
-		return nil, fmt.Errorf("auth error")
+		desc := fmt.Sprintf("etag is different %s-%s", p.Etag, etag)
+		return nil, status.NewStatusDesc(scode.PlayerAuthWrong, desc)
 	}
+
+	// 判断是否有消息推送,没有说明游戏没开始或者上次请求还未处理
 	if len(p.msgChan) == 0 {
-		return nil, fmt.Errorf("last req is not finish")
+		desc := fmt.Sprintf("maybe game not start or last req is not finish")
+		return nil, status.NewStatusDesc(scode.MessageChannelEmpty, desc)
 	}
+
+	// 获取本次消息，并异步等待响应
 	msg := <-p.msgChan
 	go func() {
 		msg.pMsg = <-p.resp
@@ -75,17 +100,29 @@ func (p *Player) ShowGameMsg(etag string) (*igm.GameMessage, error) {
 	return msg.gMsg, msg.err
 }
 
+// 回复game端信息
 func (p *Player) PutCards(req *ipm.PutMessageRequest) error {
+	// 收发信息出错
+	if p.connErr != nil {
+		return status.UpdateStatus(p.connErr)
+	}
+
 	if p.Etag != req.Etag {
-		return fmt.Errorf("auth error")
+		desc := fmt.Sprintf("etag is different %s-%s", p.Etag, req.Etag)
+		return status.NewStatusDesc(scode.PlayerAuthWrong, desc)
 	}
-	if !p.checkRespValid(req.Pmsg) {
-		return fmt.Errorf("the resp is invalid")
+
+	// 检查出牌是否有效
+	if !p.ownerCards(req.Pmsg.PutCards) || !p.checkRespValid(req.Pmsg) {
+		desc := fmt.Sprintf("please check message type and card type value length")
+		return status.NewStatusDesc(scode.MessageInvalid, desc)
 	}
+
 	p.resp <- req.Pmsg
 	return nil
 }
 
+// 检查消息类型，值是否有效
 func (p *Player) checkRespValid(resp *igm.PlayerMessage) bool {
 	if p.req.RoundOwner == p.Id {
 		// 争夺地主中只能选择抢或者过
@@ -139,58 +176,81 @@ func (p *Player) checkRespValid(resp *igm.PlayerMessage) bool {
 	return true
 }
 
+// 检查是否拥有这些牌
+func (p *Player) ownerCards(cards []int64) bool {
+	if len(cards) == 0 {
+		return true
+	}
+	cMap := make(map[int64]struct{})
+	for _, v := range p.req.YourCards {
+		cMap[v] = struct{}{}
+	}
+	for _, v := range cards {
+		if _, exist := cMap[v]; !exist {
+			return false
+		}
+	}
+	return true
+}
+
+// 建立数据连接
 func (p *Player) ConnGame(etag, addr string) error {
+	log.Infof("conn game:%s", addr)
+
 	if p.Etag != etag {
-		return fmt.Errorf("auth error")
+		desc := fmt.Sprintf("etag is different")
+		return status.NewStatusDesc(scode.PlayerAuthWrong, desc)
 	}
 	c, err := iclient.NewGameClient(addr)
 	if err != nil {
-		log.Error(err)
-		return err
+		return status.UpdateStatus(err)
 	}
 	stream, err := c.PlayerConn(context.Background())
 	if err != nil {
-		log.Error(err)
-		return err
+		desc := fmt.Sprintf("GRPC error:%s", err)
+		return status.NewStatusDesc(scode.GRPCError, desc)
 	}
-	pMsg := &igm.PlayerMessage{
-		MsgType:  igm.Over,
-		PlayerId: p.Id,
-	}
+	pMsg := &igm.PlayerMessage{Pid: p.Id}
 	err = stream.Send(pMsg)
 	if err != nil {
-		log.Error(err)
-		return err
+		desc := fmt.Sprintf("GRPC Send error:%s", err)
+		return status.NewStatusDesc(scode.GRPCError, desc)
 	}
 	p.gClient = c
 	p.stream = stream
-	go p.ListenGame()
+	p.connErr = nil
+	go p.goListenGame()
 	return nil
 }
 
+// 断开数据连接
 func (p *Player) CloseConnGame(etag string) error {
+	log.Infof("close game")
+
 	if p.Etag != etag {
-		return fmt.Errorf("auth error")
+		desc := fmt.Sprintf("etag is different %s-%s", p.Etag, etag)
+		return status.NewStatusDesc(scode.PlayerAuthWrong, desc)
 	}
 	if p.gClient == nil {
-		return fmt.Errorf("conn is nil")
+		desc := fmt.Sprintf("conn is nil")
+		return status.NewStatusDesc(scode.PlayerNotAttachGame, desc)
 	}
-	return p.gClient.Close()
+	close(p.close)
+	if err := p.gClient.Close(); err != nil {
+		log.Errorf("GRPC Close error:%s", err)
+	}
+	return nil
 }
 
-type message struct {
-	gMsg *igm.GameMessage
-	pMsg *igm.PlayerMessage
-	err  error
-	sync.WaitGroup
-}
-
-func (p *Player) ListenGame() {
+// 收发数据
+func (p *Player) goListenGame() {
 	for {
 		msg := &message{}
 		req, err := p.stream.Recv()
 		if err != nil {
-			msg.err = err
+			desc := fmt.Sprintf("GRPC Recv error:%s", err)
+			p.connErr = status.NewStatusDesc(scode.GRPCError, desc)
+			return
 		}
 		msg.gMsg = req
 		msg.Add(1)
@@ -202,7 +262,9 @@ func (p *Player) ListenGame() {
 		msg.Wait()
 		err = p.stream.Send(msg.pMsg)
 		if err != nil {
-			panic(err)
+			desc := fmt.Sprintf("GRPC Send error:%s", err)
+			p.connErr = status.NewStatusDesc(scode.GRPCError, desc)
+			return
 		}
 	}
 }

@@ -2,14 +2,19 @@ package status
 
 import (
 	"fmt"
+	"github.com/google/uuid"
+	"os"
 	"path"
+	"path/filepath"
 	"runtime"
+	"status/message"
 	"strconv"
 	"strings"
+	"util"
 )
 
 var (
-	progressInfo  string
+	progressInfo = fmt.Sprintf("host:%s,pid:%d,module:%s", util.GetIPv4Addr(), os.Getpid(), filepath.Base(os.Args[0]))
 	SuccessStatus = &Status{
 		Code: 0,
 	}
@@ -26,33 +31,32 @@ type StackInfo struct {
 }
 
 func NewStatus(sCode int32, a ...interface{}) *Status {
-
-	message := make([]string, 2)
+	msg := message.StatusMsg[sCode]
 	stack := []string{progressInfo + fmt.Sprintf(",code:%d,", sCode) + Caller()}
 	return &Status{
 		Code:      sCode,
-		Message:   fmt.Sprintf(message[0], a...),
-		MessageCn: fmt.Sprintf(message[1], a...),
+		Message:   fmt.Sprintf(msg[0], a...),
+		MessageCn: fmt.Sprintf(msg[1], a...),
 		Stack:     stack,
+		UUID:	   uuid.New().String(),
 	}
 }
 
 func NewStatusDesc(sCode int32, desc string, a ...interface{}) *Status {
-
-	message := make([]string, 2)
+	msg := message.StatusMsg[sCode]
 	stack := []string{progressInfo + fmt.Sprintf(",code:%d,", sCode) + Caller()}
 	return &Status{
 		Code:      sCode,
-		Message:   fmt.Sprintf(message[0], a...),
-		MessageCn: fmt.Sprintf(message[1], a...),
+		Message:   fmt.Sprintf(msg[0], a...),
+		MessageCn: fmt.Sprintf(msg[1], a...),
 		Stack:     stack,
 		Desc:      desc,
+		UUID:	   uuid.New().String(),
 	}
 }
 
 func NewStatusStack(sCode int32, sStatus error, a ...interface{}) *Status {
-
-	message := make([]string, 2)
+	msg := message.StatusMsg[sCode]
 	stack := []string{progressInfo + fmt.Sprintf(",code:%d,", sCode) + Caller()}
 	desc := ""
 	if sStatus != nil {
@@ -63,26 +67,16 @@ func NewStatusStack(sCode int32, sStatus error, a ...interface{}) *Status {
 	}
 	return &Status{
 		Code:      sCode,
-		Message:   fmt.Sprintf(message[0], a...),
-		MessageCn: fmt.Sprintf(message[1], a...),
+		Message:   fmt.Sprintf(msg[0], a...),
+		MessageCn: fmt.Sprintf(msg[1], a...),
 		Stack:     stack,
 		Desc:      desc,
+		UUID:	   uuid.New().String(),
 	}
 }
 
 // Error is for the error interface
 func (st Status) Error() string {
-	//siList := st.GetStackInfo()
-	//callChain := ""
-	//for _, si := range siList {
-	//	callChain = si.funname + "->" + callChain
-	//}
-	//callChain = strings.TrimSuffix(callChain, "->")
-	//return fmt.Sprintf("UUID:%s,%s,message:%s", st.UUID, callChain, st.Message)
-	return st.Details()
-}
-
-func (st Status) Details() string {
 	siList := st.GetStackInfo()
 	callChain := ""
 	lastService := ""
@@ -226,4 +220,3 @@ func Stack(err error) []string {
 		return nil
 	}
 }
-

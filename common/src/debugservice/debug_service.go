@@ -12,6 +12,7 @@ import (
 	"os"
 	"runtime"
 	"runtime/pprof"
+	"scode"
 	"status"
 	"time"
 
@@ -33,7 +34,8 @@ func (ds *DebugService) Prof(ctx context.Context, req *idebug.ProfRequest) (*ide
 	f, err := os.Create(req.Path)
 	if err != nil {
 		log.Errorf("Create path %s error %s", req.Path, err.Error())
-		return nil, err
+		desc := fmt.Sprintf("Create path %s error %s", req.Path, err)
+		return nil, status.NewStatusDesc(scode.DebugCallGoLibError, desc)
 	}
 	if req.Name == "cpu" {
 		pprof.StartCPUProfile(f)
@@ -56,7 +58,7 @@ func (ds *DebugService) Stats(ctx context.Context, req *idebug.StatsRequest) (*i
 	}
 
 	if req.Name == "stack" {
-		buf := make([]byte, 40960000)
+		buf := make([]byte, 409600)
 		length := runtime.Stack(buf, true)
 		resp.Data = buf[:length]
 		return resp, nil
@@ -114,8 +116,9 @@ func (ds *DebugService) StartPprof(ctx context.Context, req *idebug.StartPprofRe
 	resp.Status = status.SuccessStatus
 	listen, err := net.Listen("tcp", req.Addr)
 	if err != nil {
-		log.Errorf("start debug service with addr:%s, error:%s", req.Addr, err.Error())
-		resp.Status = status.NewStatus(1000, fmt.Sprintf("start debug service with addr:%s, error:%s", req.Addr, err.Error()))
+		log.Errorf("start debug service with addr:%s, error:%s", req.Addr, err)
+		desc := fmt.Sprintf("start debug service with addr:%s, error:%s", req.Addr, err)
+		resp.Status = status.NewStatusDesc(scode.DebugCallGoLibError, desc)
 		return resp, nil
 	}
 	lis = listen
@@ -130,12 +133,14 @@ func (ds *DebugService) StopPprof(ctx context.Context, req *google_protobuf.Empt
 	resp.Status = status.SuccessStatus
 	if lis == nil {
 		log.Errorf("close debug service error:pprof server is not exist")
-		resp.Status = status.NewStatus(1001, fmt.Sprintf("close debug service error:pprof server is not exist"))
+		desc := fmt.Sprintf("close debug service error:pprof server is not exist")
+		resp.Status = status.NewStatusDesc(scode.DebugAlreadyStop, desc)
 		return resp, nil
 	}
 	if err := lis.Close(); err != nil {
-		log.Errorf("close debug service error:%s", err.Error())
-		resp.Status = status.NewStatus(1002, fmt.Sprintf("close debug service error:%s", err.Error()))
+		log.Errorf("close debug service error:%s", err)
+		desc := fmt.Sprintf("close debug service error:%s", err)
+		resp.Status = status.NewStatus(scode.DebugCallGoLibError, desc)
 		return resp, nil
 	}
 	lis = nil

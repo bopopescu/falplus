@@ -1,7 +1,6 @@
 package card
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 )
@@ -142,7 +141,7 @@ func GetRepeatNumAndValue(cards []int64) (int64, int64, int64) {
 			repeat = 1
 		}
 	}
-	fmt.Println("重复次数", max, "重复值", value)
+	//fmt.Println("重复次数", max, "重复值", value)
 	return max, value, int64(len(nums))
 }
 

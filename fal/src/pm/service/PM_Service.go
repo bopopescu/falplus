@@ -50,34 +50,38 @@ func (m *PMService) Start() {
 	m.service.Start()
 }
 
+// 添加玩家信息
 func (m *PMService) PlayerCreate(ctx context.Context, req *ipm.PlayerCreateRequest) (*ipm.PlayerCreateResponse, error) {
-	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
+	log.Debugf("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &ipm.PlayerCreateResponse{}
 	resp.Status = status.SuccessStatus
 	p, err := m.pm.CreatePlayer(req)
 	if err != nil {
-		resp.Status = status.NewStatus(3000, err.Error())
-		log.Error(err)
+		log.Error("CreatePlayer error:%s", err)
+		resp.Status = status.UpdateStatus(err)
 		return resp, nil
 	}
 	resp.Player = p
 	return resp, nil
 }
 
+// 关闭进程，清除玩家信息
 func (m *PMService) PlayerDelete(ctx context.Context, req *ipm.PlayerDeleteRequest) (*ipm.PMDefaultResponse, error) {
-	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
+	log.Debugf("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &ipm.PMDefaultResponse{}
 	resp.Status = status.SuccessStatus
 	err := m.pm.DeletePlayer(req.Pid)
 	if err != nil {
-		resp.Status = status.NewStatus(3001, err.Error())
-		log.Error(err)
+		log.Error("DeletePlayer error:%s", err)
+		resp.Status = status.UpdateStatus(err)
+		return resp, nil
 	}
 	return resp, nil
 }
 
+// 获取玩家信息
 func (m *PMService) PlayerList(ctx context.Context, req *ipm.PlayerListRequest) (*ipm.PlayerListResponse, error) {
-	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
+	log.Debugf("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &ipm.PlayerListResponse{}
 	resp.Status = status.SuccessStatus
 	for pid, info := range m.pm.GetAllPlayerInfo() {
@@ -88,14 +92,15 @@ func (m *PMService) PlayerList(ctx context.Context, req *ipm.PlayerListRequest) 
 	return resp, nil
 }
 
+// 启动进程并返回认证etag
 func (m *PMService) PlayerSignIn(ctx context.Context, req *ipm.PlayerSignInRequest) (*ipm.PlayerSignInResponse, error) {
-	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
+	log.Debugf("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &ipm.PlayerSignInResponse{}
 	resp.Status = status.SuccessStatus
 	p, err := m.pm.StartPlayer(req)
 	if err != nil {
-		resp.Status = status.NewStatus(3000, err.Error())
-		log.Error(err)
+		log.Error("StartPlayer error:%s", err)
+		resp.Status = status.UpdateStatus(err)
 		return resp, nil
 	}
 	resp.Port = p.Port
@@ -103,14 +108,16 @@ func (m *PMService) PlayerSignIn(ctx context.Context, req *ipm.PlayerSignInReque
 	return resp, nil
 }
 
+// 关闭进程
 func (m *PMService) PlayerSignOut(ctx context.Context, req *ipm.PlayerSignOutRequest) (*ipm.PMDefaultResponse, error) {
-	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
+	log.Debugf("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &ipm.PMDefaultResponse{}
 	resp.Status = status.SuccessStatus
 	err := m.pm.SignOutPlayer(req)
 	if err != nil {
-		resp.Status = status.NewStatus(3000, err.Error())
-		log.Error(err)
+		log.Error("SignOutPlayer error:%s", err)
+		resp.Status = status.UpdateStatus(err)
+		return resp, nil
 	}
 	return resp, nil
 }
