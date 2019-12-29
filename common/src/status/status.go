@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	progressInfo = fmt.Sprintf("host:%s,pid:%d,module:%s", util.GetIPv4Addr(), os.Getpid(), filepath.Base(os.Args[0]))
+	progressInfo  = fmt.Sprintf("host:%s,pid:%d,module:%s", util.GetIPv4Addr(), os.Getpid(), filepath.Base(os.Args[0]))
 	SuccessStatus = &Status{
 		Code: 0,
 	}
@@ -38,7 +38,7 @@ func NewStatus(sCode int32, a ...interface{}) *Status {
 		Message:   fmt.Sprintf(msg[0], a...),
 		MessageCn: fmt.Sprintf(msg[1], a...),
 		Stack:     stack,
-		UUID:	   uuid.New().String(),
+		UUID:      uuid.New().String(),
 	}
 }
 
@@ -51,7 +51,7 @@ func NewStatusDesc(sCode int32, desc string, a ...interface{}) *Status {
 		MessageCn: fmt.Sprintf(msg[1], a...),
 		Stack:     stack,
 		Desc:      desc,
-		UUID:	   uuid.New().String(),
+		UUID:      uuid.New().String(),
 	}
 }
 
@@ -71,7 +71,7 @@ func NewStatusStack(sCode int32, sStatus error, a ...interface{}) *Status {
 		MessageCn: fmt.Sprintf(msg[1], a...),
 		Stack:     stack,
 		Desc:      desc,
-		UUID:	   uuid.New().String(),
+		UUID:      uuid.New().String(),
 	}
 }
 

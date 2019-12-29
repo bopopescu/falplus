@@ -86,7 +86,7 @@ func NewPlayerClient(addr string) (*PlayerClient, error) {
 	}, nil
 }
 
-func (c *GMClient) Close()error {
+func (c *GMClient) Close() error {
 	if c.conn != nil {
 		return c.conn.Close()
 	}
@@ -100,14 +100,14 @@ func (c *GameClient) Close() error {
 	return nil
 }
 
-func (c *PMClient) Close()error {
+func (c *PMClient) Close() error {
 	if c.conn != nil {
 		return c.conn.Close()
 	}
 	return nil
 }
 
-func (c *PlayerClient) Close()error {
+func (c *PlayerClient) Close() error {
 	if c.conn != nil {
 		return c.conn.Close()
 	}

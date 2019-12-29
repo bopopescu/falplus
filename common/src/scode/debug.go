@@ -1,6 +1,6 @@
 package scode
 
-const(
+const (
 	DebugCallGoLibError = 5001
-	DebugAlreadyStop	= 5002
+	DebugAlreadyStop    = 5002
 )

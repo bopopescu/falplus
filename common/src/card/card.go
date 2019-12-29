@@ -5,36 +5,36 @@ import (
 	"time"
 )
 
-const(
+const (
 	GameTypeFAL = "fal"
 )
 
-const(
-	CardTypeHeart = "heart"
-	CardTypeSpade = "spade"
-	CardTypeClub = "club"
+const (
+	CardTypeHeart   = "heart"
+	CardTypeSpade   = "spade"
+	CardTypeClub    = "club"
 	CardTypeDiamond = "diamond"
-	CardTypeJoker = "joker"
+	CardTypeJoker   = "joker"
 )
 
-const(
-	ValueTypeSingle = "single"
+const (
+	ValueTypeSingle   = "single"
 	ValueTypeSequence = "sequence"
-	ValueTypeDouble = "double"
-	ValueTypePairs = "pairs"
-	ValueType3take1 = "3take1"
-	ValueType4take2 = "4take2"
-	ValueTypeBomb = "bomb"
-	ValueTypeThree = "three"
-	ValueTypeUnknown = "unknown"
+	ValueTypeDouble   = "double"
+	ValueTypePairs    = "pairs"
+	ValueType3take1   = "3take1"
+	ValueType4take2   = "4take2"
+	ValueTypeBomb     = "bomb"
+	ValueTypeThree    = "three"
+	ValueTypeUnknown  = "unknown"
 )
 
 var falType = map[int64]int64{
-	1:12, 2:13, 3:1,
-	4:2,  5:3,  6:4,
-	7:5,  8:6,  9:7,
-	10:8, 11:9, 12:10,
-	13:11,14:14,15:15,
+	1: 12, 2: 13, 3: 1,
+	4: 2, 5: 3, 6: 4,
+	7: 5, 8: 6, 9: 7,
+	10: 8, 11: 9, 12: 10,
+	13: 11, 14: 14, 15: 15,
 }
 
 type Card struct {
@@ -60,10 +60,10 @@ func DistributeCards(num int64) []int64 {
 	dis := make([]int64, num+1)
 	last := rand.Int63n(num) + 1
 	dis[last] = num
-	for i:=num-1;i>0;i--{
+	for i := num - 1; i > 0; i-- {
 		index := rand.Int63n(i) + 1
 		count := int64(0)
-		for j:=int64(1);j<num+1;j++{
+		for j := int64(1); j < num+1; j++ {
 			if dis[j] == 0 {
 				count++
 			}
@@ -92,8 +92,8 @@ func init() {
 	}
 	var ctype string
 	var value int64
-	for i:=int64(0);i<52;i++{
-		switch i/13 {
+	for i := int64(0); i < 52; i++ {
+		switch i / 13 {
 		case 0:
 			ctype = CardTypeSpade
 		case 1:

@@ -16,7 +16,7 @@ var (
 )
 
 type FalDB struct {
-	DB *bolt.DB
+	DB      *bolt.DB
 	setchan chan *kvSetBatch
 	delchan chan *kvDelBatch
 	closet  chan struct{}
@@ -45,7 +45,7 @@ func NewDB(path string) *FalDB {
 		panic(err)
 	}
 	b := &FalDB{
-		DB:db,
+		DB:      db,
 		setchan: make(chan *kvSetBatch, 8191),
 		delchan: make(chan *kvDelBatch, 8191),
 		closet:  make(chan struct{}),
@@ -139,7 +139,7 @@ func (db *FalDB) ForEach(bucket string, fn func(k, v []byte) error) error {
 	return err
 }
 
-func (db *FalDB) Get (key, bucket string) (string, error) {
+func (db *FalDB) Get(key, bucket string) (string, error) {
 	var value []byte
 	err := db.DB.View(func(tx *bolt.Tx) error {
 		//根据name找到对应bucket
@@ -158,7 +158,7 @@ func (db *FalDB) Get (key, bucket string) (string, error) {
 	return string(value), err
 }
 
-func (db *FalDB) Put (key, value, bucket string) error {
+func (db *FalDB) Put(key, value, bucket string) error {
 	kv := &kvSetBatch{
 		bucket: bucket,
 		key:    key,
@@ -209,7 +209,7 @@ func (db *FalDB) putBatch(data map[string]map[string]string) error {
 	})
 }
 
-func (db *FalDB) Delete (key, bucket string) error {
+func (db *FalDB) Delete(key, bucket string) error {
 	kv := &kvDelBatch{
 		bucket: bucket,
 		key:    key,

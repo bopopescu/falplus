@@ -1,7 +1,7 @@
 package scode
 
 // GM错误码
-const(
+const (
 	GameAlreadyExist = 1001
 	GameNotExist     = 1002
 	GMDBOperateError = 1003
@@ -10,13 +10,12 @@ const(
 )
 
 // game错误码
-const(
+const (
 	GamePlayerIsNotHost = 2001
-	GameAlreadyStart	= 2002
-	GameAlreadyStop		= 2003
-	NobodyWantGetLord	= 2004
-	GamePlayerIsFull	= 2005
-	PlayerNotInTheGame	= 2006
+	GameAlreadyStart    = 2002
+	GameAlreadyStop     = 2003
+	NobodyWantGetLord   = 2004
+	GamePlayerIsFull    = 2005
+	PlayerNotInTheGame  = 2006
 	GamePlayerNotEnough = 2007
-
 )

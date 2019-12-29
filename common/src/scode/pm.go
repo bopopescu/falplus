@@ -11,7 +11,7 @@ const (
 )
 
 // player错误码
-const(
+const (
 	PlayerNotAttachGame = 4001
 	MessageChannelEmpty = 4002
 	MessageInvalid      = 4003
