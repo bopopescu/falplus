@@ -74,10 +74,6 @@ func NewService(conf, module, name, proto, addr string, handler Handler) *Servic
 	}
 
 	sconfig := &ServiceConfig{}
-	sconfig.Root = filepath.Join(rootDir, module)
-	if err := util.MkdirIfNotExists(sconfig.Root); err != nil {
-		log.Fatalf("MkdirIfNotExists %s error: %s", sconfig.Root, err.Error())
-	}
 
 	if len(name) != 0 {
 		sconfig.Name = name
@@ -102,7 +98,7 @@ func NewService(conf, module, name, proto, addr string, handler Handler) *Servic
 	//初始化日志
 	logLevel := "debug"
 	logrus.SetLevel(transferLevel(logLevel))
-	logdir := sconfig.Root
+	logdir := rootDir
 
 	logrotatefile := filepath.Join(LOGROTATE_PATH, sconfig.Name)
 	file, err := os.OpenFile(logrotatefile, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
@@ -118,7 +114,8 @@ func NewService(conf, module, name, proto, addr string, handler Handler) *Servic
 	if module == "player" {
 		logPath = filepath.Join(logdir, "player", logName)
 	}
-	if err := util.MkdirIfNotExists(filepath.Dir(logPath)); err != nil {
+	sconfig.Root = filepath.Dir(logPath)
+	if err := util.MkdirIfNotExists(sconfig.Root); err != nil {
 		log.Fatalf("MkdirIfNotExists %s error: %s", sconfig.Root, err.Error())
 	}
 	file.WriteString(logPath)

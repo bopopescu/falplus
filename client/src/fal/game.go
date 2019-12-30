@@ -160,8 +160,8 @@ func buildGameExitCmd(parent *cobra.Command) {
 		Short: "game exit",
 		Run: func(cmd *cobra.Command, args []string) {
 			req := &igm.GameExitRequest{
-				Gid:      gid,
-				PlayerId: pid,
+				Gid: gid,
+				Pid: pid,
 			}
 			defaultGMRequest(addr, func(c *iclient.GMClient) (interface{}, error) {
 				return c.GameExit(context.Background(), req)
