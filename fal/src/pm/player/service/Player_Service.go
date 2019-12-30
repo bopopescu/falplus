@@ -30,7 +30,7 @@ func NewPlayerServer(conf, name, proto, addr string) *PlayerService {
 	srv := &PlayerService{
 		player: player.NewPlayer(),
 	}
-	service := server.NewService(conf, "", name, proto, addr, srv)
+	service := server.NewService(conf, "player", name, proto, addr, srv)
 	srv.service = service
 	return srv
 }

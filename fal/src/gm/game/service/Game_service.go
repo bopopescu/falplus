@@ -29,7 +29,7 @@ func NewGameServer(configFilePath, name, proto, addr string) *GameService {
 		operate:  &sync.Map{},
 		gameOver: make(chan struct{}),
 	}
-	service := server.NewService(configFilePath, "", name, proto, addr, srv)
+	service := server.NewService(configFilePath, "game", name, proto, addr, srv)
 	srv.service = service
 	return srv
 }
