@@ -53,6 +53,7 @@ func (p *PlayerService) Start() {
 	p.service.Start()
 }
 
+// 同步信息到PM
 func (p *PlayerService) SyncInfo(ctx context.Context, req *ipm.PlayerInfo) (*ipm.PlayerInfo, error) {
 	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	p.player.UpdateInfo(req)
@@ -75,6 +76,7 @@ func (p *PlayerService) Stop(ctx context.Context, req *ipm.PlayerInfo) (*ipm.PMD
 	return resp, nil
 }
 
+// 与game端建立数据连接
 func (p *PlayerService) Attach(ctx context.Context, req *ipm.AttachRequest) (*ipm.PMDefaultResponse, error) {
 	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &ipm.PMDefaultResponse{}
@@ -88,6 +90,7 @@ func (p *PlayerService) Attach(ctx context.Context, req *ipm.AttachRequest) (*ip
 	return resp, nil
 }
 
+// 断开连接
 func (p *PlayerService) Detach(ctx context.Context, req *ipm.DetachRequest) (*ipm.PMDefaultResponse, error) {
 	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &ipm.PMDefaultResponse{}
@@ -101,6 +104,7 @@ func (p *PlayerService) Detach(ctx context.Context, req *ipm.DetachRequest) (*ip
 	return resp, nil
 }
 
+// 获取游戏消息（看牌）
 func (p *PlayerService) GetMessage(ctx context.Context, req *ipm.GetMessageRequest) (*ipm.GetMessageResponse, error) {
 	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &ipm.GetMessageResponse{}
@@ -116,6 +120,7 @@ func (p *PlayerService) GetMessage(ctx context.Context, req *ipm.GetMessageReque
 	return resp, nil
 }
 
+// 出牌
 func (p *PlayerService) PutMessage(ctx context.Context, req *ipm.PutMessageRequest) (*ipm.PMDefaultResponse, error) {
 	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &ipm.PMDefaultResponse{}

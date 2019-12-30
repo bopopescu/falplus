@@ -62,6 +62,7 @@ func (m *GameManager) Stop() {
 
 }
 
+// 初始化
 func (m *GameManager) InitUpdate() error {
 	m.Lock()
 	defer m.Unlock()
@@ -74,6 +75,7 @@ func (m *GameManager) InitUpdate() error {
 	return m.gameInit()
 }
 
+// 从数据库读入游戏数据
 func (m *GameManager) gameInit() error {
 	buckets, err := m.DB.GetAllBucket()
 	if err != nil {
@@ -108,6 +110,7 @@ func (m *GameManager) gameInit() error {
 	return nil
 }
 
+// 创建游戏并保存在数据库
 func (m *GameManager) CreateGame(req *igm.GameCreateRequest) (*igm.GameInfo, error) {
 	m.Lock()
 	defer m.Unlock()
@@ -154,6 +157,7 @@ func (m *GameManager) CreateGame(req *igm.GameCreateRequest) (*igm.GameInfo, err
 	return g, nil
 }
 
+// 分配端口
 func (m *GameManager) assignPort(port int64) int64 {
 	lis, err := net.Listen("tcp", net.JoinHostPort(util.GetIPv4Addr(), fmt.Sprint(port)))
 	if err != nil {
@@ -164,6 +168,7 @@ func (m *GameManager) assignPort(port int64) int64 {
 	return int64(lis.Addr().(*net.TCPAddr).Port)
 }
 
+// 删除游戏
 func (m *GameManager) DeleteGame(id string) error {
 	m.Lock()
 	_, exist := m.games[id]
@@ -183,6 +188,7 @@ func (m *GameManager) DeleteGame(id string) error {
 	return nil
 }
 
+// 获取所有游戏信息
 func (m *GameManager) GetAllGameInfo() map[string]*igm.GameInfo {
 	m.RLock()
 	defer m.RUnlock()
@@ -193,6 +199,7 @@ func (m *GameManager) GetAllGameInfo() map[string]*igm.GameInfo {
 	return games
 }
 
+// 获取指定游戏信息
 func (m *GameManager) GetGameInfo(gid string) *igm.GameInfo {
 	m.RLock()
 	defer m.RUnlock()
@@ -200,6 +207,7 @@ func (m *GameManager) GetGameInfo(gid string) *igm.GameInfo {
 	return g
 }
 
+// 启动游戏进程
 func (m *GameManager) startGame(g *igm.GameInfo) error {
 	args := []string{
 		filepath.Base(os.Args[0]),
@@ -225,6 +233,7 @@ func (m *GameManager) startGame(g *igm.GameInfo) error {
 	return nil
 }
 
+// 默认响应格式的服务请求
 func (m *GameManager) DefaultGameResponse(gid string, f func(c *iclient.GameClient) (*igm.GMDefaultResponse, error)) error {
 	m.RLock()
 	g, exist := m.games[gid]

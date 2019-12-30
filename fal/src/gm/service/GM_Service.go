@@ -58,6 +58,7 @@ func (m *GMService) Start() {
 	m.service.Start()
 }
 
+// 创建并启动游戏
 func (m *GMService) GameCreate(ctx context.Context, req *igm.GameCreateRequest) (*igm.GameCreateResponse, error) {
 	log.Debugf("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &igm.GameCreateResponse{}
@@ -74,6 +75,7 @@ func (m *GMService) GameCreate(ctx context.Context, req *igm.GameCreateRequest) 
 	return resp, nil
 }
 
+// 停止并删除游戏
 func (m *GMService) GameDelete(ctx context.Context, req *igm.GameDeleteRequest) (*igm.GMDefaultResponse, error) {
 	log.Debugf("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &igm.GMDefaultResponse{}
@@ -91,6 +93,7 @@ func (m *GMService) GameDelete(ctx context.Context, req *igm.GameDeleteRequest) 
 	return resp, nil
 }
 
+// 游戏列表
 func (m *GMService) GameList(ctx context.Context, req *igm.GameListRequest) (*igm.GameListResponse, error) {
 	log.Debugf("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &igm.GameListResponse{}
@@ -103,6 +106,7 @@ func (m *GMService) GameList(ctx context.Context, req *igm.GameListRequest) (*ig
 	return resp, nil
 }
 
+// 玩家加入房间
 func (m *GMService) GameAddPlayer(ctx context.Context, req *igm.AddPlayerRequest) (*igm.AddPlayerResponse, error) {
 	log.Debugf("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &igm.AddPlayerResponse{}
@@ -119,6 +123,7 @@ func (m *GMService) GameAddPlayer(ctx context.Context, req *igm.AddPlayerRequest
 	return resp, nil
 }
 
+// 玩家离开房间
 func (m *GMService) GameDelPlayer(ctx context.Context, req *igm.DelPlayerRequest) (*igm.GMDefaultResponse, error) {
 	log.Debugf("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &igm.GMDefaultResponse{}
@@ -133,6 +138,7 @@ func (m *GMService) GameDelPlayer(ctx context.Context, req *igm.DelPlayerRequest
 	return resp, nil
 }
 
+// 开始游戏
 func (m *GMService) GameStart(ctx context.Context, req *igm.GameStartRequest) (*igm.GMDefaultResponse, error) {
 	log.Debugf("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &igm.GMDefaultResponse{}
@@ -147,6 +153,7 @@ func (m *GMService) GameStart(ctx context.Context, req *igm.GameStartRequest) (*
 	return resp, nil
 }
 
+// 停止游戏
 func (m *GMService) GameStop(ctx context.Context, req *igm.GameStopRequest) (*igm.GMDefaultResponse, error) {
 	log.Debugf("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &igm.GMDefaultResponse{}
@@ -161,6 +168,7 @@ func (m *GMService) GameStop(ctx context.Context, req *igm.GameStopRequest) (*ig
 	return resp, nil
 }
 
+// 退出游戏进程
 func (m *GMService) GameExit(ctx context.Context, req *igm.GameExitRequest) (*igm.GMDefaultResponse, error) {
 	log.Debugf("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
 	resp := &igm.GMDefaultResponse{}

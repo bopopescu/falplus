@@ -49,6 +49,7 @@ func NewGame() *GameFal {
 	return game
 }
 
+// 玩家加入房间
 func (g *GameFal) AddPlayer(pid string) error {
 	g.Lock()
 	defer g.Unlock()
@@ -64,6 +65,7 @@ func (g *GameFal) AddPlayer(pid string) error {
 	return nil
 }
 
+// 玩家离开房间
 func (g *GameFal) DelPlayer(pid string) error {
 	g.Lock()
 	defer g.Unlock()
@@ -84,6 +86,7 @@ func (g *GameFal) DelPlayer(pid string) error {
 	return nil
 }
 
+// 玩家建立数据连接
 func (g *GameFal) PlayerConn(stream igm.Game_PlayerConnServer) (<-chan struct{}, error) {
 	g.Lock()
 	defer g.Unlock()
@@ -114,7 +117,7 @@ func (g *GameFal) Start(pid string) error {
 	if g.state == igm.Start {
 		return status.NewStatus(scode.GameAlreadyStart)
 	}
-	g.state = igm.Start
+
 	if len(g.players) < 3 {
 		return status.NewStatus(scode.GamePlayerNotEnough)
 	}
@@ -125,21 +128,25 @@ func (g *GameFal) Start(pid string) error {
 	go g.goStart()
 	go g.goGameLogical()
 
+	g.state = igm.Start
 	return nil
 }
 
+// 房主停止游戏
 func (g *GameFal) Stop(pid string) error {
 	g.Lock()
 	defer g.Unlock()
 	if g.state == igm.Stop {
 		return status.NewStatus(scode.GameAlreadyStop)
 	}
-	g.state = igm.Stop
+
 	if g.players[g.lastWin].Id != pid {
 		desc := fmt.Sprintf("player %s is not host in this game", pid)
 		return status.NewStatusDesc(scode.GamePlayerIsNotHost, desc)
 	}
+
 	close(g.stopForce)
+	g.state = igm.Stop
 	return nil
 }
 
@@ -147,6 +154,7 @@ func (g *GameFal) State() int {
 	return g.state
 }
 
+// 监听管道消息并发送
 func (g *GameFal) goStart() {
 	cards := card.DistributeCards(54)
 	// 此方法赋值会复用cards的内存，造成意想不到的bug
@@ -230,7 +238,7 @@ func (g *GameFal) round(rtype int64, owner int) (*igm.PlayerMessage, error) {
 	return msg.pMsg, msg.err
 }
 
-// 指定牌权，当前回合类型，场上牌，场上牌所属。
+// 游戏逻辑控制，指定牌权，当前回合类型，场上牌，场上牌所属。
 func (g *GameFal) goGameLogical() {
 	defer func() {
 		close(g.stopNormal)

@@ -96,7 +96,7 @@ func conn() {
 			panic(err)
 		}
 
-		addResp, err := gmc.GameAddPlayer(ctx, &igm.AddPlayerRequest{Gid: gameList.Games[0].Gid, PlayerId: p.Id})
+		addResp, err := gmc.GameAddPlayer(ctx, &igm.AddPlayerRequest{Gid: gameList.Games[0].Gid, Pid: p.Id})
 		if err != nil || addResp.Status.Code != 0 {
 			panic("GameAddPlayer error")
 		}
