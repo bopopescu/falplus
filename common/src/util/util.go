@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func MkdirIfNotExists(path string) error {
@@ -76,7 +77,7 @@ func GetIPv4Addr() string {
 	if err == nil {
 		for _, address := range addrs {
 			if ipnet, ok := address.(*net.IPNet); ok {
-				if p4 := ipnet.IP.To4(); len(p4) == net.IPv4len {
+				if p4 := ipnet.IP.To4(); len(p4) == net.IPv4len && !strings.HasPrefix(ipnet.IP.String(), "127"){
 					return ipnet.IP.String()
 				}
 			}

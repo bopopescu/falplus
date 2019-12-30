@@ -113,3 +113,25 @@ func (c *PlayerClient) Close() error {
 	}
 	return nil
 }
+
+type Status interface {
+	GetStatus() *status.Status
+}
+
+func DefaultGameStatusHandle(addr string, f func(c igm.GameClient)(Status, error)) error {
+	c, err := grpc.Dial(addr, grpc.WithInsecure(), kpOpt)
+	if err != nil {
+		desc := fmt.Sprintf("Dial addr %s error %s", addr, err)
+		return status.NewStatusDesc(scode.GRPCError, desc)
+	}
+	defer c.Close()
+	resp, err := f(igm.NewGameClient(c))
+	if err != nil {
+		desc := fmt.Sprintf("GRPC error:%s", err)
+		return status.NewStatusDesc(scode.GRPCError, desc)
+	}
+	if resp.GetStatus().Code != 0 {
+		return status.UpdateStatus(resp.GetStatus())
+	}
+	return nil
+}
