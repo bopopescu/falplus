@@ -1,6 +1,6 @@
 EXEC_FILE = client
 POLICY_EXEC_FILE = ./bin/$(EXEC_FILE)
-CLIENT = /mnt/d/workspace/falplus/common:/mnt/d/workspace/falplus/dependency:/mnt/d/workspace/falplus/client
+CLIENT = /mnt/hgfs/workspace/falplus/common:/mnt/hgfs/workspace/falplus/dependency:/mnt/hgfs/workspace/falplus/client
 
 .PHONY: all clean home
 

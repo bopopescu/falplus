@@ -7,7 +7,42 @@ import (
 	"golang.org/x/net/context"
 	"iclient"
 	"net"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"time"
 )
+
+func start() {
+	args := []string{
+		filepath.Base("/usr/local/bin/fal"),
+		"gm",
+		"start",
+		"--addr", net.JoinHostPort("", "12587"),
+	}
+	var attr os.ProcAttr
+	attr.Files = []*os.File{os.Stdin, os.Stdout, os.Stderr}
+	attr.Env = os.Environ()
+	bin, err := exec.LookPath("/usr/local/bin/fal")
+	if err != nil {
+		panic(err)
+	}
+	_, err = os.StartProcess(bin, args, &attr)
+	if err != nil {
+		panic(err)
+	}
+
+	args = []string{
+		filepath.Base("/usr/local/bin/fal"),
+		"pm",
+		"start",
+		"--addr", net.JoinHostPort("", "12588"),
+	}
+	_, err = os.StartProcess(bin, args, &attr)
+	if err != nil {
+		panic(err)
+	}
+}
 
 func create() {
 	gmc, err := iclient.NewGMClient(":12587")
@@ -112,6 +147,8 @@ func conn() {
 }
 
 func main() {
+	start()
+	time.Sleep(2*time.Second)
 	create()
 	conn()
 }
