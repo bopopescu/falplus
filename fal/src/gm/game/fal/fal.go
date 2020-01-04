@@ -12,9 +12,9 @@ import (
 
 var log = logrus.WithFields(logrus.Fields{"pkg": "gm/game/fal"})
 
-type GameFal struct {
+type gameFal struct {
 	sync.RWMutex
-	players    []*PInfo
+	players    []*pInfo
 	cards      [][]int64
 	lastId     string
 	lastWin    int
@@ -24,10 +24,10 @@ type GameFal struct {
 	state      int
 }
 
-type PInfo struct {
-	Stream igm.Game_PlayerConnServer
-	Id     string
-	Leave  chan struct{}
+type pInfo struct {
+	stream igm.Game_PlayerConnServer
+	id     string
+	leave  chan struct{}
 }
 
 type message struct {
@@ -38,43 +38,46 @@ type message struct {
 	sync.WaitGroup
 }
 
-var game *GameFal
+var game *gameFal
 
-func NewGame() *GameFal {
-	game = &GameFal{
+func NewGame() *gameFal {
+	return game
+}
+
+func init() {
+	game = &gameFal{
 		msgChan:    make(chan *message),
 		stopNormal: make(chan struct{}),
 		stopForce:  make(chan struct{}),
 	}
-	return game
 }
 
 // 玩家加入房间
-func (g *GameFal) AddPlayer(pid string) error {
+func (g *gameFal) AddPlayer(pid string) error {
 	g.Lock()
 	defer g.Unlock()
 	if len(g.players) >= 3 {
 		desc := fmt.Sprintf("game room is full")
 		return status.NewStatusDesc(scode.GamePlayerIsFull, desc)
 	}
-	p := &PInfo{
-		Id:    pid,
-		Leave: make(chan struct{}),
+	p := &pInfo{
+		id:    pid,
+		leave: make(chan struct{}),
 	}
 	g.players = append(g.players, p)
 	return nil
 }
 
 // 玩家离开房间
-func (g *GameFal) DelPlayer(pid string) error {
+func (g *gameFal) DelPlayer(pid string) error {
 	g.Lock()
 	defer g.Unlock()
-	var players []*PInfo
+	var players []*pInfo
 	for _, p := range g.players {
-		if p.Id != pid {
+		if p.id != pid {
 			players = append(players, p)
 		} else {
-			close(p.Leave)
+			close(p.leave)
 		}
 	}
 	// 长度相等说明pid不存在
@@ -87,7 +90,7 @@ func (g *GameFal) DelPlayer(pid string) error {
 }
 
 // 玩家建立数据连接
-func (g *GameFal) PlayerConn(stream igm.Game_PlayerConnServer) (<-chan struct{}, error) {
+func (g *gameFal) PlayerConn(stream igm.Game_PlayerConnServer) (<-chan struct{}, error) {
 	g.Lock()
 	defer g.Unlock()
 	pMsg, err := stream.Recv()
@@ -95,23 +98,23 @@ func (g *GameFal) PlayerConn(stream igm.Game_PlayerConnServer) (<-chan struct{},
 		desc := fmt.Sprintf("GRPC error:%s", err)
 		return nil, status.NewStatusDesc(scode.GRPCError, desc)
 	}
-	var p *PInfo
+	var p *pInfo
 	exist := false
 	for _, p = range g.players {
-		if p.Id == pMsg.Pid {
+		if p.id == pMsg.Pid {
 			exist = true
-			p.Stream = stream
+			p.stream = stream
 		}
 	}
 	if !exist {
 		desc := fmt.Sprintf("player %s is not belong this game", pMsg.Pid)
 		return nil, status.NewStatusDesc(scode.PlayerNotInTheGame, desc)
 	}
-	return p.Leave, nil
+	return p.leave, nil
 }
 
 // 判断发起游戏开始玩家是否为房主,人数是否够三人（房主为第一进房间的人或者上次的赢家）
-func (g *GameFal) Start(pid string) error {
+func (g *gameFal) Start(pid string) error {
 	g.Lock()
 	defer g.Unlock()
 	if g.state == igm.Start {
@@ -121,7 +124,7 @@ func (g *GameFal) Start(pid string) error {
 	if len(g.players) < 3 {
 		return status.NewStatus(scode.GamePlayerNotEnough)
 	}
-	if g.players[g.lastWin].Id != pid {
+	if g.players[g.lastWin].id != pid {
 		desc := fmt.Sprintf("player %s is not host in this game", pid)
 		return status.NewStatusDesc(scode.GamePlayerIsNotHost, desc)
 	}
@@ -133,14 +136,14 @@ func (g *GameFal) Start(pid string) error {
 }
 
 // 房主停止游戏
-func (g *GameFal) Stop(pid string) error {
+func (g *gameFal) Stop(pid string) error {
 	g.Lock()
 	defer g.Unlock()
 	if g.state == igm.Stop {
 		return status.NewStatus(scode.GameAlreadyStop)
 	}
 
-	if g.players[g.lastWin].Id != pid {
+	if g.players[g.lastWin].id != pid {
 		desc := fmt.Sprintf("player %s is not host in this game", pid)
 		return status.NewStatusDesc(scode.GamePlayerIsNotHost, desc)
 	}
@@ -150,12 +153,12 @@ func (g *GameFal) Stop(pid string) error {
 	return nil
 }
 
-func (g *GameFal) State() int {
+func (g *gameFal) State() int {
 	return g.state
 }
 
 // 监听管道消息并发送
-func (g *GameFal) goStart() {
+func (g *gameFal) goStart() {
 	cards := card.DistributeCards(54)
 	// 此方法赋值会复用cards的内存，造成意想不到的bug
 	// g.Cards = append(g.Cards, cards[:17], cards[17:34], cards[34:51], cards[51:])
@@ -177,26 +180,26 @@ func (g *GameFal) goStart() {
 }
 
 // 向所有玩家发送信息，获取牌权持有者的响应
-func (g *GameFal) sendMessage(msg *message) {
+func (g *gameFal) sendMessage(msg *message) {
 	wg := &sync.WaitGroup{}
 	for index, p := range g.players {
 		wg.Add(1)
-		go func(index int, p *PInfo) {
+		go func(index int, p *pInfo) {
 			defer wg.Done()
 			gMsg := *msg.gMsg
 			gMsg.LastCards = g.cards[3]     // 场上牌
 			gMsg.YourCards = g.cards[index] // 玩家手里牌
 			gMsg.LastId = g.lastId
-			gMsg.RoundOwner = g.players[msg.owner].Id // 牌权
-			err := p.Stream.Send(&gMsg)
+			gMsg.RoundOwner = g.players[msg.owner].id // 牌权
+			err := p.stream.Send(&gMsg)
 			if err != nil {
-				desc := fmt.Sprintf("player %s GRPC Send error:%s", p.Id, err)
+				desc := fmt.Sprintf("player %s GRPC Send error:%s", p.id, err)
 				msg.err = status.NewStatusDesc(scode.GRPCError, desc)
 				return
 			}
-			r, err := p.Stream.Recv()
+			r, err := p.stream.Recv()
 			if err != nil {
-				desc := fmt.Sprintf("player %s GRPC Recv error:%s", p.Id, err)
+				desc := fmt.Sprintf("player %s GRPC Recv error:%s", p.id, err)
 				msg.err = status.NewStatusDesc(scode.GRPCError, desc)
 				return
 			}
@@ -209,7 +212,7 @@ func (g *GameFal) sendMessage(msg *message) {
 }
 
 // 争夺地主
-func (g *GameFal) fightForLandlord(cur int) (int, error) {
+func (g *gameFal) fightForLandlord(cur int) (int, error) {
 	for i := cur; i < cur+3; i++ {
 		index := i % 3
 		resp, err := g.round(igm.Get, index)
@@ -227,7 +230,7 @@ func (g *GameFal) fightForLandlord(cur int) (int, error) {
 }
 
 // 回合指定回合类型，牌权
-func (g *GameFal) round(rtype int64, owner int) (*igm.PlayerMessage, error) {
+func (g *gameFal) round(rtype int64, owner int) (*igm.PlayerMessage, error) {
 	msg := &message{}
 	gMsg := &igm.GameMessage{MsgType: rtype}
 	msg.gMsg = gMsg
@@ -239,7 +242,7 @@ func (g *GameFal) round(rtype int64, owner int) (*igm.PlayerMessage, error) {
 }
 
 // 游戏逻辑控制，指定牌权，当前回合类型，场上牌，场上牌所属。
-func (g *GameFal) goGameLogical() {
+func (g *gameFal) goGameLogical() {
 	defer func() {
 		close(g.stopNormal)
 		g.state = igm.Stop
@@ -270,7 +273,7 @@ func (g *GameFal) goGameLogical() {
 				continue
 			}
 			g.cards[3] = resp.PutCards
-			g.lastId = g.players[cur].Id
+			g.lastId = g.players[cur].id
 			// 更新并判断
 			if g.updateCards(cur, resp.PutCards) {
 				g.round(igm.Over, cur)
@@ -282,7 +285,7 @@ func (g *GameFal) goGameLogical() {
 }
 
 // 更新玩家手牌并判断是否结束游戏
-func (g *GameFal) updateCards(index int, cards []int64) bool {
+func (g *gameFal) updateCards(index int, cards []int64) bool {
 	tmp := make(map[int64]struct{})
 	for _, seq := range cards {
 		tmp[seq] = struct{}{}

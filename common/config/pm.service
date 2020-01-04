@@ -1,0 +1,20 @@
+[Unit]
+Description=fal pm daemon
+#Requires=vagent.service
+#After=vagent.service network.target network-online.target
+#Before=shutdown.target reboot.target halt.target
+
+[Service]
+ExecStart=/usr/local/bin/fal pm start --addr :12588
+ExecReload=/bin/kill -HUP $MAINPID
+Type=idle
+KillMode=process
+Restart=always
+RestartSec=1s
+#最大进程数限制
+TasksMax=infinity
+#最大资源限制，如打开文件数，链接数
+LimitNOFILE=1000000
+
+[Install]
+WantedBy=multi-user.target

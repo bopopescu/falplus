@@ -72,6 +72,7 @@ func (db *FalDB) Close() {
 	close(db.closet)
 	close(db.setchan)
 	close(db.delchan)
+	db.DB.Close()
 	return
 }
 

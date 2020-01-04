@@ -46,20 +46,27 @@ type GameManager struct {
 }
 
 func NewGameManager() *GameManager {
-	db := fdb.NewDB(GMDB)
-	err := db.CreateBucket(BucketGameList)
-	if err != nil {
-		panic(err)
-	}
-	gm = &GameManager{
-		games: make(map[string]*igm.GameInfo),
-		DB:    db,
-	}
 	return gm
 }
 
-func (m *GameManager) Stop() {
+func init() {
+	if gm == nil {
+		db := fdb.NewDB(GMDB)
+		err := db.CreateBucket(BucketGameList)
+		if err != nil {
+			panic(err)
+		}
+		gm = &GameManager{
+			games: make(map[string]*igm.GameInfo),
+			DB:    db,
+		}
+	}
+}
 
+func (m *GameManager) Stop() {
+	if m.DB != nil {
+		m.DB.Close()
+	}
 }
 
 // 初始化
@@ -130,9 +137,17 @@ func (m *GameManager) CreateGame(req *igm.GameCreateRequest) (*igm.GameInfo, err
 		Gid:      id,
 		GameType: req.GameType,
 		Port:     m.assignPort(req.Port),
+		State:    igm.Exit,
 	}
 
-	err := m.startGame(g)
+	m.games[id] = g
+	var err error
+	defer func() {
+		if err != nil {
+			delete(m.games, id)
+		}
+	}()
+	err = m.StartGame(g)
 	if err != nil {
 		return nil, status.UpdateStatus(err)
 	}
@@ -144,8 +159,10 @@ func (m *GameManager) CreateGame(req *igm.GameCreateRequest) (*igm.GameInfo, err
 	kvs[BucketKeyPort] = fmt.Sprint(g.Port)
 	kvs[BucketKeyPid] = fmt.Sprint(g.Pid)
 	data := map[string]map[string]string{id: kvs}
-	m.games[id] = g
 
+	// 读写文件放开锁保证性能
+	m.Unlock()
+	defer m.Lock()
 	if err = m.DB.Put(id, fmt.Sprint(req.GameType), BucketGameList); err != nil {
 		desc := fmt.Sprintf("put key:%s value:%s bucket:%s error:%s", id, fmt.Sprint(req.GameType), BucketGameList, err)
 		return nil, status.NewStatusDesc(scode.GMDBOperateError, desc)
@@ -161,8 +178,11 @@ func (m *GameManager) CreateGame(req *igm.GameCreateRequest) (*igm.GameInfo, err
 func (m *GameManager) assignPort(port int64) int64 {
 	lis, err := net.Listen("tcp", net.JoinHostPort(util.GetIPv4Addr(), fmt.Sprint(port)))
 	if err != nil {
-		log.Error(err)
-		lis, _ = net.Listen("tcp", ":")
+		log.Info(err)
+		lis, err = net.Listen("tcp", ":")
+	}
+	if err != nil {
+		panic("assignPort err")
 	}
 	lis.Close()
 	return int64(lis.Addr().(*net.TCPAddr).Port)
@@ -171,14 +191,16 @@ func (m *GameManager) assignPort(port int64) int64 {
 // 删除游戏
 func (m *GameManager) DeleteGame(id string) error {
 	m.Lock()
+	defer m.Unlock()
 	_, exist := m.games[id]
 	if !exist {
 		desc := fmt.Sprintf("game %s not exist", id)
 		return status.NewStatusDesc(scode.GameNotExist, desc)
 	}
 	delete(m.games, id)
-	m.Unlock()
 
+	m.Unlock()
+	defer m.Lock()
 	if err := m.DB.Delete(id, BucketGameList); err != nil {
 		log.Error(err)
 	}
@@ -207,15 +229,24 @@ func (m *GameManager) GetGameInfo(gid string) *igm.GameInfo {
 	return g
 }
 
+// 设置游戏状态
+func (m *GameManager) SetState(gid string, state int64) {
+	m.Lock()
+	defer m.Unlock()
+	m.games[gid].State = state
+}
+
 // 启动游戏进程
-func (m *GameManager) startGame(g *igm.GameInfo) error {
+func (m *GameManager) StartGame(g *igm.GameInfo) error {
+	port := m.assignPort(g.Port)
 	args := []string{
 		filepath.Base(os.Args[0]),
 		"game",
 		"start",
 		"--name", g.Gid,
-		"--addr", net.JoinHostPort("", fmt.Sprint(g.Port)),
+		"--addr", net.JoinHostPort("", fmt.Sprint(port)),
 	}
+
 	var attr os.ProcAttr
 	attr.Files = []*os.File{os.Stdin, os.Stdout, os.Stderr}
 	attr.Env = os.Environ()
@@ -224,12 +255,20 @@ func (m *GameManager) startGame(g *igm.GameInfo) error {
 		desc := fmt.Sprintf("exec.LookPath %s error:%s", os.Args[0], err)
 		return status.NewStatusDesc(scode.GMCallGoLibError, desc)
 	}
+
 	proc, err := os.StartProcess(bin, args, &attr)
 	if err != nil {
-		desc := fmt.Sprintf("os.StartProcess %s %v %v error:%s", bin, args, attr)
+		desc := fmt.Sprintf("os.StartProcess %s %v %v error:%s", bin, args, attr, err)
 		return status.NewStatusDesc(scode.GMCallGoLibError, desc)
 	}
-	g.Pid = int64(proc.Pid)
+
+	m.games[g.Gid].Port = int64(proc.Pid)
+	m.games[g.Gid].State = igm.Running
+	if port != g.Port {
+		m.games[g.Gid].Port = port
+		m.DB.Put(BucketKeyPort, fmt.Sprint(port), g.Gid)
+	}
+
 	return nil
 }
 
@@ -242,6 +281,7 @@ func (m *GameManager) DefaultGameResponse(gid string, f func(c *iclient.GameClie
 		desc := fmt.Sprintf("game %s not exist", gid)
 		return status.NewStatusDesc(scode.GameNotExist, desc)
 	}
+
 	addr := net.JoinHostPort(util.GetIPv4Addr(), fmt.Sprint(g.Port))
 	c, err := iclient.NewGameClient(addr)
 	if err != nil {
@@ -256,5 +296,35 @@ func (m *GameManager) DefaultGameResponse(gid string, f func(c *iclient.GameClie
 	if resp.Status.Code != 0 {
 		return status.UpdateStatus(resp.Status)
 	}
+
+	return nil
+}
+
+// 发送game请求 reqOpr发送请求 respOpr处理响应
+func (m *GameManager) ConcurrenceGameOperate(gid string, reqOpr func(*igm.GameInfo) interface{}, respOpr func(interface{})) error {
+	allGame := m.GetAllGameInfo()
+	count := 0
+	mc := make(chan interface{}, len(allGame))
+
+	for _, game := range allGame {
+		if gid == "all" || game.Gid == gid {
+			count++
+			go func(g *igm.GameInfo) {
+				mc <- reqOpr(g)
+			}(game)
+		}
+	}
+
+	if count == 0 {
+		desc := fmt.Sprintf("game %s not exist", gid)
+		return status.NewStatusDesc(scode.GameNotExist, desc)
+	}
+
+	for count > 0 {
+		r := <-mc
+		respOpr(r)
+		count--
+	}
+
 	return nil
 }

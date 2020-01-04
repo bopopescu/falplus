@@ -14,7 +14,12 @@ service GM {
     rpc GameStop(GameStopRequest)returns(GMDefaultResponse){}
     rpc GameAddPlayer(AddPlayerRequest)returns(AddPlayerResponse){}
     rpc GameDelPlayer(DelPlayerRequest)returns(GMDefaultResponse){}
+    rpc GameUp(GameUpRequest)returns(GMDefaultResponse){}
     rpc GameExit(GameExitRequest)returns(GMDefaultResponse){}
+}
+
+message GameUpRequest {
+    string gid = 1;
 }
 
 message GameCreateRequest {

@@ -19,6 +19,8 @@ var MsgType = map[int64]string{
 const (
 	Stop  = 0
 	Start = 1
+	Running = 3
+	Exit = 4
 )
 
 type Game interface {

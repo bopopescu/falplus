@@ -148,7 +148,7 @@ func conn() {
 
 func main() {
 	start()
-	time.Sleep(2*time.Second)
+	time.Sleep(2 * time.Second)
 	create()
 	conn()
 }
