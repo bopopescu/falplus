@@ -217,7 +217,6 @@ func (srv *Service) Start() {
 	}
 
 	if srv.tcpListener != nil {
-		fmt.Println(srv.tcpListener.Addr())
 		srv.Server.Serve(srv.tcpListener)
 	}
 }

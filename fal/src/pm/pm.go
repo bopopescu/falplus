@@ -14,6 +14,8 @@ import (
 	"path/filepath"
 	"scode"
 	"status"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 	"util"
@@ -24,8 +26,10 @@ const (
 	BucketPlayerList = "players"
 	PlayerPrefix     = "player-"
 	BucketKeyPid     = "pid"
+	BucketKeyId      = "id"
 	BucketKeyName    = "name"
 	BucketKeyPwd     = "password"
+	BucketKeyPort    = "port"
 )
 
 var (
@@ -37,6 +41,7 @@ type PlayerManager struct {
 	sync.RWMutex
 	players map[string]*ipm.PlayerInfo
 	DB      *fdb.FalDB
+	isInit  bool
 }
 
 func NewPlayerManager() *PlayerManager {
@@ -50,6 +55,51 @@ func NewPlayerManager() *PlayerManager {
 		DB:      db,
 	}
 	return pm
+}
+
+// 初始化
+func (m *PlayerManager) InitUpdate() error {
+	m.Lock()
+	defer m.Unlock()
+
+	if m.isInit {
+		panic("InitUpdate PM twice")
+	}
+	m.isInit = true
+
+	return m.playerInit()
+}
+
+// 从数据库读入游戏数据
+func (m *PlayerManager) playerInit() error {
+	buckets, err := m.DB.GetAllBucket()
+	if err != nil {
+		desc := fmt.Sprintf("GetAllBucket error:%s", err)
+		return status.NewStatusDesc(scode.PMDBOperateError, desc)
+	}
+	log.Debug(buckets)
+	for _, b := range buckets {
+		if strings.HasPrefix(b, PlayerPrefix) {
+
+			kvs, err := m.DB.GetAllKV(b)
+			if err != nil {
+				desc := fmt.Sprintf("GetAllKV error:%s", err)
+				return status.NewStatusDesc(scode.PMDBOperateError, desc)
+			}
+
+			port, _ := strconv.ParseInt(kvs[BucketKeyPort], 10, 64)
+			pid, _ := strconv.ParseInt(kvs[BucketKeyPid], 10, 64)
+			info := &ipm.PlayerInfo{
+				Id:       kvs[BucketKeyId],
+				Port:     port,
+				Pid:      pid,
+				Name:     kvs[BucketKeyName],
+				Password: kvs[BucketKeyPwd],
+			}
+			m.players[info.Id] = info
+		}
+	}
+	return nil
 }
 
 // 创建玩家
@@ -75,12 +125,14 @@ func (m *PlayerManager) CreatePlayer(req *ipm.PlayerCreateRequest) (*ipm.PlayerI
 		Password: req.Password,
 	}
 	kvs := make(map[string]string)
-	kvs[BucketKeyPid] = id
+	kvs[BucketKeyId] = id
 	kvs[BucketKeyName] = p.Name
 	kvs[BucketKeyPwd] = p.Password
 	data := map[string]map[string]string{id: kvs}
 	m.players[id] = p
 
+	m.Unlock()
+	defer m.Lock()
 	if err := m.DB.Put(id, req.Name, BucketPlayerList); err != nil {
 		desc := fmt.Sprintf("Put key:%s value:%s bucket:%s error:%s", id, req.Name, BucketPlayerList, err)
 		return nil, status.NewStatusDesc(scode.PMDBOperateError, desc)
@@ -96,7 +148,10 @@ func (m *PlayerManager) CreatePlayer(req *ipm.PlayerCreateRequest) (*ipm.PlayerI
 func (m *PlayerManager) assignPort(port int64) int64 {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
-		lis, _ = net.Listen("tcp", ":")
+		lis, err = net.Listen("tcp", ":")
+	}
+	if err != nil {
+		panic(err)
 	}
 	lis.Close()
 	return int64(lis.Addr().(*net.TCPAddr).Port)
@@ -113,6 +168,8 @@ func (m *PlayerManager) DeletePlayer(id string) error {
 	}
 	delete(m.players, id)
 
+	m.Unlock()
+	defer m.Lock()
 	if err := m.DB.Delete(id, BucketPlayerList); err != nil {
 		log.Errorf("Delete key:%s bucket:%s error:%s", id, BucketPlayerList, err)
 	}
@@ -166,6 +223,8 @@ func (m *PlayerManager) StartPlayer(req *ipm.PlayerSignInRequest) (*ipm.PlayerIn
 		return nil, status.NewStatusDesc(scode.PMCallGoLibError, desc)
 	}
 	p.Pid = int64(proc.Pid)
+	m.DB.Put(BucketKeyPort, fmt.Sprint(p.Port), p.Id)
+	m.DB.Put(BucketKeyPid, fmt.Sprint(p.Pid), p.Id)
 
 	// 等待进程启动并同步信息
 	time.Sleep(time.Millisecond)

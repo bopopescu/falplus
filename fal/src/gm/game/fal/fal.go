@@ -39,17 +39,17 @@ type message struct {
 }
 
 var game *gameFal
+var once = new(sync.Once)
 
 func NewGame() *gameFal {
+	once.Do(func() {
+		game = &gameFal{
+			msgChan:    make(chan *message),
+			stopNormal: make(chan struct{}),
+			stopForce:  make(chan struct{}),
+		}
+	})
 	return game
-}
-
-func init() {
-	game = &gameFal{
-		msgChan:    make(chan *message),
-		stopNormal: make(chan struct{}),
-		stopForce:  make(chan struct{}),
-	}
 }
 
 // 玩家加入房间

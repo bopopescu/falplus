@@ -34,6 +34,12 @@ func NewPMServer(configFilePath, name, proto, addr string) *PMService {
 
 func (m *PMService) Init(c *goconfig.ConfigFile) {
 	m.pm = pm.NewPlayerManager()
+
+	go func() {
+		if err := m.pm.InitUpdate(); err != nil {
+			log.Errorf("InitUpdate error:%s", err)
+		}
+	}()
 }
 
 func (m *PMService) Signal(sig os.Signal) bool {

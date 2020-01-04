@@ -10,7 +10,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"time"
 )
 
 func start() {
@@ -115,7 +114,7 @@ func conn() {
 	defer pmc.Close()
 
 	ctx := context.Background()
-	gameList, err := gmc.GameList(ctx, &igm.GameListRequest{})
+	gameList, err := gmc.GameList(ctx, &igm.GameListRequest{Gid: "all"})
 	if err != nil || gameList.Status.Code != 0 {
 		panic("sign in player error")
 	}
@@ -147,8 +146,7 @@ func conn() {
 }
 
 func main() {
-	start()
-	time.Sleep(2 * time.Second)
+	//start()
 	create()
 	conn()
 }

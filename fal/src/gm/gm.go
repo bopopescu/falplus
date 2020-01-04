@@ -37,6 +37,7 @@ const (
 )
 
 var gm *GameManager
+var once = new(sync.Once)
 
 type GameManager struct {
 	sync.RWMutex
@@ -46,11 +47,8 @@ type GameManager struct {
 }
 
 func NewGameManager() *GameManager {
-	return gm
-}
-
-func init() {
-	if gm == nil {
+	once.Do(func() {
+		// 切记放在init，否则将会导致一直卡在opendb
 		db := fdb.NewDB(GMDB)
 		err := db.CreateBucket(BucketGameList)
 		if err != nil {
@@ -60,7 +58,8 @@ func init() {
 			games: make(map[string]*igm.GameInfo),
 			DB:    db,
 		}
-	}
+	})
+	return gm
 }
 
 func (m *GameManager) Stop() {
@@ -75,7 +74,7 @@ func (m *GameManager) InitUpdate() error {
 	defer m.Unlock()
 
 	if m.isInit {
-		panic("InitUpdate USM twice")
+		panic("InitUpdate GM twice")
 	}
 	m.isInit = true
 
@@ -89,14 +88,16 @@ func (m *GameManager) gameInit() error {
 		desc := fmt.Sprintf("GetAllBucket error:%s", err)
 		return status.NewStatusDesc(scode.GMDBOperateError, desc)
 	}
-	log.Info(buckets)
+	log.Debug(buckets)
 	for _, b := range buckets {
-		kvs, err := m.DB.GetAllKV(b)
-		if err != nil {
-			desc := fmt.Sprintf("GetAllKV error:%s", err)
-			return status.NewStatusDesc(scode.GMDBOperateError, desc)
-		}
 		if strings.HasPrefix(b, GamePrefix) {
+
+			kvs, err := m.DB.GetAllKV(b)
+			if err != nil {
+				desc := fmt.Sprintf("GetAllKV error:%s", err)
+				return status.NewStatusDesc(scode.GMDBOperateError, desc)
+			}
+
 			port, _ := strconv.ParseInt(kvs[BucketKeyPort], 10, 64)
 			state, _ := strconv.ParseInt(kvs[BucketKeyState], 10, 64)
 			pid, _ := strconv.ParseInt(kvs[BucketKeyPid], 10, 64)

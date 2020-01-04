@@ -74,7 +74,7 @@ func buildGameListCmd(parent *cobra.Command) {
 	}
 	flags := cmd.Flags()
 	flags.StringVarP(&addr, "addr", "", "", "")
-	flags.StringVarP(&gid, "gid", "", "", "")
+	flags.StringVarP(&gid, "gid", "", "all", "")
 	parent.AddCommand(cmd)
 }
 
