@@ -3,6 +3,7 @@ package util
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/prometheus/procfs"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/peer"
 	"net"
@@ -84,4 +85,46 @@ func GetIPv4Addr() string {
 		}
 	}
 	return ""
+}
+
+func InSliceString(val string, slice []string) bool {
+	if slice == nil {
+		return false
+	}
+	for _, v := range slice {
+		if v == val {
+			return true
+		}
+	}
+	return false
+}
+
+func FindPids(match []string) ([]int, error) {
+	procs, err := procfs.AllProcs()
+	if err != nil {
+		return nil, err
+	}
+	pids := make([]int, 0)
+	for _, proc := range procs {
+		cmdLine, err := proc.CmdLine()
+		if err != nil {
+			continue
+		}
+		flag := true
+		for _, m := range match {
+			if !InSliceString(m, cmdLine) {
+				flag = false
+				break
+			}
+		}
+		if flag {
+			stat, err := proc.NewStat()
+			if err != nil {
+				return nil, err
+			}
+			pids = append(pids, stat.PID)
+		}
+
+	}
+	return pids, nil
 }

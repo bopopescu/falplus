@@ -8,10 +8,12 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/google/uuid"
 	"iclient"
+	"io/ioutil"
 	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"scode"
 	"status"
 	"strconv"
@@ -79,6 +81,36 @@ func (m *GameManager) InitUpdate() error {
 	m.isInit = true
 
 	return m.gameInit()
+}
+
+func (m *GameManager) gameScan() ([]string, error) {
+	var ports []string
+	match := []string{"fal", "game", "start"}
+	pids, err := util.FindPids(match)
+	if err != nil {
+		return ports, err
+	}
+	portstr, _ := regexp.Compile(`:[0-9]+`)
+	number, _ := regexp.Compile(`[0-9]+`)
+	for _, pid := range pids {
+		func() {
+			file := fmt.Sprintf("/proc/%d/cmdline", pid)
+			f, err := os.Open(file)
+			if err != nil {
+				log.Errorf("get game pid error:%s", err.Error())
+				return
+			}
+			defer f.Close()
+			output, err := ioutil.ReadAll(f)
+			if err != nil {
+				log.Errorf("read vsd info error:%s", err.Error())
+				return
+			}
+			port := number.FindString(portstr.FindString(string(output)))
+			ports = append(ports, port)
+		}()
+	}
+	return ports, nil
 }
 
 // 从数据库读入游戏数据
