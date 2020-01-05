@@ -52,6 +52,13 @@ func (m *GameService) Run() {
 	m.service.Start()
 }
 
+// 同步信息到PM
+func (m *GameService) SyncInfo(ctx context.Context, req *igm.GameInfo) (*igm.GameInfo, error) {
+	log.Infof("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)
+	m.game.UpdateInfo(req)
+	return req, nil
+}
+
 // 玩家加入房间
 func (m *GameService) AddPlayer(ctx context.Context, req *igm.AddPlayerRequest) (*igm.GMDefaultResponse, error) {
 	log.Debugf("get client addr %s request:%v", util.GetIPAddrFromCtx(ctx), req)

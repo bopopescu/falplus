@@ -30,4 +30,5 @@ type Game interface {
 	Start(pid string) error
 	Stop(pid string) error
 	State() int
+	UpdateInfo(g *GameInfo)
 }

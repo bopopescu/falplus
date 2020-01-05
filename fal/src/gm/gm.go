@@ -7,18 +7,19 @@ import (
 	"fmt"
 	"github.com/Sirupsen/logrus"
 	"github.com/google/uuid"
+	"golang.org/x/net/context"
 	"iclient"
 	"io/ioutil"
 	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"scode"
 	"status"
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 	"util"
 )
 
@@ -80,37 +81,49 @@ func (m *GameManager) InitUpdate() error {
 	}
 	m.isInit = true
 
-	return m.gameInit()
+	if err := m.gameInit(); err != nil {
+		log.Error(err)
+	}
+
+	return m.scanGameInfo()
 }
 
-func (m *GameManager) gameScan() ([]string, error) {
-	var ports []string
+func (m *GameManager) scanGameInfo() error {
 	match := []string{"fal", "game", "start"}
 	pids, err := util.FindPids(match)
 	if err != nil {
-		return ports, err
+		return err
 	}
-	portstr, _ := regexp.Compile(`:[0-9]+`)
-	number, _ := regexp.Compile(`[0-9]+`)
+
 	for _, pid := range pids {
-		func() {
-			file := fmt.Sprintf("/proc/%d/cmdline", pid)
-			f, err := os.Open(file)
-			if err != nil {
-				log.Errorf("get game pid error:%s", err.Error())
-				return
+		file := fmt.Sprintf("/proc/%d/cmdline", pid)
+		output, err := ioutil.ReadFile(file)
+		if err != nil {
+			log.Errorf("read game info error:%s", err.Error())
+			continue
+		}
+		cmdLine := strings.Split(string(output[:len(output)-1]), string(byte(0)))
+		var gid string
+		var addr string
+		for _, str := range cmdLine {
+			if strings.HasPrefix(str, "--name=") {
+				gid = strings.TrimPrefix(str, "--name=")
 			}
-			defer f.Close()
-			output, err := ioutil.ReadAll(f)
-			if err != nil {
-				log.Errorf("read vsd info error:%s", err.Error())
-				return
+			if strings.HasPrefix(str, "--addr=") {
+				addr = strings.TrimPrefix(str, "--addr=")
 			}
-			port := number.FindString(portstr.FindString(string(output)))
-			ports = append(ports, port)
-		}()
+		}
+
+		if _, exist := m.games[gid]; exist {
+			_, portstr, _ := net.SplitHostPort(addr)
+			m.games[gid].Pid = int64(pid)
+			m.games[gid].Port, _ = strconv.ParseInt(portstr, 10, 64)
+			if err := m.updateGameInfo(m.games[gid]); err != nil {
+				log.Error(err)
+			}
+		}
 	}
-	return ports, nil
+	return nil
 }
 
 // 从数据库读入游戏数据
@@ -180,7 +193,7 @@ func (m *GameManager) CreateGame(req *igm.GameCreateRequest) (*igm.GameInfo, err
 			delete(m.games, id)
 		}
 	}()
-	err = m.StartGame(g)
+	err = m.startGame(g)
 	if err != nil {
 		return nil, status.UpdateStatus(err)
 	}
@@ -191,6 +204,8 @@ func (m *GameManager) CreateGame(req *igm.GameCreateRequest) (*igm.GameInfo, err
 	kvs[BucketKeyState] = fmt.Sprint(g.State)
 	kvs[BucketKeyPort] = fmt.Sprint(g.Port)
 	kvs[BucketKeyPid] = fmt.Sprint(g.Pid)
+	players, _ := json.Marshal(g.Players)
+	kvs[BucketKeyPlayers] = string(players)
 	data := map[string]map[string]string{id: kvs}
 
 	// 读写文件放开锁保证性能
@@ -205,6 +220,30 @@ func (m *GameManager) CreateGame(req *igm.GameCreateRequest) (*igm.GameInfo, err
 		return nil, status.NewStatusDesc(scode.GMDBOperateError, desc)
 	}
 	return g, nil
+}
+
+func (m *GameManager) UpdateGameInfo(g *igm.GameInfo) error {
+	m.Lock()
+	defer m.Unlock()
+	return m.updateGameInfo(g)
+}
+
+// 同步信息
+func (m *GameManager) updateGameInfo(g *igm.GameInfo) error {
+	addr := net.JoinHostPort(util.GetIPv4Addr(), fmt.Sprint(g.Port))
+	c, err := iclient.NewGameClient(addr)
+	if err != nil {
+		return status.UpdateStatus(err)
+	}
+	defer c.Close()
+	resp, err := c.SyncInfo(context.Background(), &igm.GameInfo{})
+	if err != nil {
+		desc := fmt.Sprintf("GRPC error:%s", err)
+		return status.NewStatusDesc(scode.GRPCError, desc)
+	}
+	g.State = resp.State
+	g.Players = resp.Players
+	return nil
 }
 
 // 分配端口
@@ -269,15 +308,21 @@ func (m *GameManager) SetState(gid string, state int64) {
 	m.games[gid].State = state
 }
 
-// 启动游戏进程
 func (m *GameManager) StartGame(g *igm.GameInfo) error {
+	m.Lock()
+	defer m.Unlock()
+	return m.startGame(g)
+}
+
+// 启动游戏进程
+func (m *GameManager) startGame(g *igm.GameInfo) error {
 	port := m.assignPort(g.Port)
 	args := []string{
 		filepath.Base(os.Args[0]),
 		"game",
 		"start",
-		"--name", g.Gid,
-		"--addr", net.JoinHostPort("", fmt.Sprint(port)),
+		fmt.Sprintf("--name=%s", g.Gid),
+		fmt.Sprintf("--addr=%s", net.JoinHostPort("", fmt.Sprint(port))),
 	}
 
 	var attr os.ProcAttr
@@ -295,11 +340,24 @@ func (m *GameManager) StartGame(g *igm.GameInfo) error {
 		return status.NewStatusDesc(scode.GMCallGoLibError, desc)
 	}
 
-	m.games[g.Gid].Port = int64(proc.Pid)
+	m.games[g.Gid].Pid = int64(proc.Pid)
 	m.games[g.Gid].State = igm.Running
 	if port != g.Port {
 		m.games[g.Gid].Port = port
 		m.DB.Put(BucketKeyPort, fmt.Sprint(port), g.Gid)
+	}
+
+	// 等待进程启动并同步信息
+	time.Sleep(time.Millisecond)
+	for i := 0; i < 10; i++ {
+		err = m.updateGameInfo(m.games[g.Gid])
+		if err == nil {
+			break
+		}
+		time.Sleep(500 * time.Millisecond)
+	}
+	if err != nil {
+		return status.UpdateStatus(err)
 	}
 
 	return nil

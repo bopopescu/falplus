@@ -3,9 +3,9 @@ package util
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/prometheus/procfs"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/peer"
+	"io/ioutil"
 	"net"
 	"os"
 	"strconv"
@@ -87,44 +87,59 @@ func GetIPv4Addr() string {
 	return ""
 }
 
-func InSliceString(val string, slice []string) bool {
-	if slice == nil {
-		return false
-	}
-	for _, v := range slice {
-		if v == val {
-			return true
-		}
-	}
-	return false
-}
-
-func FindPids(match []string) ([]int, error) {
-	procs, err := procfs.AllProcs()
+func AllPids() ([]int, error) {
+	var p []int
+	d, err := os.Open("/proc")
 	if err != nil {
-		return nil, err
+		return p, err
 	}
-	pids := make([]int, 0)
-	for _, proc := range procs {
-		cmdLine, err := proc.CmdLine()
+	defer d.Close()
+
+	names, err := d.Readdirnames(-1)
+	if err != nil {
+		return p, fmt.Errorf("could not read %s: %s", d.Name(), err)
+	}
+
+	for _, n := range names {
+		pid, err := strconv.Atoi(n)
 		if err != nil {
 			continue
 		}
-		flag := true
-		for _, m := range match {
-			if !InSliceString(m, cmdLine) {
-				flag = false
-				break
-			}
-		}
-		if flag {
-			stat, err := proc.NewStat()
-			if err != nil {
-				return nil, err
-			}
-			pids = append(pids, stat.PID)
-		}
+		p = append(p, pid)
+	}
 
+	return p, nil
+}
+
+func FindPids(match []string) ([]int, error) {
+	allPids, err := AllPids()
+	if err != nil {
+		return nil, err
+	}
+	var pids []int
+	for _, pid := range allPids {
+		if matchPid(pid, match) {
+			pids = append(pids, pid)
+		}
 	}
 	return pids, nil
+}
+
+func matchPid(pid int, match []string) bool {
+	data, err := ioutil.ReadFile(fmt.Sprintf("/proc/%d/cmdline", pid))
+	if err != nil {
+		return false
+	}
+	//[:len(data)-1]
+	cmdLine := strings.Split(string(data), string(byte(0)))
+	cmdLineMap := make(map[string]struct{})
+	for _, m := range cmdLine {
+		cmdLineMap[m] = struct{}{}
+	}
+	for _, m := range match {
+		if _, ok := cmdLineMap[m]; !ok {
+			return false
+		}
+	}
+	return true
 }

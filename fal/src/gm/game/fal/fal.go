@@ -52,6 +52,20 @@ func NewGame() *gameFal {
 	return game
 }
 
+func (g *gameFal) UpdateInfo(info *igm.GameInfo) {
+	g.Lock()
+	defer g.Unlock()
+	info.State = int64(g.state)
+	info.Players = make(map[string]string)
+	for index, p := range g.players {
+		if g.lastWin == index {
+			info.Players[p.id] = "landlord"
+		} else {
+			info.Players[p.id] = "farmer"
+		}
+	}
+}
+
 // 玩家加入房间
 func (g *gameFal) AddPlayer(pid string) error {
 	g.Lock()
@@ -187,7 +201,9 @@ func (g *gameFal) sendMessage(msg *message) {
 		go func(index int, p *pInfo) {
 			defer wg.Done()
 			gMsg := *msg.gMsg
-			gMsg.LastCards = g.cards[3]     // 场上牌
+			if gMsg.MsgType != igm.Get {
+				gMsg.LastCards = g.cards[3] // 场上牌
+			}
 			gMsg.YourCards = g.cards[index] // 玩家手里牌
 			gMsg.LastId = g.lastId
 			gMsg.RoundOwner = g.players[msg.owner].id // 牌权
@@ -296,9 +312,9 @@ func (g *gameFal) updateCards(index int, cards []int64) bool {
 			c = append(c, seq)
 		}
 	}
+	g.cards[index] = c
 	if len(c) == 0 {
 		return true
 	}
-	g.cards[index] = c
 	return false
 }

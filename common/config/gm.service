@@ -5,7 +5,7 @@ Description=fal gm daemon
 #Before=shutdown.target reboot.target halt.target
 
 [Service]
-ExecStart=/usr/local/bin/fal gm start --addr :12587
+ExecStart=/usr/local/bin/fal gm start --addr=:12587
 ExecReload=/bin/kill -HUP $MAINPID
 Type=idle
 KillMode=process

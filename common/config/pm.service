@@ -5,7 +5,7 @@ Description=fal pm daemon
 #Before=shutdown.target reboot.target halt.target
 
 [Service]
-ExecStart=/usr/local/bin/fal pm start --addr :12588
+ExecStart=/usr/local/bin/fal pm start --addr=:12588
 ExecReload=/bin/kill -HUP $MAINPID
 Type=idle
 KillMode=process

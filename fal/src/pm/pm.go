@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/net/context"
 	"iclient"
+	"io/ioutil"
 	"net"
 	"os"
 	"os/exec"
@@ -67,7 +68,49 @@ func (m *PlayerManager) InitUpdate() error {
 	}
 	m.isInit = true
 
-	return m.playerInit()
+	if err := m.playerInit(); err != nil {
+		return err
+	}
+
+	return m.scanPlayerInfo()
+}
+
+func (m *PlayerManager) scanPlayerInfo() error {
+	match := []string{"fal", "player", "start"}
+	pids, err := util.FindPids(match)
+	if err != nil {
+		return err
+	}
+
+	for _, pid := range pids {
+		file := fmt.Sprintf("/proc/%d/cmdline", pid)
+		output, err := ioutil.ReadFile(file)
+		if err != nil {
+			log.Errorf("read player info error:%s", err.Error())
+			continue
+		}
+		cmdLine := strings.Split(string(output[:len(output)-1]), string(byte(0)))
+		var id string
+		var addr string
+		for _, str := range cmdLine {
+			if strings.HasPrefix(str, "--name=") {
+				id = strings.TrimPrefix(str, "--name=")
+			}
+			if strings.HasPrefix(str, "--addr=") {
+				addr = strings.TrimPrefix(str, "--addr=")
+			}
+		}
+
+		if _, exist := m.players[id]; exist {
+			_, portstr, _ := net.SplitHostPort(addr)
+			m.players[id].Pid = int64(pid)
+			m.players[id].Port, _ = strconv.ParseInt(portstr, 10, 64)
+			if err := m.updatePlayerInfo(m.players[id]); err != nil {
+				log.Error(err)
+			}
+		}
+	}
+	return nil
 }
 
 // 从数据库读入游戏数据
@@ -210,8 +253,8 @@ func (m *PlayerManager) StartPlayer(req *ipm.PlayerSignInRequest) (*ipm.PlayerIn
 		filepath.Base(os.Args[0]),
 		"player",
 		"start",
-		"--name", p.Id,
-		"--addr", net.JoinHostPort("", fmt.Sprint(p.Port)),
+		fmt.Sprintf("--name=%s", p.Id),
+		fmt.Sprintf("--addr=%s", net.JoinHostPort("", fmt.Sprint(p.Port))),
 	}
 	var attr os.ProcAttr
 	attr.Files = []*os.File{os.Stdin, os.Stdout, os.Stderr}

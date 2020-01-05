@@ -110,6 +110,7 @@ func (m *GMService) GameList(ctx context.Context, req *igm.GameListRequest) (*ig
 
 	for gid, info := range m.gm.GetAllGameInfo() {
 		if gid == req.Gid || req.Gid == "all" {
+			m.gm.UpdateGameInfo(info)
 			resp.Games = append(resp.Games, info)
 		}
 	}

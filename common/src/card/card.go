@@ -2,6 +2,7 @@ package card
 
 import (
 	"math/rand"
+	"sort"
 	"time"
 )
 
@@ -122,6 +123,9 @@ func GetRepeatNumAndValue(cards []int64) (int64, int64, int64) {
 	for _, seq := range cards {
 		nums = append(nums, Cards[seq].GetCardValue())
 	}
+	sort.Slice(nums, func(i, j int) bool {
+		return nums[i] < nums[j]
+	})
 	max := int64(1)
 	repeat := int64(1)
 	value := nums[0]
