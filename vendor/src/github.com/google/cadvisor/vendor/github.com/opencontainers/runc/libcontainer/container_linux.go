@@ -884,7 +884,7 @@ func (c *linuxContainer) Checkpoint(criuOpts *CriuOpts) error {
 		ExtUnixSk:       proto.Bool(criuOpts.ExternalUnixConnections),
 		FileLocks:       proto.Bool(criuOpts.FileLocks),
 		EmptyNs:         proto.Uint32(criuOpts.EmptyNs),
-		OrphanPtsMaster: proto.Bool(true),
+		OrphanPtsMain: proto.Bool(true),
 		AutoDedup:       proto.Bool(criuOpts.AutoDedup),
 		LazyPages:       proto.Bool(criuOpts.LazyPages),
 	}
@@ -1105,7 +1105,7 @@ func (c *linuxContainer) Restore(process *Process, criuOpts *CriuOpts) error {
 			TcpEstablished:  proto.Bool(criuOpts.TcpEstablished),
 			FileLocks:       proto.Bool(criuOpts.FileLocks),
 			EmptyNs:         proto.Uint32(criuOpts.EmptyNs),
-			OrphanPtsMaster: proto.Bool(true),
+			OrphanPtsMain: proto.Bool(true),
 			AutoDedup:       proto.Bool(criuOpts.AutoDedup),
 			LazyPages:       proto.Bool(criuOpts.LazyPages),
 		},
@@ -1471,7 +1471,7 @@ func (c *linuxContainer) criuNotifications(resp *criurpc.CriuResp, process *Proc
 				logrus.Error(err)
 			}
 		}
-	case notify.GetScript() == "orphan-pts-master":
+	case notify.GetScript() == "orphan-pts-main":
 		scm, err := unix.ParseSocketControlMessage(oob)
 		if err != nil {
 			return err
@@ -1481,11 +1481,11 @@ func (c *linuxContainer) criuNotifications(resp *criurpc.CriuResp, process *Proc
 			return err
 		}
 
-		master := os.NewFile(uintptr(fds[0]), "orphan-pts-master")
-		defer master.Close()
+		main := os.NewFile(uintptr(fds[0]), "orphan-pts-main")
+		defer main.Close()
 
-		// While we can access console.master, using the API is a good idea.
-		if err := utils.SendFd(process.ConsoleSocket, master.Name(), master.Fd()); err != nil {
+		// While we can access console.main, using the API is a good idea.
+		if err := utils.SendFd(process.ConsoleSocket, main.Name(), main.Fd()); err != nil {
 			return err
 		}
 	}

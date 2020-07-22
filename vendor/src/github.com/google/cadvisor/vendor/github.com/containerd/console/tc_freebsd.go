@@ -12,14 +12,14 @@ const (
 	cmdTcSet = unix.TIOCSETA
 )
 
-// unlockpt unlocks the slave pseudoterminal device corresponding to the master pseudoterminal referred to by f.
-// unlockpt should be called before opening the slave side of a pty.
+// unlockpt unlocks the subordinate pseudoterminal device corresponding to the main pseudoterminal referred to by f.
+// unlockpt should be called before opening the subordinate side of a pty.
 // This does not exist on FreeBSD, it does not allocate controlling terminals on open
 func unlockpt(f *os.File) error {
 	return nil
 }
 
-// ptsname retrieves the name of the first available pts for the given master.
+// ptsname retrieves the name of the first available pts for the given main.
 func ptsname(f *os.File) (string, error) {
 	n, err := unix.IoctlGetInt(int(f.Fd()), unix.TIOCGPTN)
 	if err != nil {

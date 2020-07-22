@@ -72,7 +72,7 @@ func (s *GetMappingService) ExpandWildcards(expandWildcards string) *GetMappingS
 }
 
 // Local indicates whether to return local information, do not retrieve
-// the state from master node (default: false).
+// the state from main node (default: false).
 func (s *GetMappingService) Local(local bool) *GetMappingService {
 	s.local = &local
 	return s

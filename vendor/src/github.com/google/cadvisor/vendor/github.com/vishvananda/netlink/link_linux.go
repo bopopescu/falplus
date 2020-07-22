@@ -122,21 +122,21 @@ func LinkSetHardwareAddr(link Link, hwaddr net.HardwareAddr) error {
 	return err
 }
 
-// LinkSetMaster sets the master of the link device.
-// Equivalent to: `ip link set $link master $master`
-func LinkSetMaster(link Link, master *Bridge) error {
+// LinkSetMain sets the main of the link device.
+// Equivalent to: `ip link set $link main $main`
+func LinkSetMain(link Link, main *Bridge) error {
 	index := 0
-	if master != nil {
-		masterBase := master.Attrs()
-		ensureIndex(masterBase)
-		index = masterBase.Index
+	if main != nil {
+		mainBase := main.Attrs()
+		ensureIndex(mainBase)
+		index = mainBase.Index
 	}
-	return LinkSetMasterByIndex(link, index)
+	return LinkSetMainByIndex(link, index)
 }
 
-// LinkSetMasterByIndex sets the master of the link device.
-// Equivalent to: `ip link set $link master $master`
-func LinkSetMasterByIndex(link Link, masterIndex int) error {
+// LinkSetMainByIndex sets the main of the link device.
+// Equivalent to: `ip link set $link main $main`
+func LinkSetMainByIndex(link Link, mainIndex int) error {
 	base := link.Attrs()
 	ensureIndex(base)
 	req := nl.NewNetlinkRequest(syscall.RTM_SETLINK, syscall.NLM_F_ACK)
@@ -146,7 +146,7 @@ func LinkSetMasterByIndex(link Link, masterIndex int) error {
 	req.AddData(msg)
 
 	b := make([]byte, 4)
-	native.PutUint32(b, uint32(masterIndex))
+	native.PutUint32(b, uint32(mainIndex))
 
 	data := nl.NewRtAttr(syscall.IFLA_MASTER, b)
 	req.AddData(data)
@@ -367,10 +367,10 @@ func LinkAdd(link Link) error {
 
 	ensureIndex(base)
 
-	// can't set master during create, so set it afterwards
-	if base.MasterIndex != 0 {
-		// TODO: verify MasterIndex is actually a bridge?
-		return LinkSetMasterByIndex(link, base.MasterIndex)
+	// can't set main during create, so set it afterwards
+	if base.MainIndex != 0 {
+		// TODO: verify MainIndex is actually a bridge?
+		return LinkSetMainByIndex(link, base.MainIndex)
 	}
 	return nil
 }
@@ -548,7 +548,7 @@ func linkDeserialize(m []byte) (Link, error) {
 		case syscall.IFLA_LINK:
 			base.ParentIndex = int(native.Uint32(attr.Value[0:4]))
 		case syscall.IFLA_MASTER:
-			base.MasterIndex = int(native.Uint32(attr.Value[0:4]))
+			base.MainIndex = int(native.Uint32(attr.Value[0:4]))
 		case syscall.IFLA_TXQLEN:
 			base.TxQLen = int(native.Uint32(attr.Value[0:4]))
 		}

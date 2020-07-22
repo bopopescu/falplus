@@ -20,7 +20,7 @@ type OpenIndexService struct {
 	index             string
 	expandWildcards   string
 	timeout           string
-	masterTimeout     string
+	mainTimeout     string
 	ignoreUnavailable *bool
 	allowNoIndices    *bool
 }
@@ -42,9 +42,9 @@ func (s *OpenIndexService) Timeout(timeout string) *OpenIndexService {
 	return s
 }
 
-// MasterTimeout specifies the timeout for connection to master.
-func (s *OpenIndexService) MasterTimeout(masterTimeout string) *OpenIndexService {
-	s.masterTimeout = masterTimeout
+// MainTimeout specifies the timeout for connection to main.
+func (s *OpenIndexService) MainTimeout(mainTimeout string) *OpenIndexService {
+	s.mainTimeout = mainTimeout
 	return s
 }
 
@@ -85,8 +85,8 @@ func (s *OpenIndexService) buildURL() (string, url.Values, error) {
 	if s.timeout != "" {
 		params.Set("timeout", s.timeout)
 	}
-	if s.masterTimeout != "" {
-		params.Set("master_timeout", s.masterTimeout)
+	if s.mainTimeout != "" {
+		params.Set("main_timeout", s.mainTimeout)
 	}
 	if s.ignoreUnavailable != nil {
 		params.Set("ignore_unavailable", fmt.Sprintf("%v", *s.ignoreUnavailable))

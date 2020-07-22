@@ -112,7 +112,7 @@ const (
 	// VCF (Variant Call Format). The VCF files may be gzip compressed. gVCF is
 	// also supported.
 	ImportVariantsRequest_FORMAT_VCF ImportVariantsRequest_Format = 1
-	// Complete Genomics masterVarBeta format. The masterVarBeta files may
+	// Complete Genomics mainVarBeta format. The mainVarBeta files may
 	// be bzip2 compressed.
 	ImportVariantsRequest_FORMAT_COMPLETE_GENOMICS ImportVariantsRequest_Format = 2
 )

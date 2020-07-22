@@ -373,7 +373,7 @@ type CriuOpts struct {
 	InheritFd            []*InheritFd        `protobuf:"bytes,27,rep,name=inherit_fd,json=inheritFd" json:"inherit_fd,omitempty"`
 	AutoExtMnt           *bool               `protobuf:"varint,28,opt,name=auto_ext_mnt,json=autoExtMnt" json:"auto_ext_mnt,omitempty"`
 	ExtSharing           *bool               `protobuf:"varint,29,opt,name=ext_sharing,json=extSharing" json:"ext_sharing,omitempty"`
-	ExtMasters           *bool               `protobuf:"varint,30,opt,name=ext_masters,json=extMasters" json:"ext_masters,omitempty"`
+	ExtMains           *bool               `protobuf:"varint,30,opt,name=ext_mains,json=extMains" json:"ext_mains,omitempty"`
 	SkipMnt              []string            `protobuf:"bytes,31,rep,name=skip_mnt,json=skipMnt" json:"skip_mnt,omitempty"`
 	EnableFs             []string            `protobuf:"bytes,32,rep,name=enable_fs,json=enableFs" json:"enable_fs,omitempty"`
 	UnixSkIno            []*UnixSk           `protobuf:"bytes,33,rep,name=unix_sk_ino,json=unixSkIno" json:"unix_sk_ino,omitempty"`
@@ -392,7 +392,7 @@ type CriuOpts struct {
 	WeakSysctls          *bool               `protobuf:"varint,47,opt,name=weak_sysctls,json=weakSysctls" json:"weak_sysctls,omitempty"`
 	LazyPages            *bool               `protobuf:"varint,48,opt,name=lazy_pages,json=lazyPages" json:"lazy_pages,omitempty"`
 	StatusFd             *int32              `protobuf:"varint,49,opt,name=status_fd,json=statusFd" json:"status_fd,omitempty"`
-	OrphanPtsMaster      *bool               `protobuf:"varint,50,opt,name=orphan_pts_master,json=orphanPtsMaster" json:"orphan_pts_master,omitempty"`
+	OrphanPtsMain      *bool               `protobuf:"varint,50,opt,name=orphan_pts_main,json=orphanPtsMain" json:"orphan_pts_main,omitempty"`
 	XXX_unrecognized     []byte              `json:"-"`
 }
 
@@ -608,9 +608,9 @@ func (m *CriuOpts) GetExtSharing() bool {
 	return false
 }
 
-func (m *CriuOpts) GetExtMasters() bool {
-	if m != nil && m.ExtMasters != nil {
-		return *m.ExtMasters
+func (m *CriuOpts) GetExtMains() bool {
+	if m != nil && m.ExtMains != nil {
+		return *m.ExtMains
 	}
 	return false
 }
@@ -741,9 +741,9 @@ func (m *CriuOpts) GetStatusFd() int32 {
 	return 0
 }
 
-func (m *CriuOpts) GetOrphanPtsMaster() bool {
-	if m != nil && m.OrphanPtsMaster != nil {
-		return *m.OrphanPtsMaster
+func (m *CriuOpts) GetOrphanPtsMain() bool {
+	if m != nil && m.OrphanPtsMain != nil {
+		return *m.OrphanPtsMain
 	}
 	return false
 }

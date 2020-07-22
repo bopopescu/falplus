@@ -13,7 +13,7 @@ var (
 	ErrNotImplemented = errors.New("not implemented")
 )
 
-func (m *master) initStdios() {
+func (m *main) initStdios() {
 	m.in = windows.Handle(os.Stdin.Fd())
 	if err := windows.GetConsoleMode(m.in, &m.inMode); err == nil {
 		// Validate that windows.ENABLE_VIRTUAL_TERMINAL_INPUT is supported, but do not set it.
@@ -50,7 +50,7 @@ func (m *master) initStdios() {
 	}
 }
 
-type master struct {
+type main struct {
 	in     windows.Handle
 	inMode uint32
 
@@ -61,7 +61,7 @@ type master struct {
 	errMode uint32
 }
 
-func (m *master) SetRaw() error {
+func (m *main) SetRaw() error {
 	if err := makeInputRaw(m.in, m.inMode); err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func (m *master) SetRaw() error {
 	return nil
 }
 
-func (m *master) Reset() error {
+func (m *main) Reset() error {
 	for _, s := range []struct {
 		fd   windows.Handle
 		mode uint32
@@ -94,7 +94,7 @@ func (m *master) Reset() error {
 	return nil
 }
 
-func (m *master) Size() (WinSize, error) {
+func (m *main) Size() (WinSize, error) {
 	var info windows.ConsoleScreenBufferInfo
 	err := windows.GetConsoleScreenBufferInfo(m.out, &info)
 	if err != nil {
@@ -109,15 +109,15 @@ func (m *master) Size() (WinSize, error) {
 	return winsize, nil
 }
 
-func (m *master) Resize(ws WinSize) error {
+func (m *main) Resize(ws WinSize) error {
 	return ErrNotImplemented
 }
 
-func (m *master) ResizeFrom(c Console) error {
+func (m *main) ResizeFrom(c Console) error {
 	return ErrNotImplemented
 }
 
-func (m *master) DisableEcho() error {
+func (m *main) DisableEcho() error {
 	mode := m.inMode &^ windows.ENABLE_ECHO_INPUT
 	mode |= windows.ENABLE_PROCESSED_INPUT
 	mode |= windows.ENABLE_LINE_INPUT
@@ -129,26 +129,26 @@ func (m *master) DisableEcho() error {
 	return nil
 }
 
-func (m *master) Close() error {
+func (m *main) Close() error {
 	return nil
 }
 
-func (m *master) Read(b []byte) (int, error) {
+func (m *main) Read(b []byte) (int, error) {
 	panic("not implemented on windows")
 }
 
-func (m *master) Write(b []byte) (int, error) {
+func (m *main) Write(b []byte) (int, error) {
 	panic("not implemented on windows")
 }
 
-func (m *master) Fd() uintptr {
+func (m *main) Fd() uintptr {
 	return uintptr(m.in)
 }
 
 // on windows, console can only be made from os.Std{in,out,err}, hence there
 // isnt a single name here we can use. Return a dummy "console" value in this
 // case should be sufficient.
-func (m *master) Name() string {
+func (m *main) Name() string {
 	return "console"
 }
 
@@ -190,11 +190,11 @@ func checkConsole(f *os.File) error {
 	return nil
 }
 
-func newMaster(f *os.File) (Console, error) {
+func newMain(f *os.File) (Console, error) {
 	if f != os.Stdin && f != os.Stdout && f != os.Stderr {
 		return nil, errors.New("creating a console from a file is not supported on windows")
 	}
-	m := &master{}
+	m := &main{}
 	m.initStdios()
 	return m, nil
 }

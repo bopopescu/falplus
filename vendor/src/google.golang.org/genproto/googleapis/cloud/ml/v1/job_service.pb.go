@@ -56,8 +56,8 @@ const (
 	// own cluster specification. When you use this tier, set values to
 	// configure your processing cluster according to these guidelines:
 	//
-	// *   You _must_ set `TrainingInput.masterType` to specify the type
-	//     of machine to use for your master node. This is the only required
+	// *   You _must_ set `TrainingInput.mainType` to specify the type
+	//     of machine to use for your main node. This is the only required
 	//     setting.
 	//
 	// *   You _may_ set `TrainingInput.workerCount` to specify the number of
@@ -72,9 +72,9 @@ const (
 	//     use for your parameter servers.
 	//
 	// Note that all of your workers must use the same machine type, which can
-	// be different from your parameter server type and master type. Your
+	// be different from your parameter server type and main type. Your
 	// parameter servers must likewise use the same machine type, which can be
-	// different from your worker type and master type.
+	// different from your worker type and main type.
 	TrainingInput_CUSTOM TrainingInput_ScaleTier = 5
 )
 
@@ -316,7 +316,7 @@ type TrainingInput struct {
 	// and parameter servers.
 	ScaleTier TrainingInput_ScaleTier `protobuf:"varint,1,opt,name=scale_tier,json=scaleTier,proto3,enum=google.cloud.ml.v1.TrainingInput_ScaleTier" json:"scale_tier,omitempty"`
 	// Optional. Specifies the type of virtual machine to use for your training
-	// job's master worker.
+	// job's main worker.
 	//
 	// The following types are supported:
 	//
@@ -334,7 +334,7 @@ type TrainingInput struct {
 	//   </dd>
 	//   <dt>complex_model_s</dt>
 	//   <dd>
-	//   A machine suitable for the master and workers of the cluster when your
+	//   A machine suitable for the main and workers of the cluster when your
 	//   model requires more computation than the standard machine can handle
 	//   satisfactorily.
 	//   </dd>
@@ -364,12 +364,12 @@ type TrainingInput struct {
 	// </dl>
 	//
 	// You must set this value when `scaleTier` is set to `CUSTOM`.
-	MasterType string `protobuf:"bytes,2,opt,name=master_type,json=masterType,proto3" json:"master_type,omitempty"`
+	MainType string `protobuf:"bytes,2,opt,name=main_type,json=mainType,proto3" json:"main_type,omitempty"`
 	// Optional. Specifies the type of virtual machine to use for your training
 	// job's worker nodes.
 	//
 	// The supported values are the same as those described in the entry for
-	// `masterType`.
+	// `mainType`.
 	//
 	// This value must be present when `scaleTier` is set to `CUSTOM` and
 	// `workerCount` is greater than zero.
@@ -378,7 +378,7 @@ type TrainingInput struct {
 	// job's parameter server.
 	//
 	// The supported values are the same as those described in the entry for
-	// `master_type`.
+	// `main_type`.
 	//
 	// This value must be present when `scaleTier` is set to `CUSTOM` and
 	// `parameter_server_count` is greater than zero.
@@ -451,9 +451,9 @@ func (m *TrainingInput) GetScaleTier() TrainingInput_ScaleTier {
 	return TrainingInput_BASIC
 }
 
-func (m *TrainingInput) GetMasterType() string {
+func (m *TrainingInput) GetMainType() string {
 	if m != nil {
-		return m.MasterType
+		return m.MainType
 	}
 	return ""
 }

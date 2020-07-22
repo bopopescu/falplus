@@ -30,7 +30,7 @@
 		CommandInfo
 		ExecutorInfo
 		DomainInfo
-		MasterInfo
+		MainInfo
 		AgentInfo
 		CSIPluginContainerInfo
 		CSIPluginInfo
@@ -200,7 +200,7 @@ const (
 	// may be successful.
 	TASK_DROPPED TaskState = 9
 	// The task was running on an agent that has lost contact with the
-	// master, typically due to a network failure or partition. The task
+	// main, typically due to a network failure or partition. The task
 	// may or may not still be running.
 	TASK_UNREACHABLE TaskState = 10
 	// The task is no longer running. This can occur if the agent has
@@ -210,16 +210,16 @@ const (
 	// the task was preempted by the QoS controller in an
 	// oversubscription scenario.
 	TASK_GONE TaskState = 11
-	// The task was running on an agent that the master cannot contact;
+	// The task was running on an agent that the main cannot contact;
 	// the operator has asserted that the agent has been shutdown, but
-	// this has not been directly confirmed by the master. If the
+	// this has not been directly confirmed by the main. If the
 	// operator is correct, the task is not running and this is a
 	// terminal state; if the operator is mistaken, the task may still
 	// be running and might return to RUNNING in the future.
 	TASK_GONE_BY_OPERATOR TaskState = 12
-	// The master has no knowledge of the task. This is typically
-	// because either (a) the master never had knowledge of the task, or
-	// (b) the master forgot about the task because it garbage collected
+	// The main has no knowledge of the task. This is typically
+	// because either (a) the main never had knowledge of the task, or
+	// (b) the main forgot about the task because it garbage collected
 	// its metadata about the task. The task may or may not still be
 	// running.
 	TASK_UNKNOWN TaskState = 13
@@ -346,7 +346,7 @@ const (
 	DRAINING MachineInfo_Mode = 2
 	// In this mode, a machine is not running any tasks and will not offer
 	// any of its resources.  Agents on the machine will not be allowed to
-	// register with the master.
+	// register with the main.
 	DOWN MachineInfo_Mode = 3
 )
 
@@ -413,19 +413,19 @@ const (
 	// following TaskStates: TASK_UNREACHABLE, TASK_DROPPED,
 	// TASK_GONE, TASK_GONE_BY_OPERATOR, and TASK_UNKNOWN, and (2)
 	// the framework will assume responsibility for managing
-	// partitioned tasks that reregister with the master.
+	// partitioned tasks that reregister with the main.
 	//
 	// Frameworks that enable this capability can define how they
 	// would like to handle partitioned tasks. Frameworks will
 	// receive TASK_UNREACHABLE for tasks on agents that are
-	// partitioned from the master.
+	// partitioned from the main.
 	//
 	// Without this capability, frameworks will receive TASK_LOST
 	// for tasks on partitioned agents.
 	// NOTE: Prior to Mesos 1.5, such tasks will be killed by Mesos
-	// when the agent reregisters (unless the master has failed over).
+	// when the agent reregisters (unless the main has failed over).
 	// However due to the lack of benefit in maintaining different
-	// behaviors depending on whether the master has failed over
+	// behaviors depending on whether the main has failed over
 	// (see MESOS-7215), as of 1.5, Mesos will not kill these
 	// tasks in either case.
 	FrameworkInfo_Capability_PARTITION_AWARE FrameworkInfo_Capability_Type = 5
@@ -463,7 +463,7 @@ const (
 	// `Resource.reservations_size() > 1`.
 	FrameworkInfo_Capability_RESERVATION_REFINEMENT FrameworkInfo_Capability_Type = 7
 	// Indicates that the framework is prepared to receive offers
-	// for agents whose region is different from the master's
+	// for agents whose region is different from the main's
 	// region. Network links between hosts in different regions
 	// typically have higher latency and lower bandwidth than
 	// network links within a region, so frameworks should be
@@ -650,41 +650,41 @@ func (x *ExecutorInfo_Type) UnmarshalJSON(data []byte) error {
 }
 func (ExecutorInfo_Type) EnumDescriptor() ([]byte, []int) { return fileDescriptorMesos, []int{20, 0} }
 
-type MasterInfo_Capability_Type int32
+type MainInfo_Capability_Type int32
 
 const (
-	MasterInfo_Capability_UNKNOWN MasterInfo_Capability_Type = 0
-	// The master can handle slaves whose state
+	MainInfo_Capability_UNKNOWN MainInfo_Capability_Type = 0
+	// The main can handle subordinates whose state
 	// changes after re-registering.
-	MasterInfo_Capability_AGENT_UPDATE MasterInfo_Capability_Type = 1
+	MainInfo_Capability_AGENT_UPDATE MainInfo_Capability_Type = 1
 )
 
-var MasterInfo_Capability_Type_name = map[int32]string{
+var MainInfo_Capability_Type_name = map[int32]string{
 	0: "UNKNOWN",
 	1: "AGENT_UPDATE",
 }
-var MasterInfo_Capability_Type_value = map[string]int32{
+var MainInfo_Capability_Type_value = map[string]int32{
 	"UNKNOWN":      0,
 	"AGENT_UPDATE": 1,
 }
 
-func (x MasterInfo_Capability_Type) Enum() *MasterInfo_Capability_Type {
-	p := new(MasterInfo_Capability_Type)
+func (x MainInfo_Capability_Type) Enum() *MainInfo_Capability_Type {
+	p := new(MainInfo_Capability_Type)
 	*p = x
 	return p
 }
-func (x MasterInfo_Capability_Type) MarshalJSON() ([]byte, error) {
-	return proto.MarshalJSONEnum(MasterInfo_Capability_Type_name, int32(x))
+func (x MainInfo_Capability_Type) MarshalJSON() ([]byte, error) {
+	return proto.MarshalJSONEnum(MainInfo_Capability_Type_name, int32(x))
 }
-func (x *MasterInfo_Capability_Type) UnmarshalJSON(data []byte) error {
-	value, err := proto.UnmarshalJSONEnum(MasterInfo_Capability_Type_value, data, "MasterInfo_Capability_Type")
+func (x *MainInfo_Capability_Type) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(MainInfo_Capability_Type_value, data, "MainInfo_Capability_Type")
 	if err != nil {
 		return err
 	}
-	*x = MasterInfo_Capability_Type(value)
+	*x = MainInfo_Capability_Type(value)
 	return nil
 }
-func (MasterInfo_Capability_Type) EnumDescriptor() ([]byte, []int) {
+func (MainInfo_Capability_Type) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptorMesos, []int{22, 0, 0}
 }
 
@@ -710,14 +710,14 @@ const (
 	// This capability has three effects for an agent.
 	//
 	// (1) The format of the checkpointed resources, and
-	//     the resources reported to master.
+	//     the resources reported to main.
 	//
 	//     These resources are reported in the "pre-reservation-refinement"
 	//     format if none of the resources have refined reservations. If any
 	//     of the resources have refined reservations, they are reported in
 	//     the "post-reservation-refinement" format. The purpose is to allow
 	//     downgrading of an agent as well as communication with a pre-1.4.0
-	//     master until the reservation refinement feature is actually used.
+	//     main until the reservation refinement feature is actually used.
 	//
 	//     See the 'Resource Format' section for more details.
 	//
@@ -2201,7 +2201,7 @@ func (m *Unavailability) GetDuration() *DurationInfo {
 // Represents a single machine, which may hold one or more agents.
 //
 // NOTE: In order to match an agent to a machine, both the `hostname` and
-// `ip` must match the values advertised by the agent to the master.
+// `ip` must match the values advertised by the agent to the main.
 // Hostname is not case-sensitive.
 type MachineID struct {
 	Hostname *string `protobuf:"bytes,1,opt,name=hostname" json:"hostname,omitempty"`
@@ -2283,7 +2283,7 @@ type FrameworkInfo struct {
 	// MesosSchedulerDriver expects the scheduler is performing
 	// failover).
 	ID *FrameworkID `protobuf:"bytes,3,opt,name=id" json:"id,omitempty"`
-	// The amount of time (in seconds) that the master will wait for the
+	// The amount of time (in seconds) that the main will wait for the
 	// scheduler to failover before it tears down the framework by
 	// killing all its tasks/executors. This should be non-zero if a
 	// framework expects to reconnect after a failure and not lose its
@@ -2864,7 +2864,7 @@ type CommandInfo struct {
 	// 		execlp(value, arguments(0), arguments(1), ...)).
 	// NOTE: The field 'value' is changed from 'required' to 'optional'
 	// in 0.20.0. It will only cause issues if a new framework is
-	// connecting to an old master.
+	// connecting to an old main.
 	Shell     *bool    `protobuf:"varint,6,opt,name=shell,def=1" json:"shell,omitempty"`
 	Value     *string  `protobuf:"bytes,3,opt,name=value" json:"value,omitempty"`
 	Arguments []string `protobuf:"bytes,7,rep,name=arguments" json:"arguments,omitempty"`
@@ -3036,9 +3036,9 @@ type ExecutorInfo struct {
 	// period and failures / forcible terminations may occur.
 	ShutdownGracePeriod *DurationInfo `protobuf:"bytes,13,opt,name=shutdown_grace_period,json=shutdownGracePeriod" json:"shutdown_grace_period,omitempty"`
 	// Labels are free-form key value pairs which are exposed through
-	// master and agent endpoints. Labels will not be interpreted or
+	// main and agent endpoints. Labels will not be interpreted or
 	// acted upon by Mesos itself. As opposed to the data field, labels
-	// will be kept in memory on master and agent processes. Therefore,
+	// will be kept in memory on main and agent processes. Therefore,
 	// labels should be used to tag executors with lightweight metadata.
 	// Labels should not contain duplicate key-value pairs.
 	Labels *Labels `protobuf:"bytes,14,opt,name=labels" json:"labels,omitempty"`
@@ -3162,10 +3162,10 @@ func (m *ExecutorInfo) GetLabels() *Labels {
 // deployments, regions and zones can be mapped to data centers and
 // racks, respectively.
 //
-// Both masters and agents can be configured with domains. Frameworks
+// Both mains and agents can be configured with domains. Frameworks
 // can compare the domains of two hosts to determine if the hosts are
 // in the same zone, in different zones in the same region, or in
-// different regions. Note that all masters in a given Mesos cluster
+// different regions. Note that all mains in a given Mesos cluster
 // must be in the same region.
 type DomainInfo struct {
 	FaultDomain *DomainInfo_FaultDomain `protobuf:"bytes,1,opt,name=fault_domain,json=faultDomain" json:"fault_domain,omitempty"`
@@ -3240,19 +3240,19 @@ func (m *DomainInfo_FaultDomain_ZoneInfo) GetName() string {
 }
 
 // *
-// Describes a master. This will probably have more fields in the
+// Describes a main. This will probably have more fields in the
 // future which might be used, for example, to link a framework webui
-// to a master webui.
-type MasterInfo struct {
+// to a main webui.
+type MainInfo struct {
 	ID string `protobuf:"bytes,1,req,name=id" json:"id"`
 	// The IP address (only IPv4) as a packed 4-bytes integer,
 	// stored in network order.  Deprecated, use `address.ip` instead.
 	IP uint32 `protobuf:"varint,2,req,name=ip" json:"ip"`
-	// The TCP port the Master is listening on for incoming
+	// The TCP port the Main is listening on for incoming
 	// HTTP requests; deprecated, use `address.port` instead.
 	Port *uint32 `protobuf:"varint,3,req,name=port,def=5050" json:"port,omitempty"`
 	// In the default implementation, this will contain information
-	// about both the IP address, port and Master name; it should really
+	// about both the IP address, port and Main name; it should really
 	// not be relied upon by external tooling/frameworks and be
 	// considered an "internal" implementation field.
 	PID *string `protobuf:"bytes,4,opt,name=pid" json:"pid,omitempty"`
@@ -3261,106 +3261,106 @@ type MasterInfo struct {
 	// internal hostnames (eg, some public cloud providers).
 	// Deprecated, use `address.hostname` instead.
 	Hostname *string `protobuf:"bytes,5,opt,name=hostname" json:"hostname,omitempty"`
-	// The running Master version, as a string; taken from the
-	// generated "master/version.hpp".
+	// The running Main version, as a string; taken from the
+	// generated "main/version.hpp".
 	Version *string `protobuf:"bytes,6,opt,name=version" json:"version,omitempty"`
 	// The full IP address (supports both IPv4 and IPv6 formats)
 	// and supersedes the use of `ip`, `port` and `hostname`.
 	// Since Mesos 0.24.
 	Address *Address `protobuf:"bytes,7,opt,name=address" json:"address,omitempty"`
-	// The domain that this master belongs to. All masters in a Mesos
+	// The domain that this main belongs to. All mains in a Mesos
 	// cluster should belong to the same region.
 	Domain       *DomainInfo             `protobuf:"bytes,8,opt,name=domain" json:"domain,omitempty"`
-	Capabilities []MasterInfo_Capability `protobuf:"bytes,9,rep,name=capabilities" json:"capabilities"`
+	Capabilities []MainInfo_Capability `protobuf:"bytes,9,rep,name=capabilities" json:"capabilities"`
 }
 
-func (m *MasterInfo) Reset()                    { *m = MasterInfo{} }
-func (*MasterInfo) ProtoMessage()               {}
-func (*MasterInfo) Descriptor() ([]byte, []int) { return fileDescriptorMesos, []int{22} }
+func (m *MainInfo) Reset()                    { *m = MainInfo{} }
+func (*MainInfo) ProtoMessage()               {}
+func (*MainInfo) Descriptor() ([]byte, []int) { return fileDescriptorMesos, []int{22} }
 
-const Default_MasterInfo_Port uint32 = 5050
+const Default_MainInfo_Port uint32 = 5050
 
-func (m *MasterInfo) GetID() string {
+func (m *MainInfo) GetID() string {
 	if m != nil {
 		return m.ID
 	}
 	return ""
 }
 
-func (m *MasterInfo) GetIP() uint32 {
+func (m *MainInfo) GetIP() uint32 {
 	if m != nil {
 		return m.IP
 	}
 	return 0
 }
 
-func (m *MasterInfo) GetPort() uint32 {
+func (m *MainInfo) GetPort() uint32 {
 	if m != nil && m.Port != nil {
 		return *m.Port
 	}
-	return Default_MasterInfo_Port
+	return Default_MainInfo_Port
 }
 
-func (m *MasterInfo) GetPID() string {
+func (m *MainInfo) GetPID() string {
 	if m != nil && m.PID != nil {
 		return *m.PID
 	}
 	return ""
 }
 
-func (m *MasterInfo) GetHostname() string {
+func (m *MainInfo) GetHostname() string {
 	if m != nil && m.Hostname != nil {
 		return *m.Hostname
 	}
 	return ""
 }
 
-func (m *MasterInfo) GetVersion() string {
+func (m *MainInfo) GetVersion() string {
 	if m != nil && m.Version != nil {
 		return *m.Version
 	}
 	return ""
 }
 
-func (m *MasterInfo) GetAddress() *Address {
+func (m *MainInfo) GetAddress() *Address {
 	if m != nil {
 		return m.Address
 	}
 	return nil
 }
 
-func (m *MasterInfo) GetDomain() *DomainInfo {
+func (m *MainInfo) GetDomain() *DomainInfo {
 	if m != nil {
 		return m.Domain
 	}
 	return nil
 }
 
-func (m *MasterInfo) GetCapabilities() []MasterInfo_Capability {
+func (m *MainInfo) GetCapabilities() []MainInfo_Capability {
 	if m != nil {
 		return m.Capabilities
 	}
 	return nil
 }
 
-type MasterInfo_Capability struct {
-	Type MasterInfo_Capability_Type `protobuf:"varint,1,opt,name=type,enum=mesos.MasterInfo_Capability_Type" json:"type"`
+type MainInfo_Capability struct {
+	Type MainInfo_Capability_Type `protobuf:"varint,1,opt,name=type,enum=mesos.MainInfo_Capability_Type" json:"type"`
 }
 
-func (m *MasterInfo_Capability) Reset()                    { *m = MasterInfo_Capability{} }
-func (*MasterInfo_Capability) ProtoMessage()               {}
-func (*MasterInfo_Capability) Descriptor() ([]byte, []int) { return fileDescriptorMesos, []int{22, 0} }
+func (m *MainInfo_Capability) Reset()                    { *m = MainInfo_Capability{} }
+func (*MainInfo_Capability) ProtoMessage()               {}
+func (*MainInfo_Capability) Descriptor() ([]byte, []int) { return fileDescriptorMesos, []int{22, 0} }
 
-func (m *MasterInfo_Capability) GetType() MasterInfo_Capability_Type {
+func (m *MainInfo_Capability) GetType() MainInfo_Capability_Type {
 	if m != nil {
 		return m.Type
 	}
-	return MasterInfo_Capability_UNKNOWN
+	return MainInfo_Capability_UNKNOWN
 }
 
 // *
 // Describes an agent. Note that the 'id' field is only available
-// after an agent is registered with the master, and is made available
+// after an agent is registered with the main, and is made available
 // here to facilitate re-registration.
 type AgentInfo struct {
 	Hostname string `protobuf:"bytes,1,req,name=hostname" json:"hostname"`
@@ -3372,7 +3372,7 @@ type AgentInfo struct {
 	Attributes []Attribute `protobuf:"bytes,5,rep,name=attributes" json:"attributes"`
 	ID         *AgentID    `protobuf:"bytes,6,opt,name=id" json:"id,omitempty"`
 	// The domain that this agent belongs to. If the agent's region
-	// differs from the master's region, it will not appear in resource
+	// differs from the main's region, it will not appear in resource
 	// offers to frameworks that have not enabled the REGION_AWARE
 	// capability.
 	Domain *DomainInfo `protobuf:"bytes,10,opt,name=domain" json:"domain,omitempty"`
@@ -3534,7 +3534,7 @@ func (m *CSIPluginInfo) GetContainers() []CSIPluginContainerInfo {
 
 // *
 // Describes a resource provider. Note that the 'id' field is only available
-// after a resource provider is registered with the master, and is made
+// after a resource provider is registered with the main, and is made
 // available here to facilitate re-registration.
 type ResourceProviderInfo struct {
 	ID         *ResourceProviderID `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
@@ -6473,7 +6473,7 @@ type InverseOffer struct {
 	OfferID OfferID `protobuf:"bytes,1,req,name=id" json:"id"`
 	// URL for reaching the agent running on the host.  This enables some
 	// optimizations as described in MESOS-3012, such as allowing the
-	// scheduler driver to bypass the master and talk directly with an agent.
+	// scheduler driver to bypass the main and talk directly with an agent.
 	URL *URL `protobuf:"bytes,2,opt,name=url" json:"url,omitempty"`
 	// The framework that should release its resources.
 	// If no specifics are provided (i.e. which agent), all the framework's
@@ -6588,9 +6588,9 @@ type TaskInfo struct {
 	KillPolicy *KillPolicy `protobuf:"bytes,12,opt,name=kill_policy,json=killPolicy" json:"kill_policy,omitempty"`
 	Data       []byte      `protobuf:"bytes,6,opt,name=data" json:"data,omitempty"`
 	// Labels are free-form key value pairs which are exposed through
-	// master and agent endpoints. Labels will not be interpreted or
+	// main and agent endpoints. Labels will not be interpreted or
 	// acted upon by Mesos itself. As opposed to the data field, labels
-	// will be kept in memory on master and agent processes. Therefore,
+	// will be kept in memory on main and agent processes. Therefore,
 	// labels should be used to tag tasks with light-weight meta-data.
 	// Labels should not contain duplicate key-value pairs.
 	Labels *Labels `protobuf:"bytes,10,opt,name=labels" json:"labels,omitempty"`
@@ -6742,7 +6742,7 @@ type Task struct {
 	Resources   []Resource   `protobuf:"bytes,7,rep,name=resources" json:"resources"`
 	Statuses    []TaskStatus `protobuf:"bytes,8,rep,name=statuses" json:"statuses"`
 	// These fields correspond to the state and uuid of the latest
-	// status update forwarded to the master.
+	// status update forwarded to the main.
 	// NOTE: Either both the fields must be set or both must be unset.
 	StatusUpdateState *TaskState `protobuf:"varint,9,opt,name=status_update_state,json=statusUpdateState,enum=mesos.TaskState" json:"status_update_state,omitempty"`
 	StatusUpdateUUID  []byte     `protobuf:"bytes,10,opt,name=status_update_uuid,json=statusUpdateUuid" json:"status_update_uuid,omitempty"`
@@ -7152,19 +7152,19 @@ type TaskStatus struct {
 	// NOTE: Check support in built-in executors is experimental.
 	CheckStatus *CheckStatusInfo `protobuf:"bytes,15,opt,name=check_status,json=checkStatus" json:"check_status,omitempty"`
 	// Labels are free-form key value pairs which are exposed through
-	// master and agent endpoints. Labels will not be interpreted or
+	// main and agent endpoints. Labels will not be interpreted or
 	// acted upon by Mesos itself. As opposed to the data field, labels
-	// will be kept in memory on master and agent processes. Therefore,
+	// will be kept in memory on main and agent processes. Therefore,
 	// labels should be used to tag TaskStatus message with light-weight
 	// meta-data. Labels should not contain duplicate key-value pairs.
 	Labels *Labels `protobuf:"bytes,12,opt,name=labels" json:"labels,omitempty"`
 	// Container related information that is resolved dynamically such as
 	// network address.
 	ContainerStatus *ContainerStatus `protobuf:"bytes,13,opt,name=container_status,json=containerStatus" json:"container_status,omitempty"`
-	// The time (according to the master's clock) when the agent where
+	// The time (according to the main's clock) when the agent where
 	// this task was running became unreachable. This is only set on
 	// status updates for tasks running on agents that are unreachable
-	// (e.g., partitioned away from the master).
+	// (e.g., partitioned away from the main).
 	UnreachableTime *TimeInfo `protobuf:"bytes,14,opt,name=unreachable_time,json=unreachableTime" json:"unreachable_time,omitempty"`
 	// If the reason field indicates a container resource limitation,
 	// this field optionally contains additional information.
@@ -7567,7 +7567,7 @@ func (m *Secret_Value) GetData() []byte {
 }
 
 // *
-// Rate (queries per second, QPS) limit for messages from a framework to master.
+// Rate (queries per second, QPS) limit for messages from a framework to main.
 // Strictly speaking they are the combined rate from all frameworks of the same
 // principal.
 type RateLimit struct {
@@ -7578,7 +7578,7 @@ type RateLimit struct {
 	// FrameworkInfo.principal and Credential.principal (if using authentication).
 	Principal string `protobuf:"bytes,2,req,name=principal" json:"principal"`
 	// Max number of outstanding messages from frameworks of this principal
-	// allowed by master before the next message is dropped and an error is sent
+	// allowed by main before the next message is dropped and an error is sent
 	// back to the sender. Messages received before the capacity is reached are
 	// still going to be processed after the error is sent.
 	// If unspecified, this principal is assigned unlimited capacity.
@@ -8019,8 +8019,8 @@ func (m *Volume_Source_SandboxPath) GetPath() string {
 // interface, including the IP addresses and network isolation policy
 // (network group membership).
 //
-// The NetworkInfo message is not interpreted by the Master or Agent and is
-// intended to be used by Agent and Master modules implementing network
+// The NetworkInfo message is not interpreted by the Main or Agent and is
+// intended to be used by Agent and Main modules implementing network
 // isolation. If the modules are missing, the message is simply ignored. In
 // future, the task launch will fail if there is no module providing the
 // network isolation capabilities (MESOS-3390).
@@ -9455,8 +9455,8 @@ func init() {
 	proto.RegisterType((*DomainInfo_FaultDomain)(nil), "mesos.DomainInfo.FaultDomain")
 	proto.RegisterType((*DomainInfo_FaultDomain_RegionInfo)(nil), "mesos.DomainInfo.FaultDomain.RegionInfo")
 	proto.RegisterType((*DomainInfo_FaultDomain_ZoneInfo)(nil), "mesos.DomainInfo.FaultDomain.ZoneInfo")
-	proto.RegisterType((*MasterInfo)(nil), "mesos.MasterInfo")
-	proto.RegisterType((*MasterInfo_Capability)(nil), "mesos.MasterInfo.Capability")
+	proto.RegisterType((*MainInfo)(nil), "mesos.MainInfo")
+	proto.RegisterType((*MainInfo_Capability)(nil), "mesos.MainInfo.Capability")
 	proto.RegisterType((*AgentInfo)(nil), "mesos.AgentInfo")
 	proto.RegisterType((*AgentInfo_Capability)(nil), "mesos.AgentInfo.Capability")
 	proto.RegisterType((*CSIPluginContainerInfo)(nil), "mesos.CSIPluginContainerInfo")
@@ -9586,7 +9586,7 @@ func init() {
 	proto.RegisterEnum("mesos.CheckInfo_Type", CheckInfo_Type_name, CheckInfo_Type_value)
 	proto.RegisterEnum("mesos.HealthCheck_Type", HealthCheck_Type_name, HealthCheck_Type_value)
 	proto.RegisterEnum("mesos.ExecutorInfo_Type", ExecutorInfo_Type_name, ExecutorInfo_Type_value)
-	proto.RegisterEnum("mesos.MasterInfo_Capability_Type", MasterInfo_Capability_Type_name, MasterInfo_Capability_Type_value)
+	proto.RegisterEnum("mesos.MainInfo_Capability_Type", MainInfo_Capability_Type_name, MainInfo_Capability_Type_value)
 	proto.RegisterEnum("mesos.AgentInfo_Capability_Type", AgentInfo_Capability_Type_name, AgentInfo_Capability_Type_value)
 	proto.RegisterEnum("mesos.CSIPluginContainerInfo_Service", CSIPluginContainerInfo_Service_name, CSIPluginContainerInfo_Service_value)
 	proto.RegisterEnum("mesos.Value_Type", Value_Type_name, Value_Type_value)
@@ -9666,8 +9666,8 @@ func (x ExecutorInfo_Type) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
-func (x MasterInfo_Capability_Type) String() string {
-	s, ok := MasterInfo_Capability_Type_name[int32(x)]
+func (x MainInfo_Capability_Type) String() string {
+	s, ok := MainInfo_Capability_Type_name[int32(x)]
 	if ok {
 		return s
 	}
@@ -12615,7 +12615,7 @@ func (this *DomainInfo_FaultDomain_ZoneInfo) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MasterInfo) VerboseEqual(that interface{}) error {
+func (this *MainInfo) VerboseEqual(that interface{}) error {
 	if that == nil {
 		if this == nil {
 			return nil
@@ -12623,22 +12623,22 @@ func (this *MasterInfo) VerboseEqual(that interface{}) error {
 		return fmt.Errorf("that == nil && this != nil")
 	}
 
-	that1, ok := that.(*MasterInfo)
+	that1, ok := that.(*MainInfo)
 	if !ok {
-		that2, ok := that.(MasterInfo)
+		that2, ok := that.(MainInfo)
 		if ok {
 			that1 = &that2
 		} else {
-			return fmt.Errorf("that is not of type *MasterInfo")
+			return fmt.Errorf("that is not of type *MainInfo")
 		}
 	}
 	if that1 == nil {
 		if this == nil {
 			return nil
 		}
-		return fmt.Errorf("that is type *MasterInfo but is nil && this != nil")
+		return fmt.Errorf("that is type *MainInfo but is nil && this != nil")
 	} else if this == nil {
-		return fmt.Errorf("that is type *MasterInfo but is not nil && this == nil")
+		return fmt.Errorf("that is type *MainInfo but is not nil && this == nil")
 	}
 	if this.ID != that1.ID {
 		return fmt.Errorf("ID this(%v) Not Equal that(%v)", this.ID, that1.ID)
@@ -12698,7 +12698,7 @@ func (this *MasterInfo) VerboseEqual(that interface{}) error {
 	}
 	return nil
 }
-func (this *MasterInfo) Equal(that interface{}) bool {
+func (this *MainInfo) Equal(that interface{}) bool {
 	if that == nil {
 		if this == nil {
 			return true
@@ -12706,9 +12706,9 @@ func (this *MasterInfo) Equal(that interface{}) bool {
 		return false
 	}
 
-	that1, ok := that.(*MasterInfo)
+	that1, ok := that.(*MainInfo)
 	if !ok {
-		that2, ok := that.(MasterInfo)
+		that2, ok := that.(MainInfo)
 		if ok {
 			that1 = &that2
 		} else {
@@ -12781,7 +12781,7 @@ func (this *MasterInfo) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MasterInfo_Capability) VerboseEqual(that interface{}) error {
+func (this *MainInfo_Capability) VerboseEqual(that interface{}) error {
 	if that == nil {
 		if this == nil {
 			return nil
@@ -12789,29 +12789,29 @@ func (this *MasterInfo_Capability) VerboseEqual(that interface{}) error {
 		return fmt.Errorf("that == nil && this != nil")
 	}
 
-	that1, ok := that.(*MasterInfo_Capability)
+	that1, ok := that.(*MainInfo_Capability)
 	if !ok {
-		that2, ok := that.(MasterInfo_Capability)
+		that2, ok := that.(MainInfo_Capability)
 		if ok {
 			that1 = &that2
 		} else {
-			return fmt.Errorf("that is not of type *MasterInfo_Capability")
+			return fmt.Errorf("that is not of type *MainInfo_Capability")
 		}
 	}
 	if that1 == nil {
 		if this == nil {
 			return nil
 		}
-		return fmt.Errorf("that is type *MasterInfo_Capability but is nil && this != nil")
+		return fmt.Errorf("that is type *MainInfo_Capability but is nil && this != nil")
 	} else if this == nil {
-		return fmt.Errorf("that is type *MasterInfo_Capability but is not nil && this == nil")
+		return fmt.Errorf("that is type *MainInfo_Capability but is not nil && this == nil")
 	}
 	if this.Type != that1.Type {
 		return fmt.Errorf("Type this(%v) Not Equal that(%v)", this.Type, that1.Type)
 	}
 	return nil
 }
-func (this *MasterInfo_Capability) Equal(that interface{}) bool {
+func (this *MainInfo_Capability) Equal(that interface{}) bool {
 	if that == nil {
 		if this == nil {
 			return true
@@ -12819,9 +12819,9 @@ func (this *MasterInfo_Capability) Equal(that interface{}) bool {
 		return false
 	}
 
-	that1, ok := that.(*MasterInfo_Capability)
+	that1, ok := that.(*MainInfo_Capability)
 	if !ok {
-		that2, ok := that.(MasterInfo_Capability)
+		that2, ok := that.(MainInfo_Capability)
 		if ok {
 			that1 = &that2
 		} else {
@@ -26860,12 +26860,12 @@ func (this *DomainInfo_FaultDomain_ZoneInfo) GoString() string {
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
-func (this *MasterInfo) GoString() string {
+func (this *MainInfo) GoString() string {
 	if this == nil {
 		return "nil"
 	}
 	s := make([]string, 0, 13)
-	s = append(s, "&mesos.MasterInfo{")
+	s = append(s, "&mesos.MainInfo{")
 	s = append(s, "ID: "+fmt.Sprintf("%#v", this.ID)+",\n")
 	s = append(s, "IP: "+fmt.Sprintf("%#v", this.IP)+",\n")
 	if this.Port != nil {
@@ -26892,12 +26892,12 @@ func (this *MasterInfo) GoString() string {
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
-func (this *MasterInfo_Capability) GoString() string {
+func (this *MainInfo_Capability) GoString() string {
 	if this == nil {
 		return "nil"
 	}
 	s := make([]string, 0, 5)
-	s = append(s, "&mesos.MasterInfo_Capability{")
+	s = append(s, "&mesos.MainInfo_Capability{")
 	s = append(s, "Type: "+fmt.Sprintf("%#v", this.Type)+",\n")
 	s = append(s, "}")
 	return strings.Join(s, "")
@@ -30669,7 +30669,7 @@ func (m *DomainInfo_FaultDomain_ZoneInfo) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *MasterInfo) Marshal() (dAtA []byte, err error) {
+func (m *MainInfo) Marshal() (dAtA []byte, err error) {
 	size := m.ProtoSize()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -30679,7 +30679,7 @@ func (m *MasterInfo) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MasterInfo) MarshalTo(dAtA []byte) (int, error) {
+func (m *MainInfo) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -30751,7 +30751,7 @@ func (m *MasterInfo) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *MasterInfo_Capability) Marshal() (dAtA []byte, err error) {
+func (m *MainInfo_Capability) Marshal() (dAtA []byte, err error) {
 	size := m.ProtoSize()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -30761,7 +30761,7 @@ func (m *MasterInfo_Capability) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MasterInfo_Capability) MarshalTo(dAtA []byte) (int, error) {
+func (m *MainInfo_Capability) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -37551,8 +37551,8 @@ func NewPopulatedDomainInfo_FaultDomain_ZoneInfo(r randyMesos, easy bool) *Domai
 	return this
 }
 
-func NewPopulatedMasterInfo(r randyMesos, easy bool) *MasterInfo {
-	this := &MasterInfo{}
+func NewPopulatedMainInfo(r randyMesos, easy bool) *MainInfo {
+	this := &MainInfo{}
 	this.ID = string(randStringMesos(r))
 	this.IP = uint32(r.Uint32())
 	v55 := uint32(r.Uint32())
@@ -37577,9 +37577,9 @@ func NewPopulatedMasterInfo(r randyMesos, easy bool) *MasterInfo {
 	}
 	if r.Intn(10) != 0 {
 		v59 := r.Intn(5)
-		this.Capabilities = make([]MasterInfo_Capability, v59)
+		this.Capabilities = make([]MainInfo_Capability, v59)
 		for i := 0; i < v59; i++ {
-			v60 := NewPopulatedMasterInfo_Capability(r, easy)
+			v60 := NewPopulatedMainInfo_Capability(r, easy)
 			this.Capabilities[i] = *v60
 		}
 	}
@@ -37588,9 +37588,9 @@ func NewPopulatedMasterInfo(r randyMesos, easy bool) *MasterInfo {
 	return this
 }
 
-func NewPopulatedMasterInfo_Capability(r randyMesos, easy bool) *MasterInfo_Capability {
-	this := &MasterInfo_Capability{}
-	this.Type = MasterInfo_Capability_Type([]int32{0, 1}[r.Intn(2)])
+func NewPopulatedMainInfo_Capability(r randyMesos, easy bool) *MainInfo_Capability {
+	this := &MainInfo_Capability{}
+	this.Type = MainInfo_Capability_Type([]int32{0, 1}[r.Intn(2)])
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -41341,7 +41341,7 @@ func (m *DomainInfo_FaultDomain_ZoneInfo) ProtoSize() (n int) {
 	return n
 }
 
-func (m *MasterInfo) ProtoSize() (n int) {
+func (m *MainInfo) ProtoSize() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
@@ -41379,7 +41379,7 @@ func (m *MasterInfo) ProtoSize() (n int) {
 	return n
 }
 
-func (m *MasterInfo_Capability) ProtoSize() (n int) {
+func (m *MainInfo_Capability) ProtoSize() (n int) {
 	var l int
 	_ = l
 	n += 1 + sovMesos(uint64(m.Type))
@@ -44367,11 +44367,11 @@ func (this *DomainInfo_FaultDomain_ZoneInfo) String() string {
 	}, "")
 	return s
 }
-func (this *MasterInfo) String() string {
+func (this *MainInfo) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MasterInfo{`,
+	s := strings.Join([]string{`&MainInfo{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`IP:` + fmt.Sprintf("%v", this.IP) + `,`,
 		`Port:` + valueToStringMesos(this.Port) + `,`,
@@ -44380,16 +44380,16 @@ func (this *MasterInfo) String() string {
 		`Version:` + valueToStringMesos(this.Version) + `,`,
 		`Address:` + strings.Replace(fmt.Sprintf("%v", this.Address), "Address", "Address", 1) + `,`,
 		`Domain:` + strings.Replace(fmt.Sprintf("%v", this.Domain), "DomainInfo", "DomainInfo", 1) + `,`,
-		`Capabilities:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Capabilities), "MasterInfo_Capability", "MasterInfo_Capability", 1), `&`, ``, 1) + `,`,
+		`Capabilities:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Capabilities), "MainInfo_Capability", "MainInfo_Capability", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *MasterInfo_Capability) String() string {
+func (this *MainInfo_Capability) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MasterInfo_Capability{`,
+	s := strings.Join([]string{`&MainInfo_Capability{`,
 		`Type:` + fmt.Sprintf("%v", this.Type) + `,`,
 		`}`,
 	}, "")
@@ -50404,7 +50404,7 @@ func (m *DomainInfo_FaultDomain_ZoneInfo) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MasterInfo) Unmarshal(dAtA []byte) error {
+func (m *MainInfo) Unmarshal(dAtA []byte) error {
 	var hasFields [1]uint64
 	l := len(dAtA)
 	iNdEx := 0
@@ -50428,10 +50428,10 @@ func (m *MasterInfo) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MasterInfo: wiretype end group for non-group")
+			return fmt.Errorf("proto: MainInfo: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MasterInfo: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MainInfo: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -50687,7 +50687,7 @@ func (m *MasterInfo) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Capabilities = append(m.Capabilities, MasterInfo_Capability{})
+			m.Capabilities = append(m.Capabilities, MainInfo_Capability{})
 			if err := m.Capabilities[len(m.Capabilities)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -50722,7 +50722,7 @@ func (m *MasterInfo) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MasterInfo_Capability) Unmarshal(dAtA []byte) error {
+func (m *MainInfo_Capability) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -50765,7 +50765,7 @@ func (m *MasterInfo_Capability) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Type |= (MasterInfo_Capability_Type(b) & 0x7F) << shift
+				m.Type |= (MainInfo_Capability_Type(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}

@@ -30,7 +30,7 @@ type PutMappingService struct {
 	pretty            bool
 	typ               string
 	index             []string
-	masterTimeout     string
+	mainTimeout     string
 	ignoreUnavailable *bool
 	allowNoIndices    *bool
 	expandWildcards   string
@@ -67,9 +67,9 @@ func (s *PutMappingService) Timeout(timeout string) *PutMappingService {
 	return s
 }
 
-// MasterTimeout specifies the timeout for connection to master.
-func (s *PutMappingService) MasterTimeout(masterTimeout string) *PutMappingService {
-	s.masterTimeout = masterTimeout
+// MainTimeout specifies the timeout for connection to main.
+func (s *PutMappingService) MainTimeout(mainTimeout string) *PutMappingService {
+	s.mainTimeout = mainTimeout
 	return s
 }
 
@@ -160,8 +160,8 @@ func (s *PutMappingService) buildURL() (string, url.Values, error) {
 	if s.timeout != "" {
 		params.Set("timeout", s.timeout)
 	}
-	if s.masterTimeout != "" {
-		params.Set("master_timeout", s.masterTimeout)
+	if s.mainTimeout != "" {
+		params.Set("main_timeout", s.mainTimeout)
 	}
 	return path, params, nil
 }

@@ -103,7 +103,7 @@ const (
 	// usable.
 	Cluster_RUNNING Cluster_Status = 2
 	// The RECONCILING state indicates that some work is actively being done on
-	// the cluster, such as upgrading the master or node software. Details can
+	// the cluster, such as upgrading the main or node software. Details can
 	// be found in the `statusMessage` field.
 	Cluster_RECONCILING Cluster_Status = 3
 	// The STOPPING state indicates the cluster is being deleted.
@@ -189,7 +189,7 @@ const (
 	Operation_CREATE_CLUSTER Operation_Type = 1
 	// Cluster delete.
 	Operation_DELETE_CLUSTER Operation_Type = 2
-	// A master upgrade.
+	// A main upgrade.
 	Operation_UPGRADE_MASTER Operation_Type = 3
 	// A node upgrade.
 	Operation_UPGRADE_NODES Operation_Type = 4
@@ -209,7 +209,7 @@ const (
 	Operation_AUTO_UPGRADE_NODES Operation_Type = 11
 	// Set labels.
 	Operation_SET_LABELS Operation_Type = 12
-	// Set/generate master auth materials
+	// Set/generate main auth materials
 	Operation_SET_MASTER_AUTH Operation_Type = 13
 	// Set node pool size.
 	Operation_SET_NODE_POOL_SIZE Operation_Type = 14
@@ -268,41 +268,41 @@ func (Operation_Type) EnumDescriptor() ([]byte, []int) {
 }
 
 // Operation type: what type update to perform.
-type SetMasterAuthRequest_Action int32
+type SetMainAuthRequest_Action int32
 
 const (
 	// Operation is unknown and will error out.
-	SetMasterAuthRequest_UNKNOWN SetMasterAuthRequest_Action = 0
+	SetMainAuthRequest_UNKNOWN SetMainAuthRequest_Action = 0
 	// Set the password to a user generated value.
-	SetMasterAuthRequest_SET_PASSWORD SetMasterAuthRequest_Action = 1
+	SetMainAuthRequest_SET_PASSWORD SetMainAuthRequest_Action = 1
 	// Generate a new password and set it to that.
-	SetMasterAuthRequest_GENERATE_PASSWORD SetMasterAuthRequest_Action = 2
+	SetMainAuthRequest_GENERATE_PASSWORD SetMainAuthRequest_Action = 2
 	// Set the username.  If an empty username is provided, basic authentication
 	// is disabled for the cluster.  If a non-empty username is provided, basic
 	// authentication is enabled, with either a provided password or a generated
 	// one.
-	SetMasterAuthRequest_SET_USERNAME SetMasterAuthRequest_Action = 3
+	SetMainAuthRequest_SET_USERNAME SetMainAuthRequest_Action = 3
 )
 
-var SetMasterAuthRequest_Action_name = map[int32]string{
+var SetMainAuthRequest_Action_name = map[int32]string{
 	0: "UNKNOWN",
 	1: "SET_PASSWORD",
 	2: "GENERATE_PASSWORD",
 	3: "SET_USERNAME",
 }
 
-var SetMasterAuthRequest_Action_value = map[string]int32{
+var SetMainAuthRequest_Action_value = map[string]int32{
 	"UNKNOWN":           0,
 	"SET_PASSWORD":      1,
 	"GENERATE_PASSWORD": 2,
 	"SET_USERNAME":      3,
 }
 
-func (x SetMasterAuthRequest_Action) String() string {
-	return proto.EnumName(SetMasterAuthRequest_Action_name, int32(x))
+func (x SetMainAuthRequest_Action) String() string {
+	return proto.EnumName(SetMainAuthRequest_Action_name, int32(x))
 }
 
-func (SetMasterAuthRequest_Action) EnumDescriptor() ([]byte, []int) {
+func (SetMainAuthRequest_Action) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_339d8120448ec82b, []int{26, 0}
 }
 
@@ -633,16 +633,16 @@ func (m *NodeTaint) GetEffect() NodeTaint_Effect {
 	return NodeTaint_EFFECT_UNSPECIFIED
 }
 
-// The authentication information for accessing the master endpoint.
+// The authentication information for accessing the main endpoint.
 // Authentication can be done using HTTP basic auth or using client
 // certificates.
-type MasterAuth struct {
-	// The username to use for HTTP basic authentication to the master endpoint.
+type MainAuth struct {
+	// The username to use for HTTP basic authentication to the main endpoint.
 	// For clusters v1.6.0 and later, you can disable basic authentication by
 	// providing an empty username.
 	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
-	// The password to use for HTTP basic authentication to the master endpoint.
-	// Because the master endpoint is open to the Internet, you should create a
+	// The password to use for HTTP basic authentication to the main endpoint.
+	// Because the main endpoint is open to the Internet, you should create a
 	// strong password.  If a password is provided for cluster creation, username
 	// must be non-empty.
 	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
@@ -663,66 +663,66 @@ type MasterAuth struct {
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *MasterAuth) Reset()         { *m = MasterAuth{} }
-func (m *MasterAuth) String() string { return proto.CompactTextString(m) }
-func (*MasterAuth) ProtoMessage()    {}
-func (*MasterAuth) Descriptor() ([]byte, []int) {
+func (m *MainAuth) Reset()         { *m = MainAuth{} }
+func (m *MainAuth) String() string { return proto.CompactTextString(m) }
+func (*MainAuth) ProtoMessage()    {}
+func (*MainAuth) Descriptor() ([]byte, []int) {
 	return fileDescriptor_339d8120448ec82b, []int{2}
 }
-func (m *MasterAuth) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_MasterAuth.Unmarshal(m, b)
+func (m *MainAuth) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_MainAuth.Unmarshal(m, b)
 }
-func (m *MasterAuth) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_MasterAuth.Marshal(b, m, deterministic)
+func (m *MainAuth) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_MainAuth.Marshal(b, m, deterministic)
 }
-func (m *MasterAuth) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MasterAuth.Merge(m, src)
+func (m *MainAuth) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MainAuth.Merge(m, src)
 }
-func (m *MasterAuth) XXX_Size() int {
-	return xxx_messageInfo_MasterAuth.Size(m)
+func (m *MainAuth) XXX_Size() int {
+	return xxx_messageInfo_MainAuth.Size(m)
 }
-func (m *MasterAuth) XXX_DiscardUnknown() {
-	xxx_messageInfo_MasterAuth.DiscardUnknown(m)
+func (m *MainAuth) XXX_DiscardUnknown() {
+	xxx_messageInfo_MainAuth.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MasterAuth proto.InternalMessageInfo
+var xxx_messageInfo_MainAuth proto.InternalMessageInfo
 
-func (m *MasterAuth) GetUsername() string {
+func (m *MainAuth) GetUsername() string {
 	if m != nil {
 		return m.Username
 	}
 	return ""
 }
 
-func (m *MasterAuth) GetPassword() string {
+func (m *MainAuth) GetPassword() string {
 	if m != nil {
 		return m.Password
 	}
 	return ""
 }
 
-func (m *MasterAuth) GetClientCertificateConfig() *ClientCertificateConfig {
+func (m *MainAuth) GetClientCertificateConfig() *ClientCertificateConfig {
 	if m != nil {
 		return m.ClientCertificateConfig
 	}
 	return nil
 }
 
-func (m *MasterAuth) GetClusterCaCertificate() string {
+func (m *MainAuth) GetClusterCaCertificate() string {
 	if m != nil {
 		return m.ClusterCaCertificate
 	}
 	return ""
 }
 
-func (m *MasterAuth) GetClientCertificate() string {
+func (m *MainAuth) GetClientCertificate() string {
 	if m != nil {
 		return m.ClientCertificate
 	}
 	return ""
 }
 
-func (m *MasterAuth) GetClientKey() string {
+func (m *MainAuth) GetClientKey() string {
 	if m != nil {
 		return m.ClientKey
 	}
@@ -782,7 +782,7 @@ type AddonsConfig struct {
 	// Configuration for the Kubernetes Dashboard.
 	KubernetesDashboard *KubernetesDashboard `protobuf:"bytes,3,opt,name=kubernetes_dashboard,json=kubernetesDashboard,proto3" json:"kubernetes_dashboard,omitempty"`
 	// Configuration for NetworkPolicy. This only tracks whether the addon
-	// is enabled or not on the Master, it does not track whether network policy
+	// is enabled or not on the Main, it does not track whether network policy
 	// is enabled for the nodes.
 	NetworkPolicyConfig  *NetworkPolicyConfig `protobuf:"bytes,4,opt,name=network_policy_config,json=networkPolicyConfig,proto3" json:"network_policy_config,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
@@ -970,7 +970,7 @@ func (m *KubernetesDashboard) GetDisabled() bool {
 }
 
 // Configuration for NetworkPolicy. This only tracks whether the addon
-// is enabled or not on the Master, it does not track whether network policy
+// is enabled or not on the Main, it does not track whether network policy
 // is enabled for the nodes.
 type NetworkPolicyConfig struct {
 	// Whether NetworkPolicy is enabled for this cluster.
@@ -1011,53 +1011,53 @@ func (m *NetworkPolicyConfig) GetDisabled() bool {
 	return false
 }
 
-// Configuration options for the master authorized networks feature. Enabled
-// master authorized networks will disallow all external traffic to access
-// Kubernetes master through HTTPS except traffic from the given CIDR blocks,
+// Configuration options for the main authorized networks feature. Enabled
+// main authorized networks will disallow all external traffic to access
+// Kubernetes main through HTTPS except traffic from the given CIDR blocks,
 // Google Compute Engine Public IPs and Google Prod IPs.
-type MasterAuthorizedNetworksConfig struct {
-	// Whether or not master authorized networks is enabled.
+type MainAuthorizedNetworksConfig struct {
+	// Whether or not main authorized networks is enabled.
 	Enabled bool `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
 	// cidr_blocks define up to 10 external networks that could access
-	// Kubernetes master through HTTPS.
-	CidrBlocks           []*MasterAuthorizedNetworksConfig_CidrBlock `protobuf:"bytes,2,rep,name=cidr_blocks,json=cidrBlocks,proto3" json:"cidr_blocks,omitempty"`
+	// Kubernetes main through HTTPS.
+	CidrBlocks           []*MainAuthorizedNetworksConfig_CidrBlock `protobuf:"bytes,2,rep,name=cidr_blocks,json=cidrBlocks,proto3" json:"cidr_blocks,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                                    `json:"-"`
 	XXX_unrecognized     []byte                                      `json:"-"`
 	XXX_sizecache        int32                                       `json:"-"`
 }
 
-func (m *MasterAuthorizedNetworksConfig) Reset()         { *m = MasterAuthorizedNetworksConfig{} }
-func (m *MasterAuthorizedNetworksConfig) String() string { return proto.CompactTextString(m) }
-func (*MasterAuthorizedNetworksConfig) ProtoMessage()    {}
-func (*MasterAuthorizedNetworksConfig) Descriptor() ([]byte, []int) {
+func (m *MainAuthorizedNetworksConfig) Reset()         { *m = MainAuthorizedNetworksConfig{} }
+func (m *MainAuthorizedNetworksConfig) String() string { return proto.CompactTextString(m) }
+func (*MainAuthorizedNetworksConfig) ProtoMessage()    {}
+func (*MainAuthorizedNetworksConfig) Descriptor() ([]byte, []int) {
 	return fileDescriptor_339d8120448ec82b, []int{9}
 }
-func (m *MasterAuthorizedNetworksConfig) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_MasterAuthorizedNetworksConfig.Unmarshal(m, b)
+func (m *MainAuthorizedNetworksConfig) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_MainAuthorizedNetworksConfig.Unmarshal(m, b)
 }
-func (m *MasterAuthorizedNetworksConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_MasterAuthorizedNetworksConfig.Marshal(b, m, deterministic)
+func (m *MainAuthorizedNetworksConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_MainAuthorizedNetworksConfig.Marshal(b, m, deterministic)
 }
-func (m *MasterAuthorizedNetworksConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MasterAuthorizedNetworksConfig.Merge(m, src)
+func (m *MainAuthorizedNetworksConfig) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MainAuthorizedNetworksConfig.Merge(m, src)
 }
-func (m *MasterAuthorizedNetworksConfig) XXX_Size() int {
-	return xxx_messageInfo_MasterAuthorizedNetworksConfig.Size(m)
+func (m *MainAuthorizedNetworksConfig) XXX_Size() int {
+	return xxx_messageInfo_MainAuthorizedNetworksConfig.Size(m)
 }
-func (m *MasterAuthorizedNetworksConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_MasterAuthorizedNetworksConfig.DiscardUnknown(m)
+func (m *MainAuthorizedNetworksConfig) XXX_DiscardUnknown() {
+	xxx_messageInfo_MainAuthorizedNetworksConfig.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MasterAuthorizedNetworksConfig proto.InternalMessageInfo
+var xxx_messageInfo_MainAuthorizedNetworksConfig proto.InternalMessageInfo
 
-func (m *MasterAuthorizedNetworksConfig) GetEnabled() bool {
+func (m *MainAuthorizedNetworksConfig) GetEnabled() bool {
 	if m != nil {
 		return m.Enabled
 	}
 	return false
 }
 
-func (m *MasterAuthorizedNetworksConfig) GetCidrBlocks() []*MasterAuthorizedNetworksConfig_CidrBlock {
+func (m *MainAuthorizedNetworksConfig) GetCidrBlocks() []*MainAuthorizedNetworksConfig_CidrBlock {
 	if m != nil {
 		return m.CidrBlocks
 	}
@@ -1065,7 +1065,7 @@ func (m *MasterAuthorizedNetworksConfig) GetCidrBlocks() []*MasterAuthorizedNetw
 }
 
 // CidrBlock contains an optional name and one CIDR block.
-type MasterAuthorizedNetworksConfig_CidrBlock struct {
+type MainAuthorizedNetworksConfig_CidrBlock struct {
 	// display_name is an optional field for users to identify CIDR blocks.
 	DisplayName string `protobuf:"bytes,1,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
 	// cidr_block must be specified in CIDR notation.
@@ -1075,40 +1075,40 @@ type MasterAuthorizedNetworksConfig_CidrBlock struct {
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *MasterAuthorizedNetworksConfig_CidrBlock) Reset() {
-	*m = MasterAuthorizedNetworksConfig_CidrBlock{}
+func (m *MainAuthorizedNetworksConfig_CidrBlock) Reset() {
+	*m = MainAuthorizedNetworksConfig_CidrBlock{}
 }
-func (m *MasterAuthorizedNetworksConfig_CidrBlock) String() string { return proto.CompactTextString(m) }
-func (*MasterAuthorizedNetworksConfig_CidrBlock) ProtoMessage()    {}
-func (*MasterAuthorizedNetworksConfig_CidrBlock) Descriptor() ([]byte, []int) {
+func (m *MainAuthorizedNetworksConfig_CidrBlock) String() string { return proto.CompactTextString(m) }
+func (*MainAuthorizedNetworksConfig_CidrBlock) ProtoMessage()    {}
+func (*MainAuthorizedNetworksConfig_CidrBlock) Descriptor() ([]byte, []int) {
 	return fileDescriptor_339d8120448ec82b, []int{9, 0}
 }
-func (m *MasterAuthorizedNetworksConfig_CidrBlock) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_MasterAuthorizedNetworksConfig_CidrBlock.Unmarshal(m, b)
+func (m *MainAuthorizedNetworksConfig_CidrBlock) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_MainAuthorizedNetworksConfig_CidrBlock.Unmarshal(m, b)
 }
-func (m *MasterAuthorizedNetworksConfig_CidrBlock) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_MasterAuthorizedNetworksConfig_CidrBlock.Marshal(b, m, deterministic)
+func (m *MainAuthorizedNetworksConfig_CidrBlock) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_MainAuthorizedNetworksConfig_CidrBlock.Marshal(b, m, deterministic)
 }
-func (m *MasterAuthorizedNetworksConfig_CidrBlock) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MasterAuthorizedNetworksConfig_CidrBlock.Merge(m, src)
+func (m *MainAuthorizedNetworksConfig_CidrBlock) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MainAuthorizedNetworksConfig_CidrBlock.Merge(m, src)
 }
-func (m *MasterAuthorizedNetworksConfig_CidrBlock) XXX_Size() int {
-	return xxx_messageInfo_MasterAuthorizedNetworksConfig_CidrBlock.Size(m)
+func (m *MainAuthorizedNetworksConfig_CidrBlock) XXX_Size() int {
+	return xxx_messageInfo_MainAuthorizedNetworksConfig_CidrBlock.Size(m)
 }
-func (m *MasterAuthorizedNetworksConfig_CidrBlock) XXX_DiscardUnknown() {
-	xxx_messageInfo_MasterAuthorizedNetworksConfig_CidrBlock.DiscardUnknown(m)
+func (m *MainAuthorizedNetworksConfig_CidrBlock) XXX_DiscardUnknown() {
+	xxx_messageInfo_MainAuthorizedNetworksConfig_CidrBlock.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MasterAuthorizedNetworksConfig_CidrBlock proto.InternalMessageInfo
+var xxx_messageInfo_MainAuthorizedNetworksConfig_CidrBlock proto.InternalMessageInfo
 
-func (m *MasterAuthorizedNetworksConfig_CidrBlock) GetDisplayName() string {
+func (m *MainAuthorizedNetworksConfig_CidrBlock) GetDisplayName() string {
 	if m != nil {
 		return m.DisplayName
 	}
 	return ""
 }
 
-func (m *MasterAuthorizedNetworksConfig_CidrBlock) GetCidrBlock() string {
+func (m *MainAuthorizedNetworksConfig_CidrBlock) GetCidrBlock() string {
 	if m != nil {
 		return m.CidrBlock
 	}
@@ -1424,8 +1424,8 @@ type Cluster struct {
 	//
 	// If unspecified, the defaults are used.
 	NodeConfig *NodeConfig `protobuf:"bytes,4,opt,name=node_config,json=nodeConfig,proto3" json:"node_config,omitempty"`
-	// The authentication information for accessing the master endpoint.
-	MasterAuth *MasterAuth `protobuf:"bytes,5,opt,name=master_auth,json=masterAuth,proto3" json:"master_auth,omitempty"`
+	// The authentication information for accessing the main endpoint.
+	MainAuth *MainAuth `protobuf:"bytes,5,opt,name=main_auth,json=mainAuth,proto3" json:"main_auth,omitempty"`
 	// The logging service the cluster should use to write logs.
 	// Currently available options:
 	//
@@ -1466,8 +1466,8 @@ type Cluster struct {
 	Locations []string `protobuf:"bytes,13,rep,name=locations,proto3" json:"locations,omitempty"`
 	// Kubernetes alpha features are enabled on this cluster. This includes alpha
 	// API groups (e.g. v1alpha1) and features that may not be production ready in
-	// the kubernetes version of the master and nodes.
-	// The cluster has no SLA for uptime and master/node upgrades are disabled.
+	// the kubernetes version of the main and nodes.
+	// The cluster has no SLA for uptime and main/node upgrades are disabled.
 	// Alpha enabled clusters are automatically deleted thirty days after
 	// creation.
 	EnableKubernetesAlpha bool `protobuf:"varint,14,opt,name=enable_kubernetes_alpha,json=enableKubernetesAlpha,proto3" json:"enable_kubernetes_alpha,omitempty"`
@@ -1475,8 +1475,8 @@ type Cluster struct {
 	NetworkPolicy *NetworkPolicy `protobuf:"bytes,19,opt,name=network_policy,json=networkPolicy,proto3" json:"network_policy,omitempty"`
 	// Configuration for cluster IP allocation.
 	IpAllocationPolicy *IPAllocationPolicy `protobuf:"bytes,20,opt,name=ip_allocation_policy,json=ipAllocationPolicy,proto3" json:"ip_allocation_policy,omitempty"`
-	// The configuration options for master authorized networks feature.
-	MasterAuthorizedNetworksConfig *MasterAuthorizedNetworksConfig `protobuf:"bytes,22,opt,name=master_authorized_networks_config,json=masterAuthorizedNetworksConfig,proto3" json:"master_authorized_networks_config,omitempty"`
+	// The configuration options for main authorized networks feature.
+	MainAuthorizedNetworksConfig *MainAuthorizedNetworksConfig `protobuf:"bytes,22,opt,name=main_authorized_networks_config,json=mainAuthorizedNetworksConfig,proto3" json:"main_authorized_networks_config,omitempty"`
 	// Configure the maintenance policy for this cluster.
 	MaintenancePolicy *MaintenancePolicy `protobuf:"bytes,23,opt,name=maintenance_policy,json=maintenancePolicy,proto3" json:"maintenance_policy,omitempty"`
 	// Configuration for the PodSecurityPolicy feature.
@@ -1488,20 +1488,20 @@ type Cluster struct {
 	// resides.
 	// This field is deprecated, use location instead.
 	Zone string `protobuf:"bytes,101,opt,name=zone,proto3" json:"zone,omitempty"`
-	// [Output only] The IP address of this cluster's master endpoint.
+	// [Output only] The IP address of this cluster's main endpoint.
 	// The endpoint can be accessed from the internet at
 	// `https://username:password@endpoint/`.
 	//
-	// See the `masterAuth` property of this resource for username and
+	// See the `mainAuth` property of this resource for username and
 	// password information.
 	Endpoint string `protobuf:"bytes,102,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
 	// The initial Kubernetes version for this cluster.  Valid versions are those
-	// found in validMasterVersions returned by getServerConfig.  The version can
+	// found in validMainVersions returned by getServerConfig.  The version can
 	// be upgraded over time; such upgrades are reflected in
-	// currentMasterVersion and currentNodeVersion.
+	// currentMainVersion and currentNodeVersion.
 	InitialClusterVersion string `protobuf:"bytes,103,opt,name=initial_cluster_version,json=initialClusterVersion,proto3" json:"initial_cluster_version,omitempty"`
-	// [Output only] The current software version of the master endpoint.
-	CurrentMasterVersion string `protobuf:"bytes,104,opt,name=current_master_version,json=currentMasterVersion,proto3" json:"current_master_version,omitempty"`
+	// [Output only] The current software version of the main endpoint.
+	CurrentMainVersion string `protobuf:"bytes,104,opt,name=current_main_version,json=currentMainVersion,proto3" json:"current_main_version,omitempty"`
 	// [Output only] The current version of the node software components.
 	// If they are currently at multiple versions because they're in the process
 	// of being upgraded, this reflects the minimum version of all nodes.
@@ -1595,9 +1595,9 @@ func (m *Cluster) GetNodeConfig() *NodeConfig {
 	return nil
 }
 
-func (m *Cluster) GetMasterAuth() *MasterAuth {
+func (m *Cluster) GetMainAuth() *MainAuth {
 	if m != nil {
-		return m.MasterAuth
+		return m.MainAuth
 	}
 	return nil
 }
@@ -1679,9 +1679,9 @@ func (m *Cluster) GetIpAllocationPolicy() *IPAllocationPolicy {
 	return nil
 }
 
-func (m *Cluster) GetMasterAuthorizedNetworksConfig() *MasterAuthorizedNetworksConfig {
+func (m *Cluster) GetMainAuthorizedNetworksConfig() *MainAuthorizedNetworksConfig {
 	if m != nil {
-		return m.MasterAuthorizedNetworksConfig
+		return m.MainAuthorizedNetworksConfig
 	}
 	return nil
 }
@@ -1728,9 +1728,9 @@ func (m *Cluster) GetInitialClusterVersion() string {
 	return ""
 }
 
-func (m *Cluster) GetCurrentMasterVersion() string {
+func (m *Cluster) GetCurrentMainVersion() string {
 	if m != nil {
-		return m.CurrentMasterVersion
+		return m.CurrentMainVersion
 	}
 	return ""
 }
@@ -1842,14 +1842,14 @@ type ClusterUpdate struct {
 	//
 	// This list must always include the cluster's primary zone.
 	DesiredLocations []string `protobuf:"bytes,10,rep,name=desired_locations,json=desiredLocations,proto3" json:"desired_locations,omitempty"`
-	// The desired configuration options for master authorized networks feature.
-	DesiredMasterAuthorizedNetworksConfig *MasterAuthorizedNetworksConfig `protobuf:"bytes,12,opt,name=desired_master_authorized_networks_config,json=desiredMasterAuthorizedNetworksConfig,proto3" json:"desired_master_authorized_networks_config,omitempty"`
+	// The desired configuration options for main authorized networks feature.
+	DesiredMainAuthorizedNetworksConfig *MainAuthorizedNetworksConfig `protobuf:"bytes,12,opt,name=desired_main_authorized_networks_config,json=desiredMainAuthorizedNetworksConfig,proto3" json:"desired_main_authorized_networks_config,omitempty"`
 	// The desired configuration options for the PodSecurityPolicy feature.
 	DesiredPodSecurityPolicyConfig *PodSecurityPolicyConfig `protobuf:"bytes,14,opt,name=desired_pod_security_policy_config,json=desiredPodSecurityPolicyConfig,proto3" json:"desired_pod_security_policy_config,omitempty"`
-	// The Kubernetes version to change the master to. The only valid value is the
+	// The Kubernetes version to change the main to. The only valid value is the
 	// latest supported version. Use "-" to have the server automatically select
 	// the latest version.
-	DesiredMasterVersion string   `protobuf:"bytes,100,opt,name=desired_master_version,json=desiredMasterVersion,proto3" json:"desired_master_version,omitempty"`
+	DesiredMainVersion string   `protobuf:"bytes,100,opt,name=desired_main_version,json=desiredMainVersion,proto3" json:"desired_main_version,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -1928,9 +1928,9 @@ func (m *ClusterUpdate) GetDesiredLocations() []string {
 	return nil
 }
 
-func (m *ClusterUpdate) GetDesiredMasterAuthorizedNetworksConfig() *MasterAuthorizedNetworksConfig {
+func (m *ClusterUpdate) GetDesiredMainAuthorizedNetworksConfig() *MainAuthorizedNetworksConfig {
 	if m != nil {
-		return m.DesiredMasterAuthorizedNetworksConfig
+		return m.DesiredMainAuthorizedNetworksConfig
 	}
 	return nil
 }
@@ -1942,9 +1942,9 @@ func (m *ClusterUpdate) GetDesiredPodSecurityPolicyConfig() *PodSecurityPolicyCo
 	return nil
 }
 
-func (m *ClusterUpdate) GetDesiredMasterVersion() string {
+func (m *ClusterUpdate) GetDesiredMainVersion() string {
 	if m != nil {
-		return m.DesiredMasterVersion
+		return m.DesiredMainVersion
 	}
 	return ""
 }
@@ -2863,8 +2863,8 @@ func (m *SetLocationsRequest) GetName() string {
 	return ""
 }
 
-// UpdateMasterRequest updates the master of the cluster.
-type UpdateMasterRequest struct {
+// UpdateMainRequest updates the main of the cluster.
+type UpdateMainRequest struct {
 	// The Google Developers Console [project ID or project
 	// number](https://support.google.com/cloud/answer/6158840).
 	ProjectId string `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
@@ -2876,10 +2876,10 @@ type UpdateMasterRequest struct {
 	// The name of the cluster to upgrade.
 	// This field is deprecated, use name instead.
 	ClusterId string `protobuf:"bytes,3,opt,name=cluster_id,json=clusterId,proto3" json:"cluster_id,omitempty"`
-	// The Kubernetes version to change the master to. The only valid value is the
+	// The Kubernetes version to change the main to. The only valid value is the
 	// latest supported version. Use "-" to have the server automatically select
 	// the latest version.
-	MasterVersion string `protobuf:"bytes,4,opt,name=master_version,json=masterVersion,proto3" json:"master_version,omitempty"`
+	MainVersion string `protobuf:"bytes,4,opt,name=main_version,json=mainVersion,proto3" json:"main_version,omitempty"`
 	// The name (project, location, cluster) of the cluster to update.
 	// Specified in the format 'projects/*/locations/*/clusters/*'.
 	Name                 string   `protobuf:"bytes,7,opt,name=name,proto3" json:"name,omitempty"`
@@ -2888,67 +2888,67 @@ type UpdateMasterRequest struct {
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *UpdateMasterRequest) Reset()         { *m = UpdateMasterRequest{} }
-func (m *UpdateMasterRequest) String() string { return proto.CompactTextString(m) }
-func (*UpdateMasterRequest) ProtoMessage()    {}
-func (*UpdateMasterRequest) Descriptor() ([]byte, []int) {
+func (m *UpdateMainRequest) Reset()         { *m = UpdateMainRequest{} }
+func (m *UpdateMainRequest) String() string { return proto.CompactTextString(m) }
+func (*UpdateMainRequest) ProtoMessage()    {}
+func (*UpdateMainRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_339d8120448ec82b, []int{25}
 }
-func (m *UpdateMasterRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UpdateMasterRequest.Unmarshal(m, b)
+func (m *UpdateMainRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UpdateMainRequest.Unmarshal(m, b)
 }
-func (m *UpdateMasterRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UpdateMasterRequest.Marshal(b, m, deterministic)
+func (m *UpdateMainRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UpdateMainRequest.Marshal(b, m, deterministic)
 }
-func (m *UpdateMasterRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpdateMasterRequest.Merge(m, src)
+func (m *UpdateMainRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpdateMainRequest.Merge(m, src)
 }
-func (m *UpdateMasterRequest) XXX_Size() int {
-	return xxx_messageInfo_UpdateMasterRequest.Size(m)
+func (m *UpdateMainRequest) XXX_Size() int {
+	return xxx_messageInfo_UpdateMainRequest.Size(m)
 }
-func (m *UpdateMasterRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpdateMasterRequest.DiscardUnknown(m)
+func (m *UpdateMainRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpdateMainRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_UpdateMasterRequest proto.InternalMessageInfo
+var xxx_messageInfo_UpdateMainRequest proto.InternalMessageInfo
 
-func (m *UpdateMasterRequest) GetProjectId() string {
+func (m *UpdateMainRequest) GetProjectId() string {
 	if m != nil {
 		return m.ProjectId
 	}
 	return ""
 }
 
-func (m *UpdateMasterRequest) GetZone() string {
+func (m *UpdateMainRequest) GetZone() string {
 	if m != nil {
 		return m.Zone
 	}
 	return ""
 }
 
-func (m *UpdateMasterRequest) GetClusterId() string {
+func (m *UpdateMainRequest) GetClusterId() string {
 	if m != nil {
 		return m.ClusterId
 	}
 	return ""
 }
 
-func (m *UpdateMasterRequest) GetMasterVersion() string {
+func (m *UpdateMainRequest) GetMainVersion() string {
 	if m != nil {
-		return m.MasterVersion
+		return m.MainVersion
 	}
 	return ""
 }
 
-func (m *UpdateMasterRequest) GetName() string {
+func (m *UpdateMainRequest) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
 }
 
-// SetMasterAuthRequest updates the admin password of a cluster.
-type SetMasterAuthRequest struct {
+// SetMainAuthRequest updates the admin password of a cluster.
+type SetMainAuthRequest struct {
 	// The Google Developers Console [project ID or project
 	// number](https://support.google.com/cloud/answer/6158840).
 	// This field is deprecated, use name instead.
@@ -2961,10 +2961,10 @@ type SetMasterAuthRequest struct {
 	// The name of the cluster to upgrade.
 	// This field is deprecated, use name instead.
 	ClusterId string `protobuf:"bytes,3,opt,name=cluster_id,json=clusterId,proto3" json:"cluster_id,omitempty"`
-	// The exact form of action to be taken on the master auth.
-	Action SetMasterAuthRequest_Action `protobuf:"varint,4,opt,name=action,proto3,enum=google.container.v1alpha1.SetMasterAuthRequest_Action" json:"action,omitempty"`
+	// The exact form of action to be taken on the main auth.
+	Action SetMainAuthRequest_Action `protobuf:"varint,4,opt,name=action,proto3,enum=google.container.v1alpha1.SetMainAuthRequest_Action" json:"action,omitempty"`
 	// A description of the update.
-	Update *MasterAuth `protobuf:"bytes,5,opt,name=update,proto3" json:"update,omitempty"`
+	Update *MainAuth `protobuf:"bytes,5,opt,name=update,proto3" json:"update,omitempty"`
 	// The name (project, location, cluster) of the cluster to set auth.
 	// Specified in the format 'projects/*/locations/*/clusters/*'.
 	Name                 string   `protobuf:"bytes,7,opt,name=name,proto3" json:"name,omitempty"`
@@ -2973,66 +2973,66 @@ type SetMasterAuthRequest struct {
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *SetMasterAuthRequest) Reset()         { *m = SetMasterAuthRequest{} }
-func (m *SetMasterAuthRequest) String() string { return proto.CompactTextString(m) }
-func (*SetMasterAuthRequest) ProtoMessage()    {}
-func (*SetMasterAuthRequest) Descriptor() ([]byte, []int) {
+func (m *SetMainAuthRequest) Reset()         { *m = SetMainAuthRequest{} }
+func (m *SetMainAuthRequest) String() string { return proto.CompactTextString(m) }
+func (*SetMainAuthRequest) ProtoMessage()    {}
+func (*SetMainAuthRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_339d8120448ec82b, []int{26}
 }
-func (m *SetMasterAuthRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_SetMasterAuthRequest.Unmarshal(m, b)
+func (m *SetMainAuthRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SetMainAuthRequest.Unmarshal(m, b)
 }
-func (m *SetMasterAuthRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_SetMasterAuthRequest.Marshal(b, m, deterministic)
+func (m *SetMainAuthRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SetMainAuthRequest.Marshal(b, m, deterministic)
 }
-func (m *SetMasterAuthRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SetMasterAuthRequest.Merge(m, src)
+func (m *SetMainAuthRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SetMainAuthRequest.Merge(m, src)
 }
-func (m *SetMasterAuthRequest) XXX_Size() int {
-	return xxx_messageInfo_SetMasterAuthRequest.Size(m)
+func (m *SetMainAuthRequest) XXX_Size() int {
+	return xxx_messageInfo_SetMainAuthRequest.Size(m)
 }
-func (m *SetMasterAuthRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_SetMasterAuthRequest.DiscardUnknown(m)
+func (m *SetMainAuthRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_SetMainAuthRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_SetMasterAuthRequest proto.InternalMessageInfo
+var xxx_messageInfo_SetMainAuthRequest proto.InternalMessageInfo
 
-func (m *SetMasterAuthRequest) GetProjectId() string {
+func (m *SetMainAuthRequest) GetProjectId() string {
 	if m != nil {
 		return m.ProjectId
 	}
 	return ""
 }
 
-func (m *SetMasterAuthRequest) GetZone() string {
+func (m *SetMainAuthRequest) GetZone() string {
 	if m != nil {
 		return m.Zone
 	}
 	return ""
 }
 
-func (m *SetMasterAuthRequest) GetClusterId() string {
+func (m *SetMainAuthRequest) GetClusterId() string {
 	if m != nil {
 		return m.ClusterId
 	}
 	return ""
 }
 
-func (m *SetMasterAuthRequest) GetAction() SetMasterAuthRequest_Action {
+func (m *SetMainAuthRequest) GetAction() SetMainAuthRequest_Action {
 	if m != nil {
 		return m.Action
 	}
-	return SetMasterAuthRequest_UNKNOWN
+	return SetMainAuthRequest_UNKNOWN
 }
 
-func (m *SetMasterAuthRequest) GetUpdate() *MasterAuth {
+func (m *SetMainAuthRequest) GetUpdate() *MainAuth {
 	if m != nil {
 		return m.Update
 	}
 	return nil
 }
 
-func (m *SetMasterAuthRequest) GetName() string {
+func (m *SetMainAuthRequest) GetName() string {
 	if m != nil {
 		return m.Name
 	}
@@ -3563,8 +3563,8 @@ type ServerConfig struct {
 	DefaultImageType string `protobuf:"bytes,4,opt,name=default_image_type,json=defaultImageType,proto3" json:"default_image_type,omitempty"`
 	// List of valid image types.
 	ValidImageTypes []string `protobuf:"bytes,5,rep,name=valid_image_types,json=validImageTypes,proto3" json:"valid_image_types,omitempty"`
-	// List of valid master versions.
-	ValidMasterVersions  []string `protobuf:"bytes,6,rep,name=valid_master_versions,json=validMasterVersions,proto3" json:"valid_master_versions,omitempty"`
+	// List of valid main versions.
+	ValidMainVersions  []string `protobuf:"bytes,6,rep,name=valid_main_versions,json=validMainVersions,proto3" json:"valid_main_versions,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -3622,9 +3622,9 @@ func (m *ServerConfig) GetValidImageTypes() []string {
 	return nil
 }
 
-func (m *ServerConfig) GetValidMasterVersions() []string {
+func (m *ServerConfig) GetValidMainVersions() []string {
 	if m != nil {
-		return m.ValidMasterVersions
+		return m.ValidMainVersions
 	}
 	return nil
 }
@@ -3956,7 +3956,7 @@ func (m *GetNodePoolRequest) GetName() string {
 
 // NodePool contains the name and configuration for a cluster's node pool.
 // Node pools are a set of nodes (i.e. VM's), with a common configuration and
-// specification, under the control of the cluster master. They may have a set
+// specification, under the control of the cluster main. They may have a set
 // of Kubernetes labels applied to them, which may be used to reference them
 // during pod scheduling. They may also be resized up or down, to accommodate
 // the workload.
@@ -5041,7 +5041,7 @@ func (m *StartIPRotationRequest) GetName() string {
 	return ""
 }
 
-// CompleteIPRotationRequest moves the cluster master back into single-IP mode.
+// CompleteIPRotationRequest moves the cluster main back into single-IP mode.
 type CompleteIPRotationRequest struct {
 	// The Google Developers Console [project ID or project
 	// number](https://developers.google.com/console/help/new/#projectnumber).
@@ -5336,15 +5336,15 @@ func init() {
 	proto.RegisterMapType((map[string]string)(nil), "google.container.v1alpha1.NodeConfig.LabelsEntry")
 	proto.RegisterMapType((map[string]string)(nil), "google.container.v1alpha1.NodeConfig.MetadataEntry")
 	proto.RegisterType((*NodeTaint)(nil), "google.container.v1alpha1.NodeTaint")
-	proto.RegisterType((*MasterAuth)(nil), "google.container.v1alpha1.MasterAuth")
+	proto.RegisterType((*MainAuth)(nil), "google.container.v1alpha1.MainAuth")
 	proto.RegisterType((*ClientCertificateConfig)(nil), "google.container.v1alpha1.ClientCertificateConfig")
 	proto.RegisterType((*AddonsConfig)(nil), "google.container.v1alpha1.AddonsConfig")
 	proto.RegisterType((*HttpLoadBalancing)(nil), "google.container.v1alpha1.HttpLoadBalancing")
 	proto.RegisterType((*HorizontalPodAutoscaling)(nil), "google.container.v1alpha1.HorizontalPodAutoscaling")
 	proto.RegisterType((*KubernetesDashboard)(nil), "google.container.v1alpha1.KubernetesDashboard")
 	proto.RegisterType((*NetworkPolicyConfig)(nil), "google.container.v1alpha1.NetworkPolicyConfig")
-	proto.RegisterType((*MasterAuthorizedNetworksConfig)(nil), "google.container.v1alpha1.MasterAuthorizedNetworksConfig")
-	proto.RegisterType((*MasterAuthorizedNetworksConfig_CidrBlock)(nil), "google.container.v1alpha1.MasterAuthorizedNetworksConfig.CidrBlock")
+	proto.RegisterType((*MainAuthorizedNetworksConfig)(nil), "google.container.v1alpha1.MainAuthorizedNetworksConfig")
+	proto.RegisterType((*MainAuthorizedNetworksConfig_CidrBlock)(nil), "google.container.v1alpha1.MainAuthorizedNetworksConfig.CidrBlock")
 	proto.RegisterType((*NetworkPolicy)(nil), "google.container.v1alpha1.NetworkPolicy")
 	proto.RegisterType((*IPAllocationPolicy)(nil), "google.container.v1alpha1.IPAllocationPolicy")
 	proto.RegisterType((*PodSecurityPolicyConfig)(nil), "google.container.v1alpha1.PodSecurityPolicyConfig")
@@ -5360,8 +5360,8 @@ func init() {
 	proto.RegisterType((*SetMonitoringServiceRequest)(nil), "google.container.v1alpha1.SetMonitoringServiceRequest")
 	proto.RegisterType((*SetAddonsConfigRequest)(nil), "google.container.v1alpha1.SetAddonsConfigRequest")
 	proto.RegisterType((*SetLocationsRequest)(nil), "google.container.v1alpha1.SetLocationsRequest")
-	proto.RegisterType((*UpdateMasterRequest)(nil), "google.container.v1alpha1.UpdateMasterRequest")
-	proto.RegisterType((*SetMasterAuthRequest)(nil), "google.container.v1alpha1.SetMasterAuthRequest")
+	proto.RegisterType((*UpdateMainRequest)(nil), "google.container.v1alpha1.UpdateMainRequest")
+	proto.RegisterType((*SetMainAuthRequest)(nil), "google.container.v1alpha1.SetMainAuthRequest")
 	proto.RegisterType((*DeleteClusterRequest)(nil), "google.container.v1alpha1.DeleteClusterRequest")
 	proto.RegisterType((*ListClustersRequest)(nil), "google.container.v1alpha1.ListClustersRequest")
 	proto.RegisterType((*ListClustersResponse)(nil), "google.container.v1alpha1.ListClustersResponse")
@@ -5399,7 +5399,7 @@ func init() {
 	proto.RegisterEnum("google.container.v1alpha1.Cluster_Status", Cluster_Status_name, Cluster_Status_value)
 	proto.RegisterEnum("google.container.v1alpha1.Operation_Status", Operation_Status_name, Operation_Status_value)
 	proto.RegisterEnum("google.container.v1alpha1.Operation_Type", Operation_Type_name, Operation_Type_value)
-	proto.RegisterEnum("google.container.v1alpha1.SetMasterAuthRequest_Action", SetMasterAuthRequest_Action_name, SetMasterAuthRequest_Action_value)
+	proto.RegisterEnum("google.container.v1alpha1.SetMainAuthRequest_Action", SetMainAuthRequest_Action_name, SetMainAuthRequest_Action_value)
 	proto.RegisterEnum("google.container.v1alpha1.NodePool_Status", NodePool_Status_name, NodePool_Status_value)
 }
 
@@ -5448,13 +5448,13 @@ type ClusterManagerClient interface {
 	SetAddonsConfig(ctx context.Context, in *SetAddonsConfigRequest, opts ...grpc.CallOption) (*Operation, error)
 	// Sets the locations of a specific cluster.
 	SetLocations(ctx context.Context, in *SetLocationsRequest, opts ...grpc.CallOption) (*Operation, error)
-	// Updates the master of a specific cluster.
-	UpdateMaster(ctx context.Context, in *UpdateMasterRequest, opts ...grpc.CallOption) (*Operation, error)
-	// Used to set master auth materials. Currently supports :-
+	// Updates the main of a specific cluster.
+	UpdateMain(ctx context.Context, in *UpdateMainRequest, opts ...grpc.CallOption) (*Operation, error)
+	// Used to set main auth materials. Currently supports :-
 	// Changing the admin password of a specific cluster.
 	// This can be either via password generation or explicitly set.
 	// Modify basic_auth.csv and reset the K8S API server.
-	SetMasterAuth(ctx context.Context, in *SetMasterAuthRequest, opts ...grpc.CallOption) (*Operation, error)
+	SetMainAuth(ctx context.Context, in *SetMainAuthRequest, opts ...grpc.CallOption) (*Operation, error)
 	// Deletes the cluster, including the Kubernetes endpoint and all worker
 	// nodes.
 	//
@@ -5490,9 +5490,9 @@ type ClusterManagerClient interface {
 	SetLabels(ctx context.Context, in *SetLabelsRequest, opts ...grpc.CallOption) (*Operation, error)
 	// Enables or disables the ABAC authorization mechanism on a cluster.
 	SetLegacyAbac(ctx context.Context, in *SetLegacyAbacRequest, opts ...grpc.CallOption) (*Operation, error)
-	// Start master IP rotation.
+	// Start main IP rotation.
 	StartIPRotation(ctx context.Context, in *StartIPRotationRequest, opts ...grpc.CallOption) (*Operation, error)
-	// Completes master IP rotation.
+	// Completes main IP rotation.
 	CompleteIPRotation(ctx context.Context, in *CompleteIPRotationRequest, opts ...grpc.CallOption) (*Operation, error)
 	// Sets the size of a specific node pool.
 	SetNodePoolSize(ctx context.Context, in *SetNodePoolSizeRequest, opts ...grpc.CallOption) (*Operation, error)
@@ -5600,18 +5600,18 @@ func (c *clusterManagerClient) SetLocations(ctx context.Context, in *SetLocation
 	return out, nil
 }
 
-func (c *clusterManagerClient) UpdateMaster(ctx context.Context, in *UpdateMasterRequest, opts ...grpc.CallOption) (*Operation, error) {
+func (c *clusterManagerClient) UpdateMain(ctx context.Context, in *UpdateMainRequest, opts ...grpc.CallOption) (*Operation, error) {
 	out := new(Operation)
-	err := c.cc.Invoke(ctx, "/google.container.v1alpha1.ClusterManager/UpdateMaster", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/google.container.v1alpha1.ClusterManager/UpdateMain", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *clusterManagerClient) SetMasterAuth(ctx context.Context, in *SetMasterAuthRequest, opts ...grpc.CallOption) (*Operation, error) {
+func (c *clusterManagerClient) SetMainAuth(ctx context.Context, in *SetMainAuthRequest, opts ...grpc.CallOption) (*Operation, error) {
 	out := new(Operation)
-	err := c.cc.Invoke(ctx, "/google.container.v1alpha1.ClusterManager/SetMasterAuth", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/google.container.v1alpha1.ClusterManager/SetMainAuth", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -5815,13 +5815,13 @@ type ClusterManagerServer interface {
 	SetAddonsConfig(context.Context, *SetAddonsConfigRequest) (*Operation, error)
 	// Sets the locations of a specific cluster.
 	SetLocations(context.Context, *SetLocationsRequest) (*Operation, error)
-	// Updates the master of a specific cluster.
-	UpdateMaster(context.Context, *UpdateMasterRequest) (*Operation, error)
-	// Used to set master auth materials. Currently supports :-
+	// Updates the main of a specific cluster.
+	UpdateMain(context.Context, *UpdateMainRequest) (*Operation, error)
+	// Used to set main auth materials. Currently supports :-
 	// Changing the admin password of a specific cluster.
 	// This can be either via password generation or explicitly set.
 	// Modify basic_auth.csv and reset the K8S API server.
-	SetMasterAuth(context.Context, *SetMasterAuthRequest) (*Operation, error)
+	SetMainAuth(context.Context, *SetMainAuthRequest) (*Operation, error)
 	// Deletes the cluster, including the Kubernetes endpoint and all worker
 	// nodes.
 	//
@@ -5857,9 +5857,9 @@ type ClusterManagerServer interface {
 	SetLabels(context.Context, *SetLabelsRequest) (*Operation, error)
 	// Enables or disables the ABAC authorization mechanism on a cluster.
 	SetLegacyAbac(context.Context, *SetLegacyAbacRequest) (*Operation, error)
-	// Start master IP rotation.
+	// Start main IP rotation.
 	StartIPRotation(context.Context, *StartIPRotationRequest) (*Operation, error)
-	// Completes master IP rotation.
+	// Completes main IP rotation.
 	CompleteIPRotation(context.Context, *CompleteIPRotationRequest) (*Operation, error)
 	// Sets the size of a specific node pool.
 	SetNodePoolSize(context.Context, *SetNodePoolSizeRequest) (*Operation, error)
@@ -6053,38 +6053,38 @@ func _ClusterManager_SetLocations_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ClusterManager_UpdateMaster_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateMasterRequest)
+func _ClusterManager_UpdateMain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMainRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ClusterManagerServer).UpdateMaster(ctx, in)
+		return srv.(ClusterManagerServer).UpdateMain(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/google.container.v1alpha1.ClusterManager/UpdateMaster",
+		FullMethod: "/google.container.v1alpha1.ClusterManager/UpdateMain",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ClusterManagerServer).UpdateMaster(ctx, req.(*UpdateMasterRequest))
+		return srv.(ClusterManagerServer).UpdateMain(ctx, req.(*UpdateMainRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ClusterManager_SetMasterAuth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SetMasterAuthRequest)
+func _ClusterManager_SetMainAuth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetMainAuthRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ClusterManagerServer).SetMasterAuth(ctx, in)
+		return srv.(ClusterManagerServer).SetMainAuth(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/google.container.v1alpha1.ClusterManager/SetMasterAuth",
+		FullMethod: "/google.container.v1alpha1.ClusterManager/SetMainAuth",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ClusterManagerServer).SetMasterAuth(ctx, req.(*SetMasterAuthRequest))
+		return srv.(ClusterManagerServer).SetMainAuth(ctx, req.(*SetMainAuthRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -6458,12 +6458,12 @@ var _ClusterManager_serviceDesc = grpc.ServiceDesc{
 			Handler:    _ClusterManager_SetLocations_Handler,
 		},
 		{
-			MethodName: "UpdateMaster",
-			Handler:    _ClusterManager_UpdateMaster_Handler,
+			MethodName: "UpdateMain",
+			Handler:    _ClusterManager_UpdateMain_Handler,
 		},
 		{
-			MethodName: "SetMasterAuth",
-			Handler:    _ClusterManager_SetMasterAuth_Handler,
+			MethodName: "SetMainAuth",
+			Handler:    _ClusterManager_SetMainAuth_Handler,
 		},
 		{
 			MethodName: "DeleteCluster",

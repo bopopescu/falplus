@@ -24,7 +24,7 @@ type LinkAttrs struct {
 	HardwareAddr net.HardwareAddr
 	Flags        net.Flags
 	ParentIndex  int         // index of the parent link device
-	MasterIndex  int         // must be the index of a bridge
+	MainIndex  int         // must be the index of a bridge
 	Namespace    interface{} // nil | NsPid | NsFd
 }
 
@@ -220,4 +220,4 @@ func (ipvlan *IPVlan) Type() string {
 // vlan | veth | vcan | dummy | ifb | macvlan | macvtap |
 // bridge | bond | ipoib | ip6tnl | ipip | sit | vxlan |
 // gre | gretap | ip6gre | ip6gretap | vti | nlmon |
-// bond_slave | ipvlan
+// bond_subordinate | ipvlan

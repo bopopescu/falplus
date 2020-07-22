@@ -921,7 +921,7 @@ func (m *Call_AttachContainerOutput) GetContainerID() mesos.ContainerID {
 //
 // A standalone container is launched by specifying a ContainerID
 // with no parent. Standalone containers bypass the normal offer cycle
-// between the master and agent. Unlike other containers, a standalone
+// between the main and agent. Unlike other containers, a standalone
 // container does not have an executor or any tasks. This means the
 // standalone container does not report back to Mesos or any framework
 // and must be supervised separately.
@@ -944,12 +944,12 @@ type Call_LaunchContainer struct {
 	// share resources with its parent container.
 	//
 	// TODO(josephw): These resources are purely used for isolation
-	// and are not accounted for by the Mesos master (if connected).
+	// and are not accounted for by the Mesos main (if connected).
 	// It is the caller's responsibility to ensure that resources are
 	// not overcommitted (e.g. CPU and memory) or conflicting (e.g. ports
 	// and volumes). Once there is support for preempting tasks and a
 	// way to update the resources advertised by the agent, these standalone
-	// container resources should be accounted for by the master.
+	// container resources should be accounted for by the main.
 	Resources []mesos.Resource     `protobuf:"bytes,3,rep,name=resources" json:"resources"`
 	Container *mesos.ContainerInfo `protobuf:"bytes,4,opt,name=container" json:"container,omitempty"`
 }

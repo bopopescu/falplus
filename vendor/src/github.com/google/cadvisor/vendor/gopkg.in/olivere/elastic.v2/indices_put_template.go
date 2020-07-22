@@ -21,7 +21,7 @@ type IndicesPutTemplateService struct {
 	order         interface{}
 	create        *bool
 	timeout       string
-	masterTimeout string
+	mainTimeout string
 	flatSettings  *bool
 	bodyJson      interface{}
 	bodyString    string
@@ -46,9 +46,9 @@ func (s *IndicesPutTemplateService) Timeout(timeout string) *IndicesPutTemplateS
 	return s
 }
 
-// MasterTimeout specifies the timeout for connection to master.
-func (s *IndicesPutTemplateService) MasterTimeout(masterTimeout string) *IndicesPutTemplateService {
-	s.masterTimeout = masterTimeout
+// MainTimeout specifies the timeout for connection to main.
+func (s *IndicesPutTemplateService) MainTimeout(mainTimeout string) *IndicesPutTemplateService {
+	s.mainTimeout = mainTimeout
 	return s
 }
 
@@ -114,8 +114,8 @@ func (s *IndicesPutTemplateService) buildURL() (string, url.Values, error) {
 	if s.timeout != "" {
 		params.Set("timeout", s.timeout)
 	}
-	if s.masterTimeout != "" {
-		params.Set("master_timeout", s.masterTimeout)
+	if s.mainTimeout != "" {
+		params.Set("main_timeout", s.mainTimeout)
 	}
 	if s.flatSettings != nil {
 		params.Set("flat_settings", fmt.Sprintf("%v", *s.flatSettings))

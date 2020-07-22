@@ -249,9 +249,9 @@ type ClusterStatsNodes struct {
 
 type ClusterStatsNodesCounts struct {
 	Total      int `json:"total"`
-	MasterOnly int `json:"master_only"`
+	MainOnly int `json:"main_only"`
 	DataOnly   int `json:"data_only"`
-	MasterData int `json:"master_data"`
+	MainData int `json:"main_data"`
 	Client     int `json:"client"`
 }
 

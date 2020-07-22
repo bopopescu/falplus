@@ -88,7 +88,7 @@ func (s *IndicesGetSettingsService) FlatSettings(flatSettings bool) *IndicesGetS
 }
 
 // Local indicates whether to return local information, do not retrieve
-// the state from master node (default: false).
+// the state from main node (default: false).
 func (s *IndicesGetSettingsService) Local(local bool) *IndicesGetSettingsService {
 	s.local = &local
 	return s

@@ -678,7 +678,7 @@ func pivotRoot(rootfs string) error {
 		return err
 	}
 
-	// Make oldroot rslave to make sure our unmounts don't propagate to the
+	// Make oldroot rsubordinate to make sure our unmounts don't propagate to the
 	// host (and thus bork the machine). We don't use rprivate because this is
 	// known to cause issues due to races where we still have a reference to a
 	// mount while a process in the host namespace are trying to operate on

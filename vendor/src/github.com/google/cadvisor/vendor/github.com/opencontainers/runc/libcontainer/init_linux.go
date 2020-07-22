@@ -160,21 +160,21 @@ func finalizeNamespace(config *initConfig) error {
 }
 
 // setupConsole sets up the console from inside the container, and sends the
-// master pty fd to the config.Pipe (using cmsg). This is done to ensure that
+// main pty fd to the config.Pipe (using cmsg). This is done to ensure that
 // consoles are scoped to a container properly (see runc#814 and the many
 // issues related to that). This has to be run *after* we've pivoted to the new
 // rootfs (and the users' configuration is entirely set up).
 func setupConsole(socket *os.File, config *initConfig, mount bool) error {
 	defer socket.Close()
 	// At this point, /dev/ptmx points to something that we would expect. We
-	// used to change the owner of the slave path, but since the /dev/pts mount
+	// used to change the owner of the subordinate path, but since the /dev/pts mount
 	// can have gid=X set (at the users' option). So touching the owner of the
-	// slave PTY is not necessary, as the kernel will handle that for us. Note
+	// subordinate PTY is not necessary, as the kernel will handle that for us. Note
 	// however, that setupUser (specifically fixStdioPermissions) *will* change
 	// the UID owner of the console to be the user the process will run as (so
 	// they can actually control their console).
 
-	pty, slavePath, err := console.NewPty()
+	pty, subordinatePath, err := console.NewPty()
 	if err != nil {
 		return err
 	}
@@ -195,16 +195,16 @@ func setupConsole(socket *os.File, config *initConfig, mount bool) error {
 
 	// Mount the console inside our rootfs.
 	if mount {
-		if err := mountConsole(slavePath); err != nil {
+		if err := mountConsole(subordinatePath); err != nil {
 			return err
 		}
 	}
-	// While we can access console.master, using the API is a good idea.
+	// While we can access console.main, using the API is a good idea.
 	if err := utils.SendFd(socket, pty.Name(), pty.Fd()); err != nil {
 		return err
 	}
 	// Now, dup over all the things.
-	return dupStdio(slavePath)
+	return dupStdio(subordinatePath)
 }
 
 // syncParentReady sends to the given pipe a JSON payload which indicates that

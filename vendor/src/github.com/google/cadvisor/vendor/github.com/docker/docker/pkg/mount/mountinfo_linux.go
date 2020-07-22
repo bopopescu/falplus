@@ -17,7 +17,7 @@ func parseInfoFile(r io.Reader, filter FilterFunc) ([]*Info, error) {
 			return nil, err
 		}
 		/*
-		   36 35 98:0 /mnt1 /mnt2 rw,noatime master:1 - ext3 /dev/root rw,errors=continue
+		   36 35 98:0 /mnt1 /mnt2 rw,noatime main:1 - ext3 /dev/root rw,errors=continue
 		   (1)(2)(3)   (4)   (5)      (6)      (7)   (8) (9)   (10)         (11)
 
 		   (1) mount ID:  unique identifier of the mount (may be reused after umount)

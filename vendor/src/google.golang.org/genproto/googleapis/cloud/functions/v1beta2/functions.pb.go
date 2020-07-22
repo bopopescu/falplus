@@ -506,7 +506,7 @@ type SourceRepository struct {
 	// "/" if the function is defined directly in the root directory of a
 	// repository.
 	SourcePath string `protobuf:"bytes,2,opt,name=source_path,json=sourcePath,proto3" json:"source_path,omitempty"`
-	// The version of a function. Defaults to the latest version of the master
+	// The version of a function. Defaults to the latest version of the main
 	// branch.
 	//
 	// Types that are valid to be assigned to Version:

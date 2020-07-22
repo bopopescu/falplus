@@ -29,7 +29,7 @@ type DeleteMappingService struct {
 	pretty        bool
 	index         []string
 	typ           []string
-	masterTimeout string
+	mainTimeout string
 }
 
 // NewDeleteMappingService creates a new DeleteMappingService.
@@ -54,9 +54,9 @@ func (s *DeleteMappingService) Type(typ ...string) *DeleteMappingService {
 	return s
 }
 
-// MasterTimeout specifies the timeout for connecting to master.
-func (s *DeleteMappingService) MasterTimeout(masterTimeout string) *DeleteMappingService {
-	s.masterTimeout = masterTimeout
+// MainTimeout specifies the timeout for connecting to main.
+func (s *DeleteMappingService) MainTimeout(mainTimeout string) *DeleteMappingService {
+	s.mainTimeout = mainTimeout
 	return s
 }
 
@@ -82,8 +82,8 @@ func (s *DeleteMappingService) buildURL() (string, url.Values, error) {
 	if s.pretty {
 		params.Set("pretty", "1")
 	}
-	if s.masterTimeout != "" {
-		params.Set("master_timeout", s.masterTimeout)
+	if s.mainTimeout != "" {
+		params.Set("main_timeout", s.mainTimeout)
 	}
 	return path, params, nil
 }

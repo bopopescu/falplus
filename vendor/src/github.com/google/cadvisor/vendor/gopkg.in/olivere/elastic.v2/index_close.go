@@ -22,7 +22,7 @@ type CloseIndexService struct {
 	allowNoIndices    *bool
 	expandWildcards   string
 	timeout           string
-	masterTimeout     string
+	mainTimeout     string
 }
 
 // NewCloseIndexService creates a new CloseIndexService.
@@ -42,9 +42,9 @@ func (s *CloseIndexService) Timeout(timeout string) *CloseIndexService {
 	return s
 }
 
-// MasterTimeout specifies the timeout for connection to master.
-func (s *CloseIndexService) MasterTimeout(masterTimeout string) *CloseIndexService {
-	s.masterTimeout = masterTimeout
+// MainTimeout specifies the timeout for connection to main.
+func (s *CloseIndexService) MainTimeout(mainTimeout string) *CloseIndexService {
+	s.mainTimeout = mainTimeout
 	return s
 }
 
@@ -90,8 +90,8 @@ func (s *CloseIndexService) buildURL() (string, url.Values, error) {
 	if s.timeout != "" {
 		params.Set("timeout", s.timeout)
 	}
-	if s.masterTimeout != "" {
-		params.Set("master_timeout", s.masterTimeout)
+	if s.mainTimeout != "" {
+		params.Set("main_timeout", s.mainTimeout)
 	}
 	if s.ignoreUnavailable != nil {
 		params.Set("ignore_unavailable", fmt.Sprintf("%v", *s.ignoreUnavailable))

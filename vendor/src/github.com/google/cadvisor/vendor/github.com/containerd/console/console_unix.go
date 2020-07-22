@@ -9,49 +9,49 @@ import (
 )
 
 // NewPty creates a new pty pair
-// The master is returned as the first console and a string
-// with the path to the pty slave is returned as the second
+// The main is returned as the first console and a string
+// with the path to the pty subordinate is returned as the second
 func NewPty() (Console, string, error) {
 	f, err := os.OpenFile("/dev/ptmx", unix.O_RDWR|unix.O_NOCTTY|unix.O_CLOEXEC, 0)
 	if err != nil {
 		return nil, "", err
 	}
-	slave, err := ptsname(f)
+	subordinate, err := ptsname(f)
 	if err != nil {
 		return nil, "", err
 	}
 	if err := unlockpt(f); err != nil {
 		return nil, "", err
 	}
-	m, err := newMaster(f)
+	m, err := newMain(f)
 	if err != nil {
 		return nil, "", err
 	}
-	return m, slave, nil
+	return m, subordinate, nil
 }
 
-type master struct {
+type main struct {
 	f        *os.File
 	original *unix.Termios
 }
 
-func (m *master) Read(b []byte) (int, error) {
+func (m *main) Read(b []byte) (int, error) {
 	return m.f.Read(b)
 }
 
-func (m *master) Write(b []byte) (int, error) {
+func (m *main) Write(b []byte) (int, error) {
 	return m.f.Write(b)
 }
 
-func (m *master) Close() error {
+func (m *main) Close() error {
 	return m.f.Close()
 }
 
-func (m *master) Resize(ws WinSize) error {
+func (m *main) Resize(ws WinSize) error {
 	return tcswinsz(m.f.Fd(), ws)
 }
 
-func (m *master) ResizeFrom(c Console) error {
+func (m *main) ResizeFrom(c Console) error {
 	ws, err := c.Size()
 	if err != nil {
 		return err
@@ -59,14 +59,14 @@ func (m *master) ResizeFrom(c Console) error {
 	return m.Resize(ws)
 }
 
-func (m *master) Reset() error {
+func (m *main) Reset() error {
 	if m.original == nil {
 		return nil
 	}
 	return tcset(m.f.Fd(), m.original)
 }
 
-func (m *master) getCurrent() (unix.Termios, error) {
+func (m *main) getCurrent() (unix.Termios, error) {
 	var termios unix.Termios
 	if err := tcget(m.f.Fd(), &termios); err != nil {
 		return unix.Termios{}, err
@@ -74,7 +74,7 @@ func (m *master) getCurrent() (unix.Termios, error) {
 	return termios, nil
 }
 
-func (m *master) SetRaw() error {
+func (m *main) SetRaw() error {
 	rawState, err := m.getCurrent()
 	if err != nil {
 		return err
@@ -84,7 +84,7 @@ func (m *master) SetRaw() error {
 	return tcset(m.f.Fd(), &rawState)
 }
 
-func (m *master) DisableEcho() error {
+func (m *main) DisableEcho() error {
 	rawState, err := m.getCurrent()
 	if err != nil {
 		return err
@@ -93,15 +93,15 @@ func (m *master) DisableEcho() error {
 	return tcset(m.f.Fd(), &rawState)
 }
 
-func (m *master) Size() (WinSize, error) {
+func (m *main) Size() (WinSize, error) {
 	return tcgwinsz(m.f.Fd())
 }
 
-func (m *master) Fd() uintptr {
+func (m *main) Fd() uintptr {
 	return m.f.Fd()
 }
 
-func (m *master) Name() string {
+func (m *main) Name() string {
 	return m.f.Name()
 }
 
@@ -114,8 +114,8 @@ func checkConsole(f *os.File) error {
 	return nil
 }
 
-func newMaster(f *os.File) (Console, error) {
-	m := &master{
+func newMain(f *os.File) (Console, error) {
+	m := &main{
 		f: f,
 	}
 	t, err := m.getCurrent()

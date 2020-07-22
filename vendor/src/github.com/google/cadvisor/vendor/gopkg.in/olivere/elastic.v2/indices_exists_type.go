@@ -69,7 +69,7 @@ func (s *IndicesExistsTypeService) ExpandWildcards(expandWildcards string) *Indi
 }
 
 // Local specifies whether to return local information, i.e. do not retrieve
-// the state from master node (default: false).
+// the state from main node (default: false).
 func (s *IndicesExistsTypeService) Local(local bool) *IndicesExistsTypeService {
 	s.local = &local
 	return s

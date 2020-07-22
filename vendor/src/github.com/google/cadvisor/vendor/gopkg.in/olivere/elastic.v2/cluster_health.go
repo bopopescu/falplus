@@ -22,7 +22,7 @@ type ClusterHealthService struct {
 	waitForStatus           string
 	level                   string
 	local                   *bool
-	masterTimeout           string
+	mainTimeout           string
 	timeout                 string
 	waitForActiveShards     *int
 	waitForNodes            string
@@ -48,9 +48,9 @@ func (s *ClusterHealthService) Indices(indices ...string) *ClusterHealthService 
 	return s
 }
 
-// MasterTimeout specifies an explicit operation timeout for connection to master node.
-func (s *ClusterHealthService) MasterTimeout(masterTimeout string) *ClusterHealthService {
-	s.masterTimeout = masterTimeout
+// MainTimeout specifies an explicit operation timeout for connection to main node.
+func (s *ClusterHealthService) MainTimeout(mainTimeout string) *ClusterHealthService {
+	s.mainTimeout = mainTimeout
 	return s
 }
 
@@ -92,7 +92,7 @@ func (s *ClusterHealthService) Level(level string) *ClusterHealthService {
 }
 
 // Local indicates whether to return local information. If it is true,
-// we do not retrieve the state from master node (default: false).
+// we do not retrieve the state from main node (default: false).
 func (s *ClusterHealthService) Local(local bool) *ClusterHealthService {
 	s.local = &local
 	return s
@@ -122,8 +122,8 @@ func (s *ClusterHealthService) buildURL() (string, url.Values, error) {
 	if s.local != nil {
 		params.Set("local", fmt.Sprintf("%v", *s.local))
 	}
-	if s.masterTimeout != "" {
-		params.Set("master_timeout", s.masterTimeout)
+	if s.mainTimeout != "" {
+		params.Set("main_timeout", s.mainTimeout)
 	}
 	if s.timeout != "" {
 		params.Set("timeout", s.timeout)

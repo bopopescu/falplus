@@ -69,7 +69,7 @@ type Process struct {
 	// If Rlimits are not set, the container will inherit rlimits from the parent process
 	Rlimits []configs.Rlimit
 
-	// ConsoleSocket provides the masterfd console.
+	// ConsoleSocket provides the mainfd console.
 	ConsoleSocket *os.File
 
 	ops processOperations

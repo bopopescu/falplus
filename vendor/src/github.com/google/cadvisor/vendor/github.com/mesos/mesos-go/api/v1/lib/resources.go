@@ -796,7 +796,7 @@ func (left *Resource) Addable(right Resource) bool {
 	// TODO(jieyu): Even if two Resource objects with DiskInfo have the
 	// same persistence ID, they cannot be added together. In fact, this
 	// shouldn't happen if we do not add resources from different
-	// namespaces (e.g., across slave). Consider adding a warning.
+	// namespaces (e.g., across subordinate). Consider adding a warning.
 	if left.GetDisk().GetPersistence() != nil {
 		return false
 	}

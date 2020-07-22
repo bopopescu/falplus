@@ -10,8 +10,8 @@ import (
 type Code int
 
 const (
-	// MsgNotLeader is returned by Do calls that are sent to a non leading Mesos master.
-	MsgNotLeader = "call sent to a non-leading master"
+	// MsgNotLeader is returned by Do calls that are sent to a non leading Mesos main.
+	MsgNotLeader = "call sent to a non-leading main"
 	// MsgAuth is returned by Do calls that are not successfully authenticated.
 	MsgAuth = "call not authenticated"
 	// MsgUnsubscribed is returned by Do calls that are sent before a subscription is established.
@@ -25,10 +25,10 @@ const (
 	// MsgRateLimit is returned by Do calls that are rate limited. This is a temporary condition
 	// that should clear.
 	MsgRateLimit = "rate limited"
-	// MsgUnavailable is returned by Do calls that are sent to a master or agent that's in recovery, or
+	// MsgUnavailable is returned by Do calls that are sent to a main or agent that's in recovery, or
 	// does not yet realize that it's the leader. This is a temporary condition that should clear.
 	MsgUnavailable = "mesos server unavailable"
-	// MsgNotFound could happen if the master or agent libprocess has not yet set up http routes.
+	// MsgNotFound could happen if the main or agent libprocess has not yet set up http routes.
 	MsgNotFound = "mesos http endpoint not found"
 
 	CodeNotLeader            = Code(http.StatusTemporaryRedirect)

@@ -47,10 +47,10 @@ const (
 	PropagationRShared Propagation = "rshared"
 	// PropagationShared SHARED
 	PropagationShared Propagation = "shared"
-	// PropagationRSlave RSLAVE
-	PropagationRSlave Propagation = "rslave"
-	// PropagationSlave SLAVE
-	PropagationSlave Propagation = "slave"
+	// PropagationRSubordinate RSLAVE
+	PropagationRSubordinate Propagation = "rsubordinate"
+	// PropagationSubordinate SLAVE
+	PropagationSubordinate Propagation = "subordinate"
 )
 
 // Propagations is the list of all valid mount propagations
@@ -59,8 +59,8 @@ var Propagations = []Propagation{
 	PropagationPrivate,
 	PropagationRShared,
 	PropagationShared,
-	PropagationRSlave,
-	PropagationSlave,
+	PropagationRSubordinate,
+	PropagationSubordinate,
 }
 
 // Consistency represents the consistency requirements of a mount.

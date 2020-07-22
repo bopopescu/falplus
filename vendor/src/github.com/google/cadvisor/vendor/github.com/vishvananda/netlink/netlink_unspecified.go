@@ -22,7 +22,7 @@ func LinkSetMTU(link *Link, mtu int) error {
 	return ErrNotImplemented
 }
 
-func LinkSetMaster(link *Link, master *Link) error {
+func LinkSetMain(link *Link, main *Link) error {
 	return ErrNotImplemented
 }
 

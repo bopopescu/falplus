@@ -35,7 +35,7 @@ func (s *IndicesExistsTemplateService) Name(name string) *IndicesExistsTemplateS
 }
 
 // Local indicates whether to return local information, i.e. do not retrieve
-// the state from master node (default: false).
+// the state from main node (default: false).
 func (s *IndicesExistsTemplateService) Local(local bool) *IndicesExistsTemplateService {
 	s.local = &local
 	return s

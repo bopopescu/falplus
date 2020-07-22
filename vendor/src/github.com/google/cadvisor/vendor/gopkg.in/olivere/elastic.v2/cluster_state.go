@@ -21,7 +21,7 @@ type ClusterStateService struct {
 	indices       []string
 	metrics       []string
 	local         *bool
-	masterTimeout string
+	mainTimeout string
 	flatSettings  *bool
 }
 
@@ -51,7 +51,7 @@ func (s *ClusterStateService) Indices(indices ...string) *ClusterStateService {
 }
 
 // Metric limits the information returned to the specified metric.
-// It can be one of: version, master_node, nodes, routing_table, metadata,
+// It can be one of: version, main_node, nodes, routing_table, metadata,
 // blocks, or customs.
 func (s *ClusterStateService) Metric(metric string) *ClusterStateService {
 	s.metrics = make([]string, 0)
@@ -60,7 +60,7 @@ func (s *ClusterStateService) Metric(metric string) *ClusterStateService {
 }
 
 // Metrics limits the information returned to the specified metrics.
-// It can be any of: version, master_node, nodes, routing_table, metadata,
+// It can be any of: version, main_node, nodes, routing_table, metadata,
 // blocks, or customs.
 func (s *ClusterStateService) Metrics(metrics ...string) *ClusterStateService {
 	s.metrics = make([]string, 0)
@@ -69,15 +69,15 @@ func (s *ClusterStateService) Metrics(metrics ...string) *ClusterStateService {
 }
 
 // Local indicates whether to return local information. If it is true,
-// we do not retrieve the state from master node (default: false).
+// we do not retrieve the state from main node (default: false).
 func (s *ClusterStateService) Local(local bool) *ClusterStateService {
 	s.local = &local
 	return s
 }
 
-// MasterTimeout specifies the timeout for connection to master.
-func (s *ClusterStateService) MasterTimeout(masterTimeout string) *ClusterStateService {
-	s.masterTimeout = masterTimeout
+// MainTimeout specifies the timeout for connection to main.
+func (s *ClusterStateService) MainTimeout(mainTimeout string) *ClusterStateService {
+	s.mainTimeout = mainTimeout
 	return s
 }
 
@@ -108,8 +108,8 @@ func (s *ClusterStateService) buildURL() (string, url.Values, error) {
 
 	// Add query string parameters
 	params := url.Values{}
-	if s.masterTimeout != "" {
-		params.Set("master_timeout", s.masterTimeout)
+	if s.mainTimeout != "" {
+		params.Set("main_timeout", s.mainTimeout)
 	}
 	if s.flatSettings != nil {
 		params.Set("flat_settings", fmt.Sprintf("%v", *s.flatSettings))
@@ -157,7 +157,7 @@ func (s *ClusterStateService) Do() (*ClusterStateResponse, error) {
 type ClusterStateResponse struct {
 	ClusterName  string                               `json:"cluster_name"`
 	Version      int                                  `json:"version"`
-	MasterNode   string                               `json:"master_node"`
+	MainNode   string                               `json:"main_node"`
 	Blocks       map[string]interface{}               `json:"blocks"`
 	Nodes        map[string]*ClusterStateNode         `json:"nodes"`
 	Metadata     *ClusterStateMetadata                `json:"metadata"`

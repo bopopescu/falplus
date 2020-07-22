@@ -18,7 +18,7 @@ type CreateIndexService struct {
 	pretty        bool
 	index         string
 	timeout       string
-	masterTimeout string
+	mainTimeout string
 	bodyJson      interface{}
 	bodyString    string
 }
@@ -40,9 +40,9 @@ func (s *CreateIndexService) Timeout(timeout string) *CreateIndexService {
 	return s
 }
 
-// MasterTimeout specifies the timeout for connection to master.
-func (s *CreateIndexService) MasterTimeout(masterTimeout string) *CreateIndexService {
-	s.masterTimeout = masterTimeout
+// MainTimeout specifies the timeout for connection to main.
+func (s *CreateIndexService) MainTimeout(mainTimeout string) *CreateIndexService {
+	s.mainTimeout = mainTimeout
 	return s
 }
 
@@ -90,8 +90,8 @@ func (b *CreateIndexService) Do() (*CreateIndexResult, error) {
 	if b.pretty {
 		params.Set("pretty", "1")
 	}
-	if b.masterTimeout != "" {
-		params.Set("master_timeout", b.masterTimeout)
+	if b.mainTimeout != "" {
+		params.Set("main_timeout", b.mainTimeout)
 	}
 	if b.timeout != "" {
 		params.Set("timeout", b.timeout)
